@@ -64,6 +64,7 @@ declare module 'vue' {
     NodeWidgetsTerminal: typeof import('./components/v2/nodes/terminal/NodeWidgetsTerminal.vue')['default']
     PackagesTab: typeof import('./components/v2/workspace/PackagesTab.vue')['default']
     PillNode: typeof import('./components/experimental/nodes/PillNode.vue')['default']
+    Popover: typeof import('primevue/popover')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SidebarGridCard: typeof import('./components/common/sidebar/SidebarGridCard.vue')['default']
