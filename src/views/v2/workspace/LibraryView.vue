@@ -12,26 +12,19 @@ import {
 const route = useRoute()
 const workspaceId = computed(() => route.params.workspaceId as string)
 
-// Category tabs
+// Category filter
 type CategoryId = 'all' | 'workflows' | 'models' | 'nodepacks' | 'assets' | 'brand-kit'
 
-interface Category {
-  id: CategoryId
-  label: string
-  icon: string
-  count: number
-}
-
-const categories = ref<Category[]>([
-  { id: 'all', label: 'All', icon: 'pi pi-th-large', count: 248 },
-  { id: 'workflows', label: 'Workflows', icon: 'pi pi-sitemap', count: 64 },
-  { id: 'models', label: 'Models', icon: 'pi pi-box', count: 38 },
-  { id: 'nodepacks', label: 'Nodepacks', icon: 'pi pi-th-large', count: 24 },
-  { id: 'assets', label: 'Assets', icon: 'pi pi-images', count: 89 },
-  { id: 'brand-kit', label: 'Brand Kit', icon: 'pi pi-palette', count: 33 },
-])
-
 const activeCategory = ref<CategoryId>('all')
+
+const categoryOptions = [
+  { value: 'all', label: 'All Categories' },
+  { value: 'workflows', label: 'Workflows' },
+  { value: 'models', label: 'Models' },
+  { value: 'nodepacks', label: 'Nodepacks' },
+  { value: 'assets', label: 'Assets' },
+  { value: 'brand-kit', label: 'Brand Kit' },
+]
 
 // View mode & filters
 type ViewMode = 'grid' | 'list'
@@ -196,40 +189,13 @@ function formatUses(uses: number): string {
       </div>
     </div>
 
-    <!-- Category Tabs -->
-    <div class="mb-6 flex items-center gap-1 rounded-lg border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-700 dark:bg-zinc-800/50">
-      <button
-        v-for="cat in categories"
-        :key="cat.id"
-        :class="[
-          'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors',
-          activeCategory === cat.id
-            ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100'
-            : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
-        ]"
-        @click="activeCategory = cat.id"
-      >
-        <i :class="[cat.icon, 'text-sm']" />
-        {{ cat.label }}
-        <span
-          :class="[
-            'rounded-full px-1.5 py-0.5 text-xs',
-            activeCategory === cat.id
-              ? 'bg-zinc-100 text-zinc-600 dark:bg-zinc-600 dark:text-zinc-200'
-              : 'bg-zinc-200/50 text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400'
-          ]"
-        >
-          {{ cat.count }}
-        </span>
-      </button>
-    </div>
-
     <!-- Search & Filters -->
     <div class="mb-4 flex items-center gap-3">
       <WorkspaceSearchInput
         v-model="searchQuery"
         placeholder="Search library..."
       />
+      <WorkspaceFilterSelect v-model="activeCategory" :options="categoryOptions" />
       <WorkspaceViewToggle v-model="viewMode" />
       <WorkspaceSortSelect v-model="sortBy" :options="sortOptions" />
       <WorkspaceFilterSelect v-model="filterBy" :options="filterOptions" />
