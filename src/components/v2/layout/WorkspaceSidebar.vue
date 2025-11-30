@@ -44,35 +44,18 @@ const userMenuGroups = computed<MenuGroup[]>(() => [
   {
     label: 'Overview',
     items: [
-      { label: 'Dashboard', icon: 'pi pi-home', route: `/${props.workspaceId}` },
-      { label: 'Recents', icon: 'pi pi-clock', route: `/${props.workspaceId}/recents` },
-      { label: 'Library Hub', icon: 'pi pi-database', route: `/${props.workspaceId}/library` }
+      { label: 'Home', icon: 'pi pi-home', route: `/${props.workspaceId}` },
+      { label: 'Recents', icon: 'pi pi-clock', route: `/${props.workspaceId}/recents` }
     ]
   },
   {
-    label: 'My Library',
+    label: 'Private',
     items: [
       { label: 'Projects', icon: 'pi pi-folder', route: `/${props.workspaceId}/projects` },
-      { label: 'Canvases', icon: 'pi pi-objects-column', route: `/${props.workspaceId}/canvases` },
-      { label: 'Templates', icon: 'pi pi-th-large', route: `/${props.workspaceId}/templates` },
       { label: 'Workflows', icon: 'pi pi-sitemap', route: `/${props.workspaceId}/workflows` },
+      { label: 'Templates', icon: 'pi pi-th-large', route: `/${props.workspaceId}/templates` },
       { label: 'Assets', icon: 'pi pi-images', route: `/${props.workspaceId}/assets` },
       { label: 'Models', icon: 'pi pi-box', route: `/${props.workspaceId}/models` }
-    ]
-  },
-  {
-    label: 'Shared Projects',
-    items: [
-      { label: 'Image Generation', icon: 'pi pi-folder', route: `/${props.workspaceId}/img-gen` },
-      { label: 'Video Processing', icon: 'pi pi-folder', route: `/${props.workspaceId}/video-proc` },
-      { label: 'Audio Enhancement', icon: 'pi pi-folder', route: `/${props.workspaceId}/audio-enh` }
-    ]
-  },
-  {
-    label: 'Starred',
-    items: [
-      { label: 'Main Workflow', icon: 'pi pi-star-fill', route: `/${props.workspaceId}/img-gen/main-workflow` },
-      { label: 'Upscale 4x', icon: 'pi pi-star-fill', route: `/${props.workspaceId}/upscale/upscale-4x` }
     ]
   }
 ])
@@ -81,7 +64,7 @@ const teamMenuGroups = computed<MenuGroup[]>(() => [
   {
     label: 'Overview',
     items: [
-      { label: 'Dashboard', icon: 'pi pi-home', route: `/${props.workspaceId}` },
+      { label: 'Home', icon: 'pi pi-home', route: `/${props.workspaceId}` },
       { label: 'Recents', icon: 'pi pi-clock', route: `/${props.workspaceId}/recents` },
       { label: 'Library Hub', icon: 'pi pi-database', route: `/${props.workspaceId}/library` }
     ]
@@ -90,9 +73,7 @@ const teamMenuGroups = computed<MenuGroup[]>(() => [
     label: 'My Library',
     items: [
       { label: 'Projects', icon: 'pi pi-folder', route: `/${props.workspaceId}/projects` },
-      { label: 'Canvases', icon: 'pi pi-objects-column', route: `/${props.workspaceId}/canvases` },
       { label: 'Templates', icon: 'pi pi-th-large', route: `/${props.workspaceId}/templates` },
-      { label: 'Workflows', icon: 'pi pi-sitemap', route: `/${props.workspaceId}/workflows` },
       { label: 'Assets', icon: 'pi pi-images', route: `/${props.workspaceId}/assets` },
       { label: 'Models', icon: 'pi pi-box', route: `/${props.workspaceId}/models` }
     ]
@@ -202,7 +183,7 @@ function signOut(): void {
             @click="logoMenu?.hide()"
           >
             <i class="pi pi-home w-4 text-sm text-zinc-400" />
-            <span>Dashboard</span>
+            <span>Home</span>
           </RouterLink>
           <RouterLink
             :to="`/${workspaceId}/projects`"
@@ -388,7 +369,7 @@ function signOut(): void {
             </div>
             <div class="flex-1">
               <p class="font-medium">Visual Artist</p>
-              <p class="text-xs text-zinc-500 dark:text-zinc-400">Edit assets & canvases</p>
+              <p class="text-xs text-zinc-500 dark:text-zinc-400">Edit assets & workflows</p>
             </div>
           </RouterLink>
           <RouterLink
