@@ -15,6 +15,8 @@ import { FlowNode } from '@/components/v2/nodes'
 import { useWorkspaceStore } from '@/stores/workspaceStore'
 import { useUiStore } from '@/stores/uiStore'
 import { DEMO_WORKFLOW_NODES, DEMO_WORKFLOW_EDGES } from '@/data/workflowMockData'
+import { WORKFLOWS_DATA } from '@/data/sidebarMockData'
+import Menu from 'primevue/menu'
 
 import type { CanvasRouteParams } from '@/types/canvas'
 import type { FlowNodeData, NodeState } from '@/types/node'
@@ -52,6 +54,27 @@ const nodes = ref([...DEMO_WORKFLOW_NODES])
 const edges = ref([...DEMO_WORKFLOW_EDGES])
 
 const selectedNode = ref<Node<FlowNodeData> | null>(null)
+
+// Workflow dropdown
+const workflowMenu = ref<InstanceType<typeof Menu> | null>(null)
+const currentWorkflowName = ref(props.canvasId || 'Untitled Workflow')
+
+const workflowMenuItems = computed(() =>
+  WORKFLOWS_DATA.map(workflow => ({
+    label: workflow.name,
+    icon: 'pi pi-arrow-right',
+    command: () => selectWorkflow(workflow.name),
+    class: workflow.name === currentWorkflowName.value ? 'workflow-item-active' : ''
+  }))
+)
+
+function toggleWorkflowMenu(event: Event): void {
+  workflowMenu.value?.toggle(event)
+}
+
+function selectWorkflow(name: string): void {
+  currentWorkflowName.value = name
+}
 
 onNodeClick(({ node }) => {
   selectedNode.value = node as Node<FlowNodeData>
@@ -119,13 +142,22 @@ function closePropertiesPanel(): void {
           @zoom-out="zoomOut()"
         />
 
-        <!-- Workflow name -->
+        <!-- Workflow name dropdown -->
         <div class="absolute left-4 top-4 z-10">
-          <span
-            class="rounded bg-white/80 px-2.5 py-1 text-xs font-medium text-zinc-700 shadow-sm backdrop-blur dark:bg-zinc-800/80 dark:text-zinc-300"
+          <button
+            class="flex items-center gap-1.5 rounded bg-white/80 px-2.5 py-1 text-xs font-medium text-zinc-700 shadow-sm backdrop-blur transition-colors hover:bg-white/90 dark:bg-zinc-800/80 dark:text-zinc-300 dark:hover:bg-zinc-800/90"
+            @click="toggleWorkflowMenu"
           >
-            {{ props.canvasId }}
-          </span>
+            <i class="pi pi-sitemap text-[10px] opacity-70" />
+            {{ currentWorkflowName }}
+            <i class="pi pi-chevron-down text-[10px] opacity-70" />
+          </button>
+          <Menu
+            ref="workflowMenu"
+            :model="workflowMenuItems"
+            :popup="true"
+            class="workflow-dropdown-menu"
+          />
         </div>
 
         <!-- Run Controls (top-right) -->
@@ -186,4 +218,5 @@ function closePropertiesPanel(): void {
   stroke: #3b82f6;
   stroke-width: 2;
 }
+
 </style>
