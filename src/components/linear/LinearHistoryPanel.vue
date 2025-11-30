@@ -1,26 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import LinearCanvasView from './canvas/LinearCanvasView.vue'
+import type { HistoryViewMode, GenerationItem } from '@/types/linearCanvas'
 
-interface GenerationItem {
-  id: string
-  prompt: string
-  workflow: string
-  mode: string
-  status: 'completed' | 'generating' | 'queued'
-  progress?: number
-  createdAt: Date
-  images: string[]
-  batchSize: number
-  parameters: {
-    steps: number
-    cfg: number
-    width: number
-    height: number
-    seed: number
-    sampler?: string
-    model?: string
-  }
-}
+// View mode toggle
+const viewMode = ref<HistoryViewMode>('timeline')
+
+// Using GenerationItem from @/types/linearCanvas
 
 // Mock generation data with batch images
 const generations = ref<GenerationItem[]>([
@@ -181,6 +167,17 @@ function handleRerun(gen: GenerationItem): void {
   console.log('Rerun:', gen)
 }
 
+// Canvas event handlers (receive id, find generation)
+function handleCanvasRerun(id: string): void {
+  const gen = generations.value.find(g => g.id === id)
+  if (gen) handleRerun(gen)
+}
+
+function handleCanvasDownload(id: string): void {
+  const gen = generations.value.find(g => g.id === id)
+  if (gen) handleDownload(gen)
+}
+
 function getGridCols(count: number): string {
   if (count === 1) return 'grid-cols-2'
   if (count === 2) return 'grid-cols-4'
@@ -198,7 +195,35 @@ function getGridCols(count: number): string {
           {{ generations.length }}
         </span>
       </div>
+
+      <!-- View Mode Toggle -->
       <div class="flex items-center gap-2">
+        <div class="flex items-center gap-0.5 rounded-lg border border-zinc-800 p-0.5">
+          <button
+            v-tooltip.top="'Timeline view'"
+            :class="[
+              'flex h-6 w-6 items-center justify-center rounded transition-colors',
+              viewMode === 'timeline'
+                ? 'bg-zinc-700 text-zinc-100'
+                : 'text-zinc-500 hover:text-zinc-300'
+            ]"
+            @click="viewMode = 'timeline'"
+          >
+            <i class="pi pi-list text-xs" />
+          </button>
+          <button
+            v-tooltip.top="'Canvas view'"
+            :class="[
+              'flex h-6 w-6 items-center justify-center rounded transition-colors',
+              viewMode === 'canvas'
+                ? 'bg-zinc-700 text-zinc-100'
+                : 'text-zinc-500 hover:text-zinc-300'
+            ]"
+            @click="viewMode = 'canvas'"
+          >
+            <i class="pi pi-th-large text-xs" />
+          </button>
+        </div>
         <button
           v-tooltip.bottom="'Clear all'"
           class="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
@@ -208,8 +233,8 @@ function getGridCols(count: number): string {
       </div>
     </div>
 
-    <!-- Generations List -->
-    <div class="flex-1 overflow-y-auto p-3">
+    <!-- Timeline View -->
+    <div v-if="viewMode === 'timeline'" class="flex-1 overflow-y-auto p-3">
       <div class="flex flex-col gap-3">
         <div
           v-for="gen in generations"
@@ -388,6 +413,16 @@ function getGridCols(count: number): string {
         </p>
       </div>
     </div>
+
+    <!-- Canvas View -->
+    <LinearCanvasView
+      v-else
+      :generations="generations"
+      class="flex-1"
+      @rerun="handleCanvasRerun"
+      @download="handleCanvasDownload"
+      @delete="handleDelete"
+    />
   </main>
 </template>
 
