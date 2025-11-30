@@ -7,6 +7,7 @@ import '@vue-flow/core/dist/theme-default.css'
 
 import GenerationFrameNode from './GenerationFrameNode.vue'
 import AssetNode from './AssetNode.vue'
+import CanvasToolbar from './CanvasToolbar.vue'
 import { calculateGridPosition, CANVAS_LAYOUT } from '@/types/linearCanvas'
 import type { GenerationItem, AssetNodeData } from '@/types/linearCanvas'
 import type { Node } from '@vue-flow/core'
@@ -328,6 +329,9 @@ function handleReorderImages(generationId: string, fromIndex: number, toIndex: n
         />
       </template>
     </VueFlow>
+
+    <!-- Bottom Toolbar -->
+    <CanvasToolbar />
 
     <!-- Zoom Controls -->
     <div class="absolute bottom-4 right-4 z-10 flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/90 p-1 backdrop-blur">

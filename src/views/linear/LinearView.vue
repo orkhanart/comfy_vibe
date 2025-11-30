@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import LinearTopBar from '@/components/linear/LinearTopBar.vue'
+import LinearSidebar, { type SidebarTab } from '@/components/linear/LinearSidebar.vue'
 import LinearWorkflowsPanel from '@/components/linear/LinearWorkflowsPanel.vue'
+import LinearAssetsPanel from '@/components/linear/LinearAssetsPanel.vue'
 import LinearHistoryPanel from '@/components/linear/LinearHistoryPanel.vue'
+
+const activeTab = ref<SidebarTab>('workflows')
 </script>
 
 <template>
@@ -11,10 +16,14 @@ import LinearHistoryPanel from '@/components/linear/LinearHistoryPanel.vue'
 
     <!-- Main Content -->
     <div class="flex flex-1 overflow-hidden">
-      <!-- Left Panel - Run Workflow (always open) -->
-      <LinearWorkflowsPanel />
+      <!-- Left Icon Sidebar -->
+      <LinearSidebar v-model:active-tab="activeTab" />
 
-      <!-- Right Main Area (generations) -->
+      <!-- Left Panel - switches based on active tab -->
+      <LinearAssetsPanel v-if="activeTab === 'assets'" />
+      <LinearWorkflowsPanel v-else-if="activeTab === 'workflows'" />
+
+      <!-- Right Main Area (generations/canvas) -->
       <LinearHistoryPanel />
     </div>
   </div>
