@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, markRaw } from 'vue'
+import { ref, computed, onMounted, markRaw } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import '@vue-flow/core/dist/style.css'
@@ -7,9 +7,15 @@ import '@vue-flow/core/dist/theme-default.css'
 
 import GenerationFrameNode from './GenerationFrameNode.vue'
 import AssetNode from './AssetNode.vue'
+import GroupHeaderNode from './GroupHeaderNode.vue'
 import CanvasToolbar from './CanvasToolbar.vue'
-import { calculateGridPosition, CANVAS_LAYOUT } from '@/types/linearCanvas'
-import type { GenerationItem, AssetNodeData } from '@/types/linearCanvas'
+import {
+  calculateGroupedPosition,
+  calculateGroupStartPositions,
+  CANVAS_LAYOUT,
+  STATUS_GROUPS,
+} from '@/types/linearCanvas'
+import type { GenerationItem, AssetNodeData, StatusGroup } from '@/types/linearCanvas'
 import type { Node } from '@vue-flow/core'
 
 interface Props {
@@ -23,12 +29,15 @@ const emit = defineEmits<{
   download: [id: string]
   delete: [id: string]
   reorderImages: [generationId: string, fromIndex: number, toIndex: number]
+  addImageToGeneration: [generationId: string, imageUrl: string]
+  preview: [imageUrl: string]
 }>()
 
 // Custom node types
 const nodeTypes = {
   generationFrame: markRaw(GenerationFrameNode),
   asset: markRaw(AssetNode),
+  groupHeader: markRaw(GroupHeaderNode),
 }
 
 // VueFlow hooks
@@ -43,18 +52,60 @@ const assetNodes = ref<Node<AssetNodeData>[]>([])
 // Track which images have been extracted (generationId:index)
 const extractedImages = ref<Set<string>>(new Set())
 
+// Calculate group positions
+const groupPositions = computed(() => calculateGroupStartPositions(props.generations))
+
+// Group header nodes
+const groupHeaderNodes = computed<Node[]>(() => {
+  const headers: Node[] = []
+
+  for (const status of STATUS_GROUPS) {
+    const group = groupPositions.value[status]
+    if (group.count > 0) {
+      headers.push({
+        id: `group-header-${status}`,
+        type: 'groupHeader',
+        position: {
+          x: CANVAS_LAYOUT.START_X,
+          y: group.startY,
+        },
+        data: {
+          status,
+          count: group.count,
+        },
+        draggable: false,
+        selectable: false,
+      })
+    }
+  }
+
+  return headers
+})
+
 // Convert generations to VueFlow nodes (filter out extracted images)
-const frameNodes = computed<Node[]>(() =>
-  props.generations.map((gen, index) => {
+const frameNodes = computed<Node[]>(() => {
+  // Track index within each status group
+  const statusIndex: Record<StatusGroup, number> = {
+    generating: 0,
+    queued: 0,
+    completed: 0,
+  }
+
+  return props.generations.map((gen) => {
     // Filter out extracted images from the generation
     const remainingImages = gen.images.filter((_, imgIdx) =>
       !extractedImages.value.has(`${gen.id}:${imgIdx}`)
     )
 
+    const indexInGroup = statusIndex[gen.status]
+    statusIndex[gen.status]++
+
+    const groupStartY = groupPositions.value[gen.status].startY
+
     return {
       id: gen.id,
       type: 'generationFrame',
-      position: calculateGridPosition(index),
+      position: calculateGroupedPosition(gen.status, indexInGroup, groupStartY),
       data: {
         ...gen,
         images: remainingImages,
@@ -64,10 +115,10 @@ const frameNodes = computed<Node[]>(() =>
       selectable: true,
     }
   }).filter(node => node.data.images.length > 0 || node.data.status !== 'completed')
-)
+})
 
-// Combined nodes (frames + assets)
-const nodes = computed(() => [...frameNodes.value, ...assetNodes.value])
+// Combined nodes (headers + frames + assets)
+const nodes = computed(() => [...groupHeaderNodes.value, ...frameNodes.value, ...assetNodes.value])
 
 // No edges for now (MVP)
 const edges = ref([])
@@ -125,14 +176,26 @@ function handleDelete(id: string): void {
   emit('delete', id)
 }
 
+// Helper to find a generation's position in the grouped layout
+function getFramePosition(generationId: string): { x: number; y: number } {
+  const gen = props.generations.find(g => g.id === generationId)
+  if (!gen) return { x: 0, y: 0 }
+
+  // Find the index within its status group
+  const sameStatusGens = props.generations.filter(g => g.status === gen.status)
+  const indexInGroup = sameStatusGens.findIndex(g => g.id === generationId)
+  const groupStartY = groupPositions.value[gen.status].startY
+
+  return calculateGroupedPosition(gen.status, indexInGroup, groupStartY)
+}
+
 // Ungroup handler - extract all images from a frame
 function handleUngroup(generationId: string): void {
   const gen = props.generations.find(g => g.id === generationId)
   if (!gen || gen.images.length === 0) return
 
-  // Find the frame position
-  const frameIndex = props.generations.findIndex(g => g.id === generationId)
-  const framePos = calculateGridPosition(frameIndex)
+  // Find the frame position using grouped layout
+  const framePos = getFramePosition(generationId)
 
   // Create asset nodes for each image
   gen.images.forEach((imageUrl, index) => {
@@ -179,9 +242,8 @@ function handleExtractImage(generationId: string, imageIndex: number, imageUrl: 
 
   extractedImages.value.add(key)
 
-  // Find position near the frame
-  const frameIndex = props.generations.findIndex(g => g.id === generationId)
-  const framePos = calculateGridPosition(frameIndex)
+  // Find position near the frame using grouped layout
+  const framePos = getFramePosition(generationId)
 
   const assetId = `asset-${generationId}-${imageIndex}-${Date.now()}`
 
@@ -280,6 +342,36 @@ function handleAssetDownload(id: string): void {
 function handleReorderImages(generationId: string, fromIndex: number, toIndex: number): void {
   emit('reorderImages', generationId, fromIndex, toIndex)
 }
+
+// Preview image handler
+function handlePreview(imageUrl: string): void {
+  emit('preview', imageUrl)
+}
+
+// Add image to a section (from canvas drop or from another section)
+function handleAddImageToSection(targetGenerationId: string, imageUrl: string): void {
+  // Find the source of the image
+  // Check if it's from an asset node
+  const assetNode = assetNodes.value.find(n => n.data.imageUrl === imageUrl)
+  if (assetNode) {
+    // Remove the asset node
+    const index = assetNodes.value.findIndex(n => n.id === assetNode.id)
+    if (index !== -1) {
+      assetNodes.value.splice(index, 1)
+    }
+
+    // If it was extracted from this generation, restore it
+    if (assetNode.data.sourceGenerationId) {
+      const key = `${assetNode.data.sourceGenerationId}:${assetNode.data.sourceIndex}`
+      extractedImages.value.delete(key)
+    }
+    return
+  }
+
+  // Check if it came from another generation (cross-section move)
+  // For now, we'll emit an event to handle this at the parent level
+  emit('addImageToGeneration', targetGenerationId, imageUrl)
+}
 </script>
 
 <template>
@@ -315,6 +407,8 @@ function handleReorderImages(generationId: string, fromIndex: number, toIndex: n
           @ungroup="handleUngroup"
           @extract-image="handleExtractImage"
           @reorder-images="handleReorderImages"
+          @add-image="handleAddImageToSection"
+          @preview="handlePreview"
         />
       </template>
 
@@ -326,6 +420,15 @@ function handleReorderImages(generationId: string, fromIndex: number, toIndex: n
           :selected="selectedNodeId === nodeProps.id"
           @download="handleAssetDownload"
           @delete="handleDelete"
+          @preview="handlePreview"
+        />
+      </template>
+
+      <!-- Group Header Node -->
+      <template #node-groupHeader="nodeProps">
+        <GroupHeaderNode
+          :id="nodeProps.id"
+          :data="nodeProps.data"
         />
       </template>
     </VueFlow>
@@ -402,6 +505,14 @@ function handleReorderImages(generationId: string, fromIndex: number, toIndex: n
 }
 
 .linear-canvas .vue-flow__node-asset.selected {
+  box-shadow: none;
+}
+
+/* Override default node styles - Group Header */
+.linear-canvas .vue-flow__node-groupHeader {
+  background: transparent;
+  border: none;
+  padding: 0;
   box-shadow: none;
 }
 

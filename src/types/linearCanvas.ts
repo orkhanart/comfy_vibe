@@ -80,6 +80,10 @@ export const CANVAS_LAYOUT = {
   COLUMNS: 3,
   START_X: 50,
   START_Y: 50,
+  // Group section settings
+  GROUP_HEADER_HEIGHT: 40,
+  GROUP_GAP: 60,
+  GROUP_PADDING: 20,
   // Random placement bounds
   RANDOM_AREA_WIDTH: 1200,
   RANDOM_AREA_HEIGHT: 800,
@@ -87,32 +91,87 @@ export const CANVAS_LAYOUT = {
 } as const
 
 /**
- * Seeded random number generator for consistent positions
+ * Status group labels and order
  */
-function seededRandom(seed: number): number {
-  const x = Math.sin(seed * 9999) * 10000
-  return x - Math.floor(x)
+export const STATUS_GROUPS = ['generating', 'queued', 'completed'] as const
+export type StatusGroup = (typeof STATUS_GROUPS)[number]
+
+export const STATUS_GROUP_LABELS: Record<StatusGroup, string> = {
+  generating: 'Generating',
+  queued: 'Queued',
+  completed: 'Completed',
 }
 
 /**
- * Calculate random position for canvas items
+ * Calculate position within a status group
+ */
+export function calculateGroupedPosition(
+  status: StatusGroup,
+  indexInGroup: number,
+  groupStartY: number
+): { x: number; y: number } {
+  const col = indexInGroup % CANVAS_LAYOUT.COLUMNS
+  const row = Math.floor(indexInGroup / CANVAS_LAYOUT.COLUMNS)
+
+  return {
+    x: CANVAS_LAYOUT.START_X + col * (CANVAS_LAYOUT.FRAME_WIDTH + CANVAS_LAYOUT.GAP),
+    y: groupStartY + CANVAS_LAYOUT.GROUP_HEADER_HEIGHT + row * (CANVAS_LAYOUT.FRAME_HEIGHT + CANVAS_LAYOUT.GAP),
+  }
+}
+
+/**
+ * Calculate the Y position where each group starts
+ */
+export function calculateGroupStartPositions(
+  generations: GenerationItem[]
+): Record<StatusGroup, { startY: number; count: number }> {
+  // Count items in each group
+  const counts: Record<StatusGroup, number> = {
+    generating: 0,
+    queued: 0,
+    completed: 0,
+  }
+
+  generations.forEach(gen => {
+    counts[gen.status]++
+  })
+
+  // Calculate start Y for each group
+  let currentY = CANVAS_LAYOUT.START_Y
+  const result: Record<StatusGroup, { startY: number; count: number }> = {
+    generating: { startY: 0, count: 0 },
+    queued: { startY: 0, count: 0 },
+    completed: { startY: 0, count: 0 },
+  }
+
+  for (const status of STATUS_GROUPS) {
+    const count = counts[status]
+    result[status] = { startY: currentY, count }
+
+    if (count > 0) {
+      const rows = Math.ceil(count / CANVAS_LAYOUT.COLUMNS)
+      const groupHeight =
+        CANVAS_LAYOUT.GROUP_HEADER_HEIGHT +
+        rows * CANVAS_LAYOUT.FRAME_HEIGHT +
+        (rows - 1) * CANVAS_LAYOUT.GAP +
+        CANVAS_LAYOUT.GROUP_PADDING
+      currentY += groupHeight + CANVAS_LAYOUT.GROUP_GAP
+    }
+  }
+
+  return result
+}
+
+/**
+ * Legacy: Calculate random position for canvas items (kept for asset nodes)
  * Uses seeded random so positions are consistent across renders
  */
 export function calculateGridPosition(index: number): { x: number; y: number } {
-  // Use index as seed for consistent random positions
-  const seed1 = index * 127 + 1
-  const seed2 = index * 311 + 7
-
-  // Spread items across a wider area with some randomness
-  const baseCol = index % 4
-  const baseRow = Math.floor(index / 4)
-
-  // Add random offset to base grid position
-  const randomOffsetX = (seededRandom(seed1) - 0.5) * 200
-  const randomOffsetY = (seededRandom(seed2) - 0.5) * 150
+  const col = index % CANVAS_LAYOUT.COLUMNS
+  const row = Math.floor(index / CANVAS_LAYOUT.COLUMNS)
 
   return {
-    x: CANVAS_LAYOUT.START_X + baseCol * (CANVAS_LAYOUT.FRAME_WIDTH + 80) + randomOffsetX,
-    y: CANVAS_LAYOUT.START_Y + baseRow * (CANVAS_LAYOUT.FRAME_HEIGHT + 60) + randomOffsetY,
+    x: CANVAS_LAYOUT.START_X + col * (CANVAS_LAYOUT.FRAME_WIDTH + CANVAS_LAYOUT.GAP),
+    y: CANVAS_LAYOUT.START_Y + row * (CANVAS_LAYOUT.FRAME_HEIGHT + CANVAS_LAYOUT.GAP),
   }
 }

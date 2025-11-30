@@ -13,6 +13,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   download: [id: string]
   delete: [id: string]
+  preview: [imageUrl: string]
 }>()
 
 function formatTime(date: Date): string {
@@ -33,39 +34,60 @@ function formatTime(date: Date): string {
 }
 
 const sizeLabel = computed(() => `${props.data.width}x${props.data.height}`)
+
+// Drag handling for moving asset to sections
+function handleDragStart(event: DragEvent): void {
+  if (!event.dataTransfer) return
+  event.dataTransfer.effectAllowed = 'move'
+  event.dataTransfer.setData('application/json', JSON.stringify({
+    type: 'standalone-image',
+    assetId: props.id,
+    imageUrl: props.data.imageUrl,
+    sourceGenerationId: props.data.sourceGenerationId,
+    sourceIndex: props.data.sourceIndex,
+  }))
+}
 </script>
 
 <template>
   <div
     :class="[
-      'asset-node group w-[160px] rounded-lg border bg-zinc-900/95 shadow-lg transition-all',
+      'asset-node group w-[160px] cursor-grab rounded border bg-zinc-900/95 shadow-lg transition-all active:cursor-grabbing',
       selected ? 'border-blue-500 ring-2 ring-blue-500/30' : 'border-zinc-700 hover:border-zinc-600',
     ]"
+    draggable="true"
+    @dragstart="handleDragStart"
   >
     <!-- Image -->
-    <div class="relative aspect-square overflow-hidden rounded-t-lg bg-zinc-800">
+    <div class="relative aspect-square overflow-hidden rounded-t bg-zinc-800">
       <img
         :src="data.imageUrl"
         alt="Asset"
-        class="h-full w-full object-cover"
-        draggable="false"
+        class="pointer-events-none h-full w-full object-cover"
       />
 
       <!-- Hover overlay with actions -->
-      <div class="absolute inset-0 flex items-center justify-center gap-1.5 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+      <div class="absolute inset-0 flex items-center justify-center gap-1 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+        <button
+          v-tooltip.top="'Preview'"
+          class="flex h-6 w-6 items-center justify-center rounded bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
+          @click.stop="emit('preview', data.imageUrl)"
+        >
+          <i class="pi pi-expand text-[10px]" />
+        </button>
         <button
           v-tooltip.top="'Download'"
-          class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
+          class="flex h-6 w-6 items-center justify-center rounded bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
           @click.stop="emit('download', id)"
         >
-          <i class="pi pi-download text-xs" />
+          <i class="pi pi-download text-[10px]" />
         </button>
         <button
           v-tooltip.top="'Delete'"
-          class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-red-500/50"
+          class="flex h-6 w-6 items-center justify-center rounded bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-red-500/50"
           @click.stop="emit('delete', id)"
         >
-          <i class="pi pi-trash text-xs" />
+          <i class="pi pi-trash text-[10px]" />
         </button>
       </div>
     </div>

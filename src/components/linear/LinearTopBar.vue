@@ -82,7 +82,7 @@ function toggleExperimentalUI(): void {
         <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-zinc-500">Workspace</div>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="goToWorkspace">
           <i class="pi pi-home w-4 text-sm text-zinc-500" />
-          <span>Dashboard</span>
+          <span>Home</span>
         </button>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="goToProjects">
           <i class="pi pi-folder w-4 text-sm text-zinc-500" />
