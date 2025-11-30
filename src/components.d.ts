@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppCard: typeof import('./components/linear/apps/AppCard.vue')['default']
     AppForm: typeof import('./components/linear/apps/AppForm.vue')['default']
+    AssetNode: typeof import('./components/linear/canvas/AssetNode.vue')['default']
     AssetsSidebar: typeof import('./components/v2/canvas/AssetsSidebar.vue')['default']
     AssetsTab: typeof import('./components/v2/workspace/AssetsTab.vue')['default']
     CanvasBottomBar: typeof import('./components/v2/canvas/CanvasBottomBar.vue')['default']

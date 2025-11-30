@@ -14,6 +14,8 @@ const emit = defineEmits<{
   rerun: [id: string]
   download: [id: string]
   delete: [id: string]
+  ungroup: [id: string]
+  extractImage: [generationId: string, imageIndex: number, imageUrl: string]
 }>()
 
 function formatTime(date: Date): string {
@@ -67,6 +69,27 @@ const truncatedPrompt = computed(() => {
   if (props.data.prompt.length <= maxLength) return props.data.prompt
   return props.data.prompt.slice(0, maxLength) + '...'
 })
+
+const canUngroup = computed(() => props.data.images.length > 0)
+
+// Drag handling for extracting images
+function handleDragStart(event: DragEvent, imageUrl: string, index: number): void {
+  if (!event.dataTransfer) return
+  event.dataTransfer.effectAllowed = 'move'
+  event.dataTransfer.setData('application/json', JSON.stringify({
+    type: 'extract-image',
+    generationId: props.id,
+    imageIndex: index,
+    imageUrl,
+  }))
+}
+
+function handleImageClick(event: MouseEvent, imageUrl: string, index: number): void {
+  // Emit extract on double-click
+  if (event.detail === 2) {
+    emit('extractImage', props.id, index, imageUrl)
+  }
+}
 </script>
 
 <template>
@@ -91,6 +114,14 @@ const truncatedPrompt = computed(() => {
         <span class="text-[11px] text-zinc-500">{{ formatTime(data.createdAt) }}</span>
       </div>
       <div class="flex items-center gap-0.5">
+        <button
+          v-if="canUngroup"
+          v-tooltip.top="'Ungroup images'"
+          class="flex h-6 w-6 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-amber-400"
+          @click.stop="emit('ungroup', id)"
+        >
+          <i class="pi pi-objects-column text-[10px]" />
+        </button>
         <button
           v-tooltip.top="'Rerun'"
           class="flex h-6 w-6 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
@@ -118,18 +149,28 @@ const truncatedPrompt = computed(() => {
 
     <!-- Images Grid -->
     <div class="p-2">
-      <!-- Completed: show images -->
+      <!-- Completed: show images (draggable) -->
       <div v-if="data.images.length > 0" :class="['grid gap-1.5', gridCols]">
         <div
           v-for="(img, idx) in data.images"
           :key="idx"
-          class="group relative aspect-square overflow-hidden rounded bg-zinc-800"
+          class="group/img relative aspect-square cursor-grab overflow-hidden rounded bg-zinc-800 transition-transform active:cursor-grabbing active:scale-95"
+          draggable="true"
+          @dragstart="handleDragStart($event, img, idx)"
+          @click="handleImageClick($event, img, idx)"
         >
           <img
             :src="img"
             alt="Generated image"
-            class="h-full w-full object-cover"
+            class="pointer-events-none h-full w-full object-cover"
           />
+          <!-- Drag hint overlay -->
+          <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover/img:opacity-100">
+            <div class="flex flex-col items-center text-white">
+              <i class="pi pi-arrows-alt text-sm" />
+              <span class="mt-0.5 text-[9px]">Drag to extract</span>
+            </div>
+          </div>
         </div>
       </div>
 

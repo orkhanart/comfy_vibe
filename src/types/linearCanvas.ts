@@ -42,6 +42,21 @@ export interface GenerationFrameData extends GenerationItem {
 }
 
 /**
+ * Data structure for standalone asset node
+ */
+export interface AssetNodeData {
+  id: string
+  imageUrl: string
+  sourceGenerationId: string
+  sourceIndex: number
+  prompt?: string
+  seed?: number
+  width: number
+  height: number
+  createdAt: Date
+}
+
+/**
  * Canvas viewport state
  */
 export interface CanvasViewport {
