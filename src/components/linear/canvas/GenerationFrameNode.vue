@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { GenerationFrameData } from '@/types/linearCanvas'
 
 interface Props {
@@ -16,7 +16,12 @@ const emit = defineEmits<{
   delete: [id: string]
   ungroup: [id: string]
   extractImage: [generationId: string, imageIndex: number, imageUrl: string]
+  reorderImages: [generationId: string, fromIndex: number, toIndex: number]
 }>()
+
+// Internal drag state for reordering
+const dragFromIndex = ref<number | null>(null)
+const dragOverIndex = ref<number | null>(null)
 
 function formatTime(date: Date): string {
   const now = new Date()
@@ -72,8 +77,13 @@ const truncatedPrompt = computed(() => {
 
 const canUngroup = computed(() => props.data.images.length > 0)
 
-// Drag handling for extracting images
+// Drag handling for extracting images or reordering
 function handleDragStart(event: DragEvent, imageUrl: string, index: number): void {
+  // Stop propagation to prevent parent node from dragging
+  event.stopPropagation()
+
+  dragFromIndex.value = index
+
   if (!event.dataTransfer) return
   event.dataTransfer.effectAllowed = 'move'
   event.dataTransfer.setData('application/json', JSON.stringify({
@@ -82,6 +92,35 @@ function handleDragStart(event: DragEvent, imageUrl: string, index: number): voi
     imageIndex: index,
     imageUrl,
   }))
+}
+
+function handleDragOver(event: DragEvent, index: number): void {
+  event.preventDefault()
+  event.stopPropagation()
+  if (dragFromIndex.value !== null && dragFromIndex.value !== index) {
+    dragOverIndex.value = index
+  }
+}
+
+function handleDragLeave(): void {
+  dragOverIndex.value = null
+}
+
+function handleDrop(event: DragEvent, toIndex: number): void {
+  event.preventDefault()
+  event.stopPropagation()
+
+  if (dragFromIndex.value !== null && dragFromIndex.value !== toIndex) {
+    emit('reorderImages', props.id, dragFromIndex.value, toIndex)
+  }
+
+  dragFromIndex.value = null
+  dragOverIndex.value = null
+}
+
+function handleDragEnd(): void {
+  dragFromIndex.value = null
+  dragOverIndex.value = null
 }
 
 function handleImageClick(event: MouseEvent, imageUrl: string, index: number): void {
@@ -150,13 +189,21 @@ function handleImageClick(event: MouseEvent, imageUrl: string, index: number): v
     <!-- Images Grid -->
     <div class="p-2">
       <!-- Completed: show images (draggable) -->
-      <div v-if="data.images.length > 0" :class="['grid gap-1.5', gridCols]">
+      <div v-if="data.images.length > 0" :class="['grid gap-1.5 nodrag', gridCols]">
         <div
           v-for="(img, idx) in data.images"
           :key="idx"
-          class="group/img relative aspect-square cursor-grab overflow-hidden rounded bg-zinc-800 transition-transform active:cursor-grabbing active:scale-95"
+          :class="[
+            'nodrag group/img relative aspect-square cursor-grab overflow-hidden rounded bg-zinc-800 transition-all active:cursor-grabbing',
+            dragFromIndex === idx && 'opacity-50 scale-95',
+            dragOverIndex === idx && 'ring-2 ring-blue-500 ring-offset-2 ring-offset-zinc-900',
+          ]"
           draggable="true"
           @dragstart="handleDragStart($event, img, idx)"
+          @dragover="handleDragOver($event, idx)"
+          @dragleave="handleDragLeave"
+          @drop="handleDrop($event, idx)"
+          @dragend="handleDragEnd"
           @click="handleImageClick($event, img, idx)"
         >
           <img
@@ -168,7 +215,7 @@ function handleImageClick(event: MouseEvent, imageUrl: string, index: number): v
           <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover/img:opacity-100">
             <div class="flex flex-col items-center text-white">
               <i class="pi pi-arrows-alt text-sm" />
-              <span class="mt-0.5 text-[9px]">Drag to extract</span>
+              <span class="mt-0.5 text-[9px]">Drag to reorder</span>
             </div>
           </div>
         </div>

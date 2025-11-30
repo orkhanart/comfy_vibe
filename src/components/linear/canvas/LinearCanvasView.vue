@@ -21,6 +21,7 @@ const emit = defineEmits<{
   rerun: [id: string]
   download: [id: string]
   delete: [id: string]
+  reorderImages: [generationId: string, fromIndex: number, toIndex: number]
 }>()
 
 // Custom node types
@@ -273,6 +274,11 @@ function handleAssetDownload(id: string): void {
   link.click()
   document.body.removeChild(link)
 }
+
+// Reorder images within a generation
+function handleReorderImages(generationId: string, fromIndex: number, toIndex: number): void {
+  emit('reorderImages', generationId, fromIndex, toIndex)
+}
 </script>
 
 <template>
@@ -307,6 +313,7 @@ function handleAssetDownload(id: string): void {
           @delete="handleDelete"
           @ungroup="handleUngroup"
           @extract-image="handleExtractImage"
+          @reorder-images="handleReorderImages"
         />
       </template>
 

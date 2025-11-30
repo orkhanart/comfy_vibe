@@ -71,7 +71,7 @@ export interface CanvasViewport {
 export type HistoryViewMode = 'timeline' | 'canvas'
 
 /**
- * Layout constants for auto-stacking
+ * Layout constants for canvas
  */
 export const CANVAS_LAYOUT = {
   FRAME_WIDTH: 320,
@@ -80,16 +80,39 @@ export const CANVAS_LAYOUT = {
   COLUMNS: 3,
   START_X: 50,
   START_Y: 50,
+  // Random placement bounds
+  RANDOM_AREA_WIDTH: 1200,
+  RANDOM_AREA_HEIGHT: 800,
+  MIN_SPACING: 100,
 } as const
 
 /**
- * Calculate grid position for auto-stacking
+ * Seeded random number generator for consistent positions
+ */
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed * 9999) * 10000
+  return x - Math.floor(x)
+}
+
+/**
+ * Calculate random position for canvas items
+ * Uses seeded random so positions are consistent across renders
  */
 export function calculateGridPosition(index: number): { x: number; y: number } {
-  const col = index % CANVAS_LAYOUT.COLUMNS
-  const row = Math.floor(index / CANVAS_LAYOUT.COLUMNS)
+  // Use index as seed for consistent random positions
+  const seed1 = index * 127 + 1
+  const seed2 = index * 311 + 7
+
+  // Spread items across a wider area with some randomness
+  const baseCol = index % 4
+  const baseRow = Math.floor(index / 4)
+
+  // Add random offset to base grid position
+  const randomOffsetX = (seededRandom(seed1) - 0.5) * 200
+  const randomOffsetY = (seededRandom(seed2) - 0.5) * 150
+
   return {
-    x: CANVAS_LAYOUT.START_X + col * (CANVAS_LAYOUT.FRAME_WIDTH + CANVAS_LAYOUT.GAP),
-    y: CANVAS_LAYOUT.START_Y + row * (CANVAS_LAYOUT.FRAME_HEIGHT + CANVAS_LAYOUT.GAP),
+    x: CANVAS_LAYOUT.START_X + baseCol * (CANVAS_LAYOUT.FRAME_WIDTH + 80) + randomOffsetX,
+    y: CANVAS_LAYOUT.START_Y + baseRow * (CANVAS_LAYOUT.FRAME_HEIGHT + 60) + randomOffsetY,
   }
 }

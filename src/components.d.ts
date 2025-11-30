@@ -47,6 +47,7 @@ declare module 'vue' {
     LinearModelsPanel: typeof import('./components/linear/LinearModelsPanel.vue')['default']
     LinearOutputGallery: typeof import('./components/linear/LinearOutputGallery.vue')['default']
     LinearParameterPanel: typeof import('./components/linear/LinearParameterPanel.vue')['default']
+    LinearRunningWorkflowPanel: typeof import('./components/linear/LinearRunningWorkflowPanel.vue')['default']
     LinearSandboxPanel: typeof import('./components/linear/LinearSandboxPanel.vue')['default']
     LinearStepCard: typeof import('./components/linear/LinearStepCard.vue')['default']
     LinearTemplateCard: typeof import('./components/linear/LinearTemplateCard.vue')['default']

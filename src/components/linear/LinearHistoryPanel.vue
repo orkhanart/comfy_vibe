@@ -178,6 +178,19 @@ function handleCanvasDownload(id: string): void {
   if (gen) handleDownload(gen)
 }
 
+function handleReorderImages(generationId: string, fromIndex: number, toIndex: number): void {
+  const gen = generations.value.find(g => g.id === generationId)
+  if (!gen || gen.images.length === 0) return
+
+  // Reorder the images array
+  const images = [...gen.images]
+  const [movedImage] = images.splice(fromIndex, 1)
+  if (movedImage) {
+    images.splice(toIndex, 0, movedImage)
+    gen.images = images
+  }
+}
+
 function getGridCols(count: number): string {
   if (count === 1) return 'grid-cols-2'
   if (count === 2) return 'grid-cols-4'
@@ -422,6 +435,7 @@ function getGridCols(count: number): string {
       @rerun="handleCanvasRerun"
       @download="handleCanvasDownload"
       @delete="handleDelete"
+      @reorder-images="handleReorderImages"
     />
   </main>
 </template>
