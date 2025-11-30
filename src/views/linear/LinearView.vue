@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import LinearTopBar from '@/components/linear/LinearTopBar.vue'
 import LinearSidebar, { type SidebarTab } from '@/components/linear/LinearSidebar.vue'
 import LinearWorkflowsPanel from '@/components/linear/LinearWorkflowsPanel.vue'
 import LinearAssetsPanel from '@/components/linear/LinearAssetsPanel.vue'
 import LinearHistoryPanel from '@/components/linear/LinearHistoryPanel.vue'
+import { useUiStore } from '@/stores/uiStore'
 
+const uiStore = useUiStore()
 const activeTab = ref<SidebarTab>('workflows')
+
+onMounted(() => {
+  // Set canvas mode to linear when this view mounts
+  uiStore.setCanvasMode('linear')
+})
 </script>
 
 <template>

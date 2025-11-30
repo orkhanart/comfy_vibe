@@ -1,306 +1,199 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import WorkflowBrowser, { type WorkflowSource, type WorkflowItem } from './workflows/WorkflowBrowser.vue'
-import WorkflowForm, { type WorkflowTemplate, type ExposedInput } from './workflows/WorkflowForm.vue'
+import { useWorkspaceStore } from '@/stores/workspaceStore'
+import CollapsibleSection from '@/components/common/CollapsibleSection.vue'
+import Select from 'primevue/select'
+import Slider from 'primevue/slider'
+import Textarea from 'primevue/textarea'
 
-// Source tabs
-type SourceTab = { id: WorkflowSource; label: string; icon: string }
+const workspaceStore = useWorkspaceStore()
 
-const sourceTabs: SourceTab[] = [
-  { id: 'templates', label: 'Templates', icon: 'pi-box' },
-  { id: 'my-workflows', label: 'My Workflows', icon: 'pi-folder' },
-  { id: 'shared', label: 'Shared', icon: 'pi-users' },
-  { id: 'libraries', label: 'Libraries', icon: 'pi-database' },
+// Form state
+const prompt = ref('')
+const negativePrompt = ref('')
+const seed = ref(-1)
+const steps = ref(20)
+const cfgScale = ref(7)
+const aspectRatio = ref('1:1')
+const batchSize = ref(1)
+
+const aspectOptions = [
+  { label: '1:1 Square', value: '1:1' },
+  { label: '16:9 Landscape', value: '16:9' },
+  { label: '9:16 Portrait', value: '9:16' },
+  { label: '4:3 Standard', value: '4:3' },
+  { label: '3:4 Portrait', value: '3:4' },
+  { label: '21:9 Ultrawide', value: '21:9' },
 ]
 
-const activeSource = ref<WorkflowSource>('templates')
-const currentFolderId = ref<string | null>(null)
-const loadedWorkflow = ref<WorkflowTemplate | null>(null)
+const workflowOptions = computed(() =>
+  workspaceStore.availableWorkflows.map(w => ({
+    label: w.name,
+    value: w.id,
+    description: w.description,
+  }))
+)
 
-// Mock data for different sources
-const templateWorkflows: WorkflowItem[] = [
-  {
-    id: 'sdxl-simple',
-    name: 'SDXL Text to Image',
-    description: 'Generate high-quality images from text prompts using SDXL',
-    thumbnail: '/assets/card_images/workflow_01.webp',
-    author: 'ComfyUI',
-    version: '1.0',
-    category: 'Image Generation',
-    downloads: 15420,
-    tags: ['SDXL', 'Text2Image', 'Popular'],
-  },
-  {
-    id: 'flux-schnell',
-    name: 'Flux Schnell',
-    description: 'Fast image generation with Flux model',
-    thumbnail: '/assets/card_images/workflow_02.webp',
-    author: 'ComfyUI',
-    version: '1.0',
-    category: 'Image Generation',
-    downloads: 21000,
-    tags: ['Flux', 'Fast', 'Popular'],
-  },
-  {
-    id: 'upscale',
-    name: '4x Upscaler',
-    description: 'Upscale images to 4x resolution with AI enhancement',
-    thumbnail: '/assets/card_images/workflow_03.webp',
-    author: 'Community',
-    version: '1.0',
-    category: 'Enhancement',
-    downloads: 12300,
-    tags: ['Upscale', 'Enhancement'],
-  },
-  {
-    id: 'controlnet-pose',
-    name: 'ControlNet Pose',
-    description: 'Generate images with pose control using OpenPose',
-    thumbnail: '/assets/card_images/workflow_01.webp',
-    author: 'Community',
-    version: '1.0',
-    category: 'ControlNet',
-    downloads: 9870,
-    tags: ['ControlNet', 'Pose', 'OpenPose'],
-  },
-]
-
-const myWorkflows: WorkflowItem[] = [
-  {
-    id: 'folder-portraits',
-    name: 'Portraits',
-    description: '',
-    thumbnail: '',
-    author: 'Me',
-    version: '1.0',
-    category: '',
-    tags: [],
-    isFolder: true,
-    parentId: null,
-  },
-  {
-    id: 'folder-landscapes',
-    name: 'Landscapes',
-    description: '',
-    thumbnail: '',
-    author: 'Me',
-    version: '1.0',
-    category: '',
-    tags: [],
-    isFolder: true,
-    parentId: null,
-  },
-  {
-    id: 'my-custom-sdxl',
-    name: 'My Custom SDXL',
-    description: 'Customized SDXL workflow with LoRA',
-    thumbnail: '/assets/card_images/workflow_02.webp',
-    author: 'Me',
-    version: '1.2',
-    category: 'Image Generation',
-    tags: ['Custom', 'LoRA'],
-    updatedAt: new Date(Date.now() - 86400000),
-    parentId: null,
-  },
-  {
-    id: 'portrait-style-1',
-    name: 'Portrait Style v1',
-    description: 'Professional portrait generation',
-    thumbnail: '/assets/card_images/workflow_03.webp',
-    author: 'Me',
-    version: '1.0',
-    category: 'Portraits',
-    tags: ['Portrait'],
-    updatedAt: new Date(Date.now() - 172800000),
-    parentId: 'folder-portraits',
-  },
-]
-
-const sharedWorkflows: WorkflowItem[] = [
-  {
-    id: 'shared-anime',
-    name: 'Anime Character Gen',
-    description: 'High quality anime character generation',
-    thumbnail: '/assets/card_images/workflow_01.webp',
-    author: 'Alex',
-    version: '2.1',
-    category: 'Anime',
-    tags: ['Anime', 'Character'],
-    sharedBy: 'Alex',
-    updatedAt: new Date(Date.now() - 3600000),
-  },
-  {
-    id: 'shared-product',
-    name: 'Product Photography',
-    description: 'Studio-quality product shots',
-    thumbnail: '/assets/card_images/workflow_04.webp',
-    author: 'Studio Team',
-    version: '1.0',
-    category: 'Commercial',
-    tags: ['Product', 'Commercial'],
-    sharedBy: 'Maria',
-    updatedAt: new Date(Date.now() - 7200000),
-  },
-]
-
-const libraryWorkflows: WorkflowItem[] = [
-  {
-    id: 'lib-civitai-1',
-    name: 'Realistic Vision v5',
-    description: 'Photorealistic image generation',
-    thumbnail: '/assets/card_images/workflow_02.webp',
-    author: 'CivitAI',
-    version: '5.0',
-    category: 'Realistic',
-    downloads: 45000,
-    tags: ['Realistic', 'Photorealistic'],
-  },
-  {
-    id: 'lib-openart-1',
-    name: 'DreamShaper XL',
-    description: 'Versatile artistic generation',
-    thumbnail: '/assets/card_images/workflow_03.webp',
-    author: 'OpenArt',
-    version: '2.0',
-    category: 'Artistic',
-    downloads: 32000,
-    tags: ['Artistic', 'Creative'],
-  },
-]
-
-// Workflow templates with exposed inputs (for the form)
-const workflowTemplates: Record<string, WorkflowTemplate> = {
-  'sdxl-simple': {
-    id: 'sdxl-simple',
-    name: 'SDXL Text to Image',
-    description: 'Generate high-quality images from text prompts using SDXL',
-    thumbnail: '/assets/card_images/workflow_01.webp',
-    author: 'ComfyUI',
-    version: '1.0',
-    category: 'Image Generation',
-    exposedInputs: [
-      { id: 'prompt', nodeId: '3', inputName: 'text', type: 'textarea', label: 'Prompt', placeholder: 'Describe your image...', required: true, group: 'Main' },
-      { id: 'negative', nodeId: '4', inputName: 'text', type: 'textarea', label: 'Negative Prompt', placeholder: 'What to avoid...', group: 'Main' },
-      { id: 'aspect', nodeId: '5', inputName: 'ratio', type: 'select', label: 'Aspect Ratio', options: [
-        { value: '1:1', label: '1:1 Square' },
-        { value: '16:9', label: '16:9 Landscape' },
-        { value: '9:16', label: '9:16 Portrait' },
-      ], default: '1:1', group: 'Settings' },
-      { id: 'seed', nodeId: '7', inputName: 'seed', type: 'seed', label: 'Seed', default: -1, group: 'Settings' },
-    ],
-  },
-  'flux-schnell': {
-    id: 'flux-schnell',
-    name: 'Flux Schnell',
-    description: 'Fast image generation with Flux model',
-    thumbnail: '/assets/card_images/workflow_02.webp',
-    author: 'ComfyUI',
-    version: '1.0',
-    category: 'Image Generation',
-    exposedInputs: [
-      { id: 'prompt', nodeId: '3', inputName: 'text', type: 'textarea', label: 'Prompt', placeholder: 'Describe your image...', required: true, group: 'Main' },
-      { id: 'seed', nodeId: '7', inputName: 'seed', type: 'seed', label: 'Seed', default: -1, group: 'Settings' },
-    ],
-  },
-}
-
-// Get workflows for current source
-const currentWorkflows = computed(() => {
-  switch (activeSource.value) {
-    case 'templates':
-      return templateWorkflows
-    case 'my-workflows':
-      return myWorkflows
-    case 'shared':
-      return sharedWorkflows
-    case 'libraries':
-      return libraryWorkflows
-    default:
-      return []
-  }
+const selectedWorkflowId = computed({
+  get: () => workspaceStore.currentWorkflow?.id ?? '',
+  set: (id: string) => workspaceStore.setCurrentWorkflowById(id)
 })
 
-function handleSelectWorkflow(item: WorkflowItem): void {
-  // Load workflow template (in real app, fetch from server)
-  const template = workflowTemplates[item.id]
-  if (template) {
-    loadedWorkflow.value = template
-  } else {
-    // Create a basic template for workflows without defined inputs
-    loadedWorkflow.value = {
-      ...item,
-      exposedInputs: [
-        { id: 'prompt', nodeId: '1', inputName: 'text', type: 'textarea', label: 'Prompt', placeholder: 'Enter prompt...', required: true, group: 'Input' },
-      ],
-    }
-  }
+function randomizeSeed(): void {
+  seed.value = Math.floor(Math.random() * 2147483647)
 }
 
-function handleNavigateFolder(folderId: string | null): void {
-  currentFolderId.value = folderId
-}
-
-function handleImport(): void {
-  console.log('Import workflow')
-}
-
-function handleCreateFolder(): void {
-  console.log('Create folder')
-}
-
-function handleRunWorkflow(values: Record<string, unknown>, images: Record<string, string>): void {
-  console.log('Run workflow:', loadedWorkflow.value?.id, values, images)
+function handleRun(): void {
+  console.log('Run workflow:', {
+    workflow: workspaceStore.currentWorkflow?.id,
+    prompt: prompt.value,
+    negativePrompt: negativePrompt.value,
+    seed: seed.value,
+    steps: steps.value,
+    cfgScale: cfgScale.value,
+    aspectRatio: aspectRatio.value,
+    batchSize: batchSize.value,
+  })
 }
 </script>
 
 <template>
-  <div class="flex h-full w-96 flex-col border-r border-zinc-800 bg-zinc-950">
-    <!-- Header with Title -->
+  <div class="flex h-full w-80 flex-col border-r border-zinc-800 bg-zinc-950">
+    <!-- Header -->
     <div class="flex items-center justify-between border-b border-zinc-800 px-3 py-2">
       <span class="text-sm font-medium text-zinc-200">Run Workflow</span>
     </div>
 
-    <!-- Content -->
-    <template v-if="!loadedWorkflow">
-      <!-- Source Tabs -->
-      <div class="flex border-b border-zinc-800">
-        <button
-          v-for="tab in sourceTabs"
-          :key="tab.id"
-          v-tooltip.bottom="tab.label"
-          :class="[
-            'flex flex-1 items-center justify-center gap-1.5 py-2 text-[10px] font-medium transition-colors',
-            activeSource === tab.id
-              ? 'border-b-2 border-zinc-400 text-zinc-200'
-              : 'text-zinc-500 hover:text-zinc-300'
-          ]"
-          @click="activeSource = tab.id; currentFolderId = null"
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto">
+      <!-- Workflow Section -->
+      <CollapsibleSection title="Workflow" icon="pi-sitemap" :default-open="true">
+        <Select
+          v-model="selectedWorkflowId"
+          :options="workflowOptions"
+          option-label="label"
+          option-value="value"
+          placeholder="Select workflow"
+          class="w-full"
         >
-          <i :class="['pi', tab.icon, 'text-xs']" />
-          <span class="hidden sm:inline">{{ tab.label }}</span>
-        </button>
-      </div>
+          <template #option="{ option }">
+            <div class="flex flex-col gap-0.5">
+              <span class="text-sm">{{ option.label }}</span>
+              <span v-if="option.description" class="text-xs text-zinc-500">{{ option.description }}</span>
+            </div>
+          </template>
+        </Select>
 
-      <!-- Browser -->
-      <WorkflowBrowser
-        :workflows="currentWorkflows"
-        :source="activeSource"
-        :current-folder-id="currentFolderId"
-        class="flex-1"
-        @select="handleSelectWorkflow"
-        @import="handleImport"
-        @navigate-folder="handleNavigateFolder"
-        @create-folder="handleCreateFolder"
-      />
-    </template>
+        <!-- Workflow info -->
+        <div v-if="workspaceStore.currentWorkflow" class="mt-2 rounded-md bg-zinc-900 p-2">
+          <p class="text-xs text-zinc-400">{{ workspaceStore.currentWorkflow.description }}</p>
+        </div>
+      </CollapsibleSection>
 
-    <!-- Workflow Form -->
-    <WorkflowForm
-      v-else
-      :workflow="loadedWorkflow"
-      class="flex-1"
-      @back="loadedWorkflow = null"
-      @run="handleRunWorkflow"
-    />
+      <!-- Inputs Section -->
+      <CollapsibleSection title="Inputs" icon="pi-pencil" :default-open="true">
+        <div class="space-y-3">
+          <!-- Prompt -->
+          <div>
+            <label class="mb-1 block text-xs text-zinc-400">Prompt</label>
+            <Textarea
+              v-model="prompt"
+              placeholder="Describe what you want to generate..."
+              :auto-resize="true"
+              rows="3"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Negative Prompt -->
+          <div>
+            <label class="mb-1 block text-xs text-zinc-400">Negative Prompt</label>
+            <Textarea
+              v-model="negativePrompt"
+              placeholder="What to avoid..."
+              :auto-resize="true"
+              rows="2"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Aspect Ratio -->
+          <div>
+            <label class="mb-1 block text-xs text-zinc-400">Aspect Ratio</label>
+            <Select
+              v-model="aspectRatio"
+              :options="aspectOptions"
+              option-label="label"
+              option-value="value"
+              class="w-full"
+            />
+          </div>
+        </div>
+      </CollapsibleSection>
+
+      <!-- Settings Section -->
+      <CollapsibleSection title="Settings" icon="pi-cog" :default-open="false">
+        <div class="space-y-4">
+          <!-- Seed -->
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <label class="text-xs text-zinc-400">Seed</label>
+              <button
+                class="text-xs text-blue-400 hover:text-blue-300"
+                @click="randomizeSeed"
+              >
+                Randomize
+              </button>
+            </div>
+            <div class="flex gap-2">
+              <input
+                v-model.number="seed"
+                type="number"
+                class="flex-1 rounded-md border border-zinc-700 bg-zinc-900 px-2 py-1.5 text-sm text-zinc-200 focus:border-blue-500 focus:outline-none"
+              />
+            </div>
+            <p class="mt-1 text-[10px] text-zinc-500">-1 for random seed each generation</p>
+          </div>
+
+          <!-- Steps -->
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <label class="text-xs text-zinc-400">Steps</label>
+              <span class="text-xs text-zinc-500">{{ steps }}</span>
+            </div>
+            <Slider v-model="steps" :min="1" :max="50" class="w-full" />
+          </div>
+
+          <!-- CFG Scale -->
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <label class="text-xs text-zinc-400">CFG Scale</label>
+              <span class="text-xs text-zinc-500">{{ cfgScale }}</span>
+            </div>
+            <Slider v-model="cfgScale" :min="1" :max="20" :step="0.5" class="w-full" />
+          </div>
+
+          <!-- Batch Size -->
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <label class="text-xs text-zinc-400">Batch Size</label>
+              <span class="text-xs text-zinc-500">{{ batchSize }}</span>
+            </div>
+            <Slider v-model="batchSize" :min="1" :max="8" class="w-full" />
+          </div>
+        </div>
+      </CollapsibleSection>
+    </div>
+
+    <!-- Run Button -->
+    <div class="border-t border-zinc-800 p-3">
+      <button
+        class="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-500"
+        @click="handleRun"
+      >
+        <i class="pi pi-play text-xs" />
+        Run
+      </button>
+    </div>
   </div>
 </template>

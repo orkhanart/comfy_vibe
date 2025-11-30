@@ -37,6 +37,8 @@ const nodeTypes = {
 onMounted(() => {
   workspaceStore.setCurrentIds(props.workspaceId, props.projectId, props.canvasId)
   workspaceStore.openCanvas(props.canvasId, props.canvasId, props.projectId)
+  // Set canvas mode to node when this view mounts
+  uiStore.setCanvasMode('node')
 })
 
 // Vue Flow
@@ -145,7 +147,7 @@ function closePropertiesPanel(): void {
         <!-- Workflow name dropdown -->
         <div class="absolute left-4 top-4 z-10">
           <button
-            class="flex items-center gap-1.5 rounded bg-white/80 px-2.5 py-1 text-xs font-medium text-zinc-700 shadow-sm backdrop-blur transition-colors hover:bg-white/90 dark:bg-zinc-800/80 dark:text-zinc-300 dark:hover:bg-zinc-800/90"
+            class="flex items-center gap-1.5 rounded bg-white/80 px-2.5 py-1.5 text-xs font-medium text-zinc-700 shadow-sm backdrop-blur transition-colors hover:bg-white/90 dark:bg-zinc-800/80 dark:text-zinc-300 dark:hover:bg-zinc-800/90"
             @click="toggleWorkflowMenu"
           >
             <i class="pi pi-sitemap text-[10px] opacity-70" />

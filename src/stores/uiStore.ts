@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
 export type InterfaceVersion = 'v1' | 'v2'
+export type CanvasMode = 'node' | 'linear'
 
 export type SidebarTabId = 'nodes' | 'models' | 'workflows' | 'assets' | 'templates' | 'library' | 'packages' | null
 
@@ -232,6 +233,9 @@ export const useUiStore = defineStore('ui', () => {
   const leftSidebarOpen = ref(true)
   const rightSidebarOpen = ref(false)
 
+  // Canvas mode: node = node editor, linear = linear/chat mode
+  const canvasMode = ref<CanvasMode>('node')
+
   // Sidebar tab state (left sidebar)
   const activeSidebarTab = ref<SidebarTabId>(null)
 
@@ -266,6 +270,14 @@ export const useUiStore = defineStore('ui', () => {
 
   function toggleInterfaceVersion(): void {
     interfaceVersion.value = interfaceVersion.value === 'v1' ? 'v2' : 'v1'
+  }
+
+  function setCanvasMode(mode: CanvasMode): void {
+    canvasMode.value = mode
+  }
+
+  function toggleCanvasMode(): void {
+    canvasMode.value = canvasMode.value === 'node' ? 'linear' : 'node'
   }
 
   function toggleLeftSidebar(): void {
@@ -334,6 +346,8 @@ export const useUiStore = defineStore('ui', () => {
     sidebarPanelExpanded,
     activeBottomTab,
     bottomPanelExpanded,
+    // Canvas mode
+    canvasMode,
     // Node category exports
     activeNodeCategory,
     activeNodeCategoryData,
@@ -343,6 +357,8 @@ export const useUiStore = defineStore('ui', () => {
     // Functions
     setInterfaceVersion,
     toggleInterfaceVersion,
+    setCanvasMode,
+    toggleCanvasMode,
     toggleLeftSidebar,
     toggleRightSidebar,
     toggleSidebarTab,

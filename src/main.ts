@@ -3,6 +3,10 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 
 import PrimeVue from 'primevue/config'
+
+// Ensure dark mode classes are applied to HTML element
+// This is a safeguard in case the HTML classes are stripped during build
+document.documentElement.classList.add('dark', 'dark-theme')
 import { definePreset } from '@primevue/themes'
 import Aura from '@primevue/themes/aura'
 import ToastService from 'primevue/toastservice'
