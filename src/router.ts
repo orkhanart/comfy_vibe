@@ -83,7 +83,7 @@ const v2Routes: RouteRecordRaw[] = [
     ]
   },
   {
-    path: '/:workspaceId/:projectId/:canvasId',
+    path: '/nodemode/:workspaceId/:canvasId',
     name: 'canvas',
     component: () => import('./views/v2/CanvasView.vue'),
     props: true
