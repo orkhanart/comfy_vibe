@@ -52,7 +52,7 @@ async function connectToServer() {
             :icon="comfyStore.isConnected ? 'pi pi-arrow-right' : 'pi pi-link'"
             @click="
               comfyStore.isConnected
-                ? $router.push('/default/main/untitled')
+                ? $router.push('/nodemode/default/untitled')
                 : connectToServer()
             "
           />

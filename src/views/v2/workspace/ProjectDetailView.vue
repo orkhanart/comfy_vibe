@@ -38,11 +38,11 @@ type Tab = 'canvases' | 'assets'
 const activeTab = ref<Tab>('canvases')
 
 function openCanvas(canvasId: string): void {
-  router.push(`/${workspaceId.value}/${projectId.value}/${canvasId}`)
+  router.push(`/nodemode/${workspaceId.value}/${canvasId}`)
 }
 
 function createCanvas(): void {
-  router.push(`/${workspaceId.value}/${projectId.value}/untitled`)
+  router.push(`/nodemode/${workspaceId.value}/untitled`)
 }
 
 function getAssetIcon(type: string): string {

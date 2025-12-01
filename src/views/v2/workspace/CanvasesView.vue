@@ -89,11 +89,11 @@ const filteredCanvases = computed(() => {
 })
 
 function openCanvas(canvas: { id: string; projectId: string }): void {
-  router.push(`/${workspaceId.value}/${canvas.projectId}/${canvas.id}`)
+  router.push(`/nodemode/${workspaceId.value}/${canvas.id}`)
 }
 
 function createCanvas(): void {
-  router.push(`/${workspaceId.value}/default/untitled`)
+  router.push(`/nodemode/${workspaceId.value}/untitled`)
 }
 
 const emptyStateDescription = computed(() =>

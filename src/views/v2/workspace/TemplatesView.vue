@@ -94,7 +94,7 @@ function formatUses(uses: number): string {
 }
 
 function openTemplate(templateId: string): void {
-  router.push(`/${workspaceId.value}/default/${templateId}`)
+  router.push(`/nodemode/${workspaceId.value}/${templateId}`)
 }
 </script>
 
