@@ -1,19 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import LinearTopBar from '@/components/linear/LinearTopBar.vue'
-import LinearSidebar, { type SidebarTab } from '@/components/linear/LinearSidebar.vue'
+import LinearIconSidebar, { type LinearTab } from '@/components/linear/LinearIconSidebar.vue'
+import LinearChatPanel from '@/components/linear/LinearChatPanel.vue'
 import LinearWorkflowsPanel from '@/components/linear/LinearWorkflowsPanel.vue'
-import LinearAssetsPanel from '@/components/linear/LinearAssetsPanel.vue'
+import LinearAppsPanel from '@/components/linear/LinearAppsPanel.vue'
+import LinearModelsPanel from '@/components/linear/LinearModelsPanel.vue'
 import LinearHistoryPanel from '@/components/linear/LinearHistoryPanel.vue'
-import { useUiStore } from '@/stores/uiStore'
 
-const uiStore = useUiStore()
-const activeTab = ref<SidebarTab>('workflows')
-
-onMounted(() => {
-  // Set canvas mode to linear when this view mounts
-  uiStore.setCanvasMode('linear')
-})
+const activeTab = ref<LinearTab>('chat')
 </script>
 
 <template>
@@ -23,14 +18,16 @@ onMounted(() => {
 
     <!-- Main Content -->
     <div class="flex flex-1 overflow-hidden">
-      <!-- Left Icon Sidebar -->
-      <LinearSidebar v-model:active-tab="activeTab" />
+      <!-- Left Icon Sidebar (Chat, Workflows, Apps) -->
+      <LinearIconSidebar v-model:active-tab="activeTab" />
 
       <!-- Left Panel - switches based on active tab -->
-      <LinearAssetsPanel v-if="activeTab === 'assets'" />
+      <LinearChatPanel v-if="activeTab === 'chat'" />
       <LinearWorkflowsPanel v-else-if="activeTab === 'workflows'" />
+      <LinearAppsPanel v-else-if="activeTab === 'apps'" />
+      <LinearModelsPanel v-else-if="activeTab === 'models'" />
 
-      <!-- Right Main Area (generations/canvas) -->
+      <!-- Right Main Area (generations) -->
       <LinearHistoryPanel />
     </div>
   </div>

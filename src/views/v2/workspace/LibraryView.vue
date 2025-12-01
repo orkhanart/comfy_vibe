@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
+import Popover from 'primevue/popover'
 import {
   WorkspaceSearchInput,
   WorkspaceViewToggle,
@@ -12,19 +13,54 @@ import {
 const route = useRoute()
 const workspaceId = computed(() => route.params.workspaceId as string)
 
-// Category filter
+// Library/Brand switcher
+interface Library {
+  id: string
+  name: string
+  icon: string
+  color: string
+  itemCount: number
+}
+
+const libraries = ref<Library[]>([
+  { id: 'netflix', name: 'Netflix', icon: 'pi pi-play', color: 'bg-red-600', itemCount: 248 },
+  { id: 'adobe', name: 'Adobe Creative', icon: 'pi pi-palette', color: 'bg-rose-600', itemCount: 156 },
+  { id: 'personal', name: 'My Library', icon: 'pi pi-user', color: 'bg-zinc-600', itemCount: 89 },
+  { id: 'community', name: 'Community Hub', icon: 'pi pi-users', color: 'bg-violet-600', itemCount: 1240 },
+])
+
+const currentLibrary = ref<Library>(libraries.value[0])
+const libraryMenu = ref<InstanceType<typeof Popover> | null>(null)
+
+function toggleLibraryMenu(event: Event): void {
+  libraryMenu.value?.toggle(event)
+}
+
+function selectLibrary(library: Library): void {
+  currentLibrary.value = library
+  libraryMenu.value?.hide()
+}
+
+// Category tabs
 type CategoryId = 'all' | 'workflows' | 'models' | 'nodepacks' | 'assets' | 'brand-kit'
 
-const activeCategory = ref<CategoryId>('all')
+interface Category {
+  id: CategoryId
+  label: string
+  icon: string
+  count: number
+}
 
-const categoryOptions = [
-  { value: 'all', label: 'All Categories' },
-  { value: 'workflows', label: 'Workflows' },
-  { value: 'models', label: 'Models' },
-  { value: 'nodepacks', label: 'Nodepacks' },
-  { value: 'assets', label: 'Assets' },
-  { value: 'brand-kit', label: 'Brand Kit' },
-]
+const categories = ref<Category[]>([
+  { id: 'all', label: 'All', icon: 'pi pi-th-large', count: 248 },
+  { id: 'workflows', label: 'Workflows', icon: 'pi pi-sitemap', count: 64 },
+  { id: 'models', label: 'Models', icon: 'pi pi-box', count: 38 },
+  { id: 'nodepacks', label: 'Nodepacks', icon: 'pi pi-th-large', count: 24 },
+  { id: 'assets', label: 'Assets', icon: 'pi pi-images', count: 89 },
+  { id: 'brand-kit', label: 'Brand Kit', icon: 'pi pi-palette', count: 33 },
+])
+
+const activeCategory = ref<CategoryId>('all')
 
 // View mode & filters
 type ViewMode = 'grid' | 'list'
@@ -154,22 +190,114 @@ function formatUses(uses: number): string {
 
 <template>
   <div class="p-6">
-    <!-- Header -->
+    <!-- Header with Library Switcher -->
     <div class="mb-6 flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Library Hub
-        </h1>
-        <p class="text-sm text-zinc-500 dark:text-zinc-400">
-          Shared workflows, models, nodepacks, and brand assets
-        </p>
+      <div class="flex items-center gap-4">
+        <!-- Library Switcher -->
+        <button
+          class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-2.5 transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
+          @click="toggleLibraryMenu"
+        >
+          <div :class="['flex h-8 w-8 items-center justify-center rounded-md text-white', currentLibrary.color]">
+            <i :class="[currentLibrary.icon, 'text-sm']" />
+          </div>
+          <div class="text-left">
+            <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ currentLibrary.name }}</p>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ currentLibrary.itemCount }} items</p>
+          </div>
+          <i class="pi pi-chevron-down text-xs text-zinc-400" />
+        </button>
+
+        <!-- Library Menu -->
+        <Popover ref="libraryMenu" append-to="self">
+          <div class="w-72 p-2">
+            <p class="px-2 py-1.5 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              Switch Library
+            </p>
+            <div class="mt-1 flex flex-col gap-0.5">
+              <button
+                v-for="lib in libraries"
+                :key="lib.id"
+                :class="[
+                  'flex items-center gap-3 rounded-md px-2 py-2 text-left transition-colors',
+                  currentLibrary.id === lib.id
+                    ? 'bg-zinc-100 dark:bg-zinc-700'
+                    : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                ]"
+                @click="selectLibrary(lib)"
+              >
+                <div :class="['flex h-8 w-8 items-center justify-center rounded-md text-white', lib.color]">
+                  <i :class="[lib.icon, 'text-sm']" />
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ lib.name }}</p>
+                  <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ lib.itemCount }} items</p>
+                </div>
+                <i v-if="currentLibrary.id === lib.id" class="pi pi-check text-sm text-blue-500" />
+              </button>
+            </div>
+          </div>
+        </Popover>
+
+        <div>
+          <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+            Library Hub
+          </h1>
+          <p class="text-sm text-zinc-500 dark:text-zinc-400">
+            Shared workflows, models, nodepacks, and brand assets
+          </p>
+        </div>
       </div>
 
+      <div class="flex items-center gap-2">
+        <RouterLink
+          :to="`/${workspaceId}/create`"
+          class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        >
+          <i class="pi pi-bolt text-xs" />
+          Linear
+        </RouterLink>
+        <RouterLink
+          :to="`/${workspaceId}/canvas`"
+          class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        >
+          <i class="pi pi-share-alt text-xs" />
+          Node
+        </RouterLink>
+        <button
+          class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        >
+          <i class="pi pi-plus text-xs" />
+          Add to Library
+        </button>
+      </div>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="mb-6 flex items-center gap-1 rounded-lg border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-700 dark:bg-zinc-800/50">
       <button
-        class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        v-for="cat in categories"
+        :key="cat.id"
+        :class="[
+          'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors',
+          activeCategory === cat.id
+            ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-zinc-100'
+            : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+        ]"
+        @click="activeCategory = cat.id"
       >
-        <i class="pi pi-plus text-xs" />
-        Add to Library
+        <i :class="[cat.icon, 'text-sm']" />
+        {{ cat.label }}
+        <span
+          :class="[
+            'rounded-full px-1.5 py-0.5 text-xs',
+            activeCategory === cat.id
+              ? 'bg-zinc-100 text-zinc-600 dark:bg-zinc-600 dark:text-zinc-200'
+              : 'bg-zinc-200/50 text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400'
+          ]"
+        >
+          {{ cat.count }}
+        </span>
       </button>
     </div>
 
@@ -179,7 +307,6 @@ function formatUses(uses: number): string {
         v-model="searchQuery"
         placeholder="Search library..."
       />
-      <WorkspaceFilterSelect v-model="activeCategory" :options="categoryOptions" />
       <WorkspaceViewToggle v-model="viewMode" />
       <WorkspaceSortSelect v-model="sortBy" :options="sortOptions" />
       <WorkspaceFilterSelect v-model="filterBy" :options="filterOptions" />

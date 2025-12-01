@@ -10,13 +10,13 @@ const workspaceId = computed(() => route.params.workspaceId as string)
 const isTeam = computed(() => workspaceId.value === 'team')
 
 const recentProjects = [
-  { id: 'img-gen', name: 'Image Generation', workflowCount: 5, updatedAt: '2 hours ago' },
-  { id: 'video-proc', name: 'Video Processing', workflowCount: 3, updatedAt: '1 day ago' },
-  { id: 'audio-enh', name: 'Audio Enhancement', workflowCount: 2, updatedAt: '3 days ago' }
+  { id: 'img-gen', name: 'Image Generation', canvasCount: 5, updatedAt: '2 hours ago' },
+  { id: 'video-proc', name: 'Video Processing', canvasCount: 3, updatedAt: '1 day ago' },
+  { id: 'audio-enh', name: 'Audio Enhancement', canvasCount: 2, updatedAt: '3 days ago' }
 ]
 
 const recentActivity = [
-  { icon: 'pi pi-plus', text: 'New workflow created in Image Generation', time: '2h ago' },
+  { icon: 'pi pi-plus', text: 'New canvas created in Image Generation', time: '2h ago' },
   { icon: 'pi pi-upload', text: 'Model uploaded: SDXL Lightning', time: '5h ago' },
   { icon: 'pi pi-pencil', text: 'Workflow updated: Upscale Pipeline', time: '1d ago' },
   { icon: 'pi pi-user-plus', text: 'New team member joined', time: '2d ago' }
@@ -38,11 +38,27 @@ const starterTemplates = [
     <div class="mb-6 flex items-start justify-between">
       <div>
         <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
-          {{ isTeam ? 'Team Home' : 'Home' }}
+          {{ isTeam ? 'Team Dashboard' : 'Dashboard' }}
         </h1>
         <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           Welcome back, {{ workspaceId }}
         </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <RouterLink
+          :to="`/${workspaceId}/create`"
+          class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        >
+          <i class="pi pi-bolt text-xs" />
+          Linear
+        </RouterLink>
+        <RouterLink
+          :to="`/${workspaceId}/canvas`"
+          class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+        >
+          <i class="pi pi-share-alt text-xs" />
+          Node
+        </RouterLink>
       </div>
     </div>
 
@@ -53,13 +69,7 @@ const starterTemplates = [
         @click="router.push(`/${workspaceId}/default/untitled`)"
       >
         <i class="pi pi-plus text-xs" />
-        New Workflow
-      </button>
-      <button
-        class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-      >
-        <i class="pi pi-upload text-xs" />
-        Import Workflow
+        New Canvas
       </button>
       <button
         class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
@@ -67,6 +77,12 @@ const starterTemplates = [
       >
         <i class="pi pi-folder-plus text-xs" />
         New Project
+      </button>
+      <button
+        class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+      >
+        <i class="pi pi-upload text-xs" />
+        Upload Model
       </button>
     </div>
 
@@ -102,8 +118,8 @@ const starterTemplates = [
       </div>
     </div>
 
-    <!-- Content Grid (Team workspace only) -->
-    <div v-if="isTeam" class="grid grid-cols-1 gap-6 lg:grid-cols-5">
+    <!-- Content Grid -->
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
       <!-- Recent Projects -->
       <div class="lg:col-span-3">
         <div class="rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
@@ -128,7 +144,7 @@ const starterTemplates = [
               </div>
               <div class="flex-1">
                 <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ project.name }}</p>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ project.workflowCount }} workflows</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ project.canvasCount }} canvases</p>
               </div>
               <span class="text-xs text-zinc-400 dark:text-zinc-500">{{ project.updatedAt }}</span>
             </button>

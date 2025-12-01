@@ -53,45 +53,13 @@
 }
 
 /* ===================== Root Variables ===================== */
-/* Default to DARK theme - this app is dark-first */
-:root,
-:root.dark,
-:root.dark-theme {
-  /* Base colors - Dark mode (default) */
-  --fg-color: #fff;
-  --bg-color: #09090b;
-  --comfy-menu-bg: #18181b;
-  --input-text: #fafafa;
-  --border-color: #27272a;
-
-  /* Semantic tokens - Dark mode (default) */
-  --base-foreground: var(--color-white);
-  --base-background: #09090b;
-  --muted-foreground: var(--color-smoke-700);
-  --secondary-background: var(--color-charcoal-600);
-  --secondary-background-hover: var(--color-charcoal-400);
-  --primary-background: var(--color-azure-600);
-  --primary-background-hover: var(--color-azure-400);
-  --border-default: var(--color-charcoal-200);
-  --border-subtle: var(--color-charcoal-300);
-
-  /* Interface colors - Dark mode (default) */
-  --interface-panel-surface: #09090b;
-  --interface-stroke: var(--color-charcoal-400);
-  --button-surface: var(--color-charcoal-600);
-  --button-hover-surface: var(--color-charcoal-400);
-
-  /* Force dark color scheme for browser UI */
-  color-scheme: dark;
-}
-
-/* ===================== Light Theme (opt-in) ===================== */
-:root.light-theme {
+:root {
+  /* Base colors - Light mode */
   --fg-color: #000;
   --bg-color: #fff;
   --comfy-menu-bg: #353535;
-  --input-text: #171717;
-  --border-color: #e4e4e7;
+  --input-text: #ddd;
+  --border-color: #4e4e4e;
 
   /* Semantic tokens - Light mode */
   --base-foreground: var(--color-charcoal-800);
@@ -109,8 +77,29 @@
   --interface-stroke: var(--color-smoke-300);
   --button-surface: var(--color-white);
   --button-hover-surface: var(--color-smoke-200);
+}
 
-  color-scheme: light;
+/* ===================== Dark Theme ===================== */
+.dark-theme {
+  --fg-color: #fff;
+  --bg-color: #202020;
+
+  /* Semantic tokens - Dark mode */
+  --base-foreground: var(--color-white);
+  --base-background: var(--color-charcoal-800);
+  --muted-foreground: var(--color-smoke-700);
+  --secondary-background: var(--color-charcoal-600);
+  --secondary-background-hover: var(--color-charcoal-400);
+  --primary-background: var(--color-azure-600);
+  --primary-background-hover: var(--color-azure-400);
+  --border-default: var(--color-charcoal-200);
+  --border-subtle: var(--color-charcoal-300);
+
+  /* Interface colors */
+  --interface-panel-surface: var(--color-charcoal-800);
+  --interface-stroke: var(--color-charcoal-400);
+  --button-surface: var(--color-charcoal-600);
+  --button-hover-surface: var(--color-charcoal-400);
 }
 
 /* ===================== Tailwind Theme Inline ===================== */
@@ -135,22 +124,17 @@ html {
   font-family: var(--font-sans, system-ui, sans-serif);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Ensure dark background even before CSS loads */
-  background-color: #09090b;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  /* Dark background with fallback */
-  background-color: var(--bg-color, #09090b);
-  color: var(--fg-color, #fff);
+  background-color: var(--bg-color);
+  color: var(--fg-color);
 }
 
 #app {
   min-height: 100vh;
-  /* Ensure app container also has dark background */
-  background-color: var(--bg-color, #09090b);
 }
 
 /* ===================== Utility Classes ===================== */
@@ -363,52 +347,5 @@ body {
     --p-popover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
     --p-popover-padding: 0;
     --p-popover-content-padding: 0;
-  }
-
-  /* Workflow dropdown menu */
-  .workflow-dropdown-menu.p-menu {
-    --p-menu-background: #18181b;
-    --p-menu-border-color: #27272a;
-    --p-menu-border-radius: 0.375rem;
-    --p-menu-padding: 0.25rem;
-    --p-menu-item-padding: 0.25rem 0.5rem;
-    --p-menu-item-border-radius: 0.25rem;
-    --p-menu-item-color: #fafafa;
-    --p-menu-item-hover-background: #27272a;
-    --p-menu-item-hover-color: #fafafa;
-    min-width: 160px;
-  }
-
-  .workflow-dropdown-menu.p-menu .p-menu-item-label,
-  .workflow-dropdown-menu.p-menu .p-menuitem-text,
-  .workflow-dropdown-menu.p-menu span:not(.p-menu-item-icon) {
-    font-size: 0.75rem !important;
-  }
-
-  .workflow-dropdown-menu.p-menu .p-menu-item-link {
-    flex-direction: row-reverse;
-    justify-content: space-between;
-  }
-
-  .workflow-dropdown-menu.p-menu .p-menu-item-icon {
-    font-size: 0.5rem !important;
-    color: #71717a !important;
-    margin-left: auto;
-    margin-right: 0;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-
-  .workflow-dropdown-menu.p-menu .p-menu-item-content:hover .p-menu-item-icon {
-    opacity: 1;
-  }
-
-  .workflow-dropdown-menu .workflow-item-active {
-    --p-menu-item-background: #27272a;
-  }
-
-  .workflow-dropdown-menu .workflow-item-active .p-menu-item-icon {
-    color: #3b82f6 !important;
-    opacity: 1;
   }
 }

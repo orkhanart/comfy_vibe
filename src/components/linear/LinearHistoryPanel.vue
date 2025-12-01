@@ -1,12 +1,30 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import LinearCanvasView from './canvas/LinearCanvasView.vue'
-import type { HistoryViewMode, GenerationItem } from '@/types/linearCanvas'
 
-// View mode toggle - default to canvas
-const viewMode = ref<HistoryViewMode>('canvas')
+type ViewMode = 'list' | 'canvas'
+const viewMode = ref<ViewMode>('list')
 
-// Using GenerationItem from @/types/linearCanvas
+interface GenerationItem {
+  id: string
+  prompt: string
+  workflow: string
+  mode: string
+  status: 'completed' | 'generating' | 'queued'
+  progress?: number
+  createdAt: Date
+  images: string[]
+  batchSize: number
+  parameters: {
+    steps: number
+    cfg: number
+    width: number
+    height: number
+    seed: number
+    sampler?: string
+    model?: string
+  }
+}
 
 // Mock generation data with batch images
 const generations = ref<GenerationItem[]>([
@@ -39,9 +57,9 @@ const generations = ref<GenerationItem[]>([
     createdAt: new Date(Date.now() - 300000),
     images: [
       '/assets/card_images/workflow_01.webp',
-      '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp',
-      '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp',
-      '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp',
+      '/assets/card_images/workflow_02.webp',
+      '/assets/card_images/workflow_03.webp',
+      '/assets/card_images/workflow_04.webp',
     ],
     batchSize: 4,
     parameters: {
@@ -62,8 +80,8 @@ const generations = ref<GenerationItem[]>([
     status: 'completed',
     createdAt: new Date(Date.now() - 600000),
     images: [
-      '/assets/card_images/228616f4-12ad-426d-84fb-f20e488ba7ee.webp',
-      '/assets/card_images/91f1f589-ddb4-4c4f-b3a7-ba30fc271987.webp',
+      '/assets/card_images/workflow_02.webp',
+      '/assets/card_images/workflow_01.webp',
     ],
     batchSize: 2,
     parameters: {
@@ -167,30 +185,6 @@ function handleRerun(gen: GenerationItem): void {
   console.log('Rerun:', gen)
 }
 
-// Canvas event handlers (receive id, find generation)
-function handleCanvasRerun(id: string): void {
-  const gen = generations.value.find(g => g.id === id)
-  if (gen) handleRerun(gen)
-}
-
-function handleCanvasDownload(id: string): void {
-  const gen = generations.value.find(g => g.id === id)
-  if (gen) handleDownload(gen)
-}
-
-function handleReorderImages(generationId: string, fromIndex: number, toIndex: number): void {
-  const gen = generations.value.find(g => g.id === generationId)
-  if (!gen || gen.images.length === 0) return
-
-  // Reorder the images array
-  const images = [...gen.images]
-  const [movedImage] = images.splice(fromIndex, 1)
-  if (movedImage) {
-    images.splice(toIndex, 0, movedImage)
-    gen.images = images
-  }
-}
-
 function getGridCols(count: number): string {
   if (count === 1) return 'grid-cols-2'
   if (count === 2) return 'grid-cols-4'
@@ -199,19 +193,64 @@ function getGridCols(count: number): string {
 </script>
 
 <template>
-  <main class="flex h-full flex-1 flex-col bg-zinc-900">
-    <!-- Canvas View (default) -->
+  <main class="flex h-full flex-1 flex-col bg-zinc-950">
+    <!-- Header with Tabs -->
+    <div class="flex items-center justify-between border-b border-zinc-800 px-4">
+      <div class="flex items-center gap-1">
+        <!-- Timeline View Tab -->
+        <button
+          :class="[
+            'relative flex items-center gap-2 px-3 py-2.5 text-sm font-medium transition-colors',
+            viewMode === 'list' ? 'text-zinc-200' : 'text-zinc-500 hover:text-zinc-300'
+          ]"
+          @click="viewMode = 'list'"
+        >
+          <i class="pi pi-list text-xs" />
+          Timeline View
+          <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-500">
+            {{ generations.length }}
+          </span>
+          <span
+            v-if="viewMode === 'list'"
+            class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500"
+          />
+        </button>
+        <!-- Canvas View Tab -->
+        <button
+          :class="[
+            'relative flex items-center gap-2 px-3 py-2.5 text-sm font-medium transition-colors',
+            viewMode === 'canvas' ? 'text-zinc-200' : 'text-zinc-500 hover:text-zinc-300'
+          ]"
+          @click="viewMode = 'canvas'"
+        >
+          <i class="pi pi-th-large text-xs" />
+          Canvas View
+          <span
+            v-if="viewMode === 'canvas'"
+            class="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500"
+          />
+        </button>
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          v-tooltip.bottom="'Clear all'"
+          class="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
+        >
+          <i class="pi pi-trash text-xs" />
+        </button>
+      </div>
+    </div>
+
+    <!-- Canvas View -->
     <LinearCanvasView
       v-if="viewMode === 'canvas'"
       :generations="generations"
-      class="flex-1"
-      @rerun="handleCanvasRerun"
-      @download="handleCanvasDownload"
+      @rerun="(id: string) => { const gen = generations.find(g => g.id === id); if (gen) handleRerun(gen); }"
+      @download="(id) => { const gen = generations.find(g => g.id === id); if (gen) handleDownload(gen); }"
       @delete="handleDelete"
-      @reorder-images="handleReorderImages"
     />
 
-    <!-- Timeline View (hidden for now, will move to Assets) -->
+    <!-- Generations List -->
     <div v-else class="flex-1 overflow-y-auto p-3">
       <div class="flex flex-col gap-3">
         <div

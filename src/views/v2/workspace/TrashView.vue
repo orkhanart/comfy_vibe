@@ -5,14 +5,14 @@ import WorkspaceViewHeader from '@/components/v2/workspace/WorkspaceViewHeader.v
 interface TrashItem {
   id: string
   name: string
-  type: 'workflow' | 'asset' | 'project'
+  type: 'canvas' | 'workflow' | 'asset' | 'project'
   icon: string
   deletedAt: string
   expiresIn: string
 }
 
 const trashItems = ref<TrashItem[]>([
-  { id: '1', name: 'Old Workflow Draft', type: 'workflow', icon: 'pi-sitemap', deletedAt: '2 days ago', expiresIn: '28 days' },
+  { id: '1', name: 'Old Canvas Draft', type: 'canvas', icon: 'pi-objects-column', deletedAt: '2 days ago', expiresIn: '28 days' },
   { id: '2', name: 'Test Workflow', type: 'workflow', icon: 'pi-sitemap', deletedAt: '5 days ago', expiresIn: '25 days' },
   { id: '3', name: 'unused_asset.png', type: 'asset', icon: 'pi-image', deletedAt: '1 week ago', expiresIn: '23 days' },
   { id: '4', name: 'Archived Project', type: 'project', icon: 'pi-folder', deletedAt: '2 weeks ago', expiresIn: '16 days' },
@@ -53,6 +53,7 @@ function emptyTrash(): void {
 
 function getTypeLabel(type: string): string {
   const labels: Record<string, string> = {
+    canvas: 'Canvas',
     workflow: 'Workflow',
     asset: 'Asset',
     project: 'Project'

@@ -32,6 +32,7 @@ export interface GenerationItem {
   images: string[]
   batchSize: number
   parameters: GenerationParameters
+  sectionId?: string // Optional section assignment
 }
 
 /**
@@ -54,6 +55,33 @@ export interface AssetNodeData {
   width: number
   height: number
   createdAt: Date
+  sectionId?: string
+}
+
+/**
+ * Canvas section - user-defined grouping for media
+ */
+export interface CanvasSection {
+  id: string
+  name: string
+  color: string
+  position: { x: number; y: number }
+  width: number
+  height: number
+  collapsed?: boolean
+}
+
+/**
+ * Section header node data
+ */
+export interface SectionHeaderData {
+  id: string
+  name: string
+  color: string
+  width: number
+  height: number
+  itemCount: number
+  collapsed?: boolean
 }
 
 /**
@@ -71,6 +99,22 @@ export interface CanvasViewport {
 export type HistoryViewMode = 'timeline' | 'canvas'
 
 /**
+ * Section color presets
+ */
+export const SECTION_COLORS = [
+  { name: 'Blue', value: '#3b82f6' },
+  { name: 'Purple', value: '#8b5cf6' },
+  { name: 'Pink', value: '#ec4899' },
+  { name: 'Red', value: '#ef4444' },
+  { name: 'Orange', value: '#f97316' },
+  { name: 'Yellow', value: '#eab308' },
+  { name: 'Green', value: '#22c55e' },
+  { name: 'Teal', value: '#14b8a6' },
+  { name: 'Cyan', value: '#06b6d4' },
+  { name: 'Gray', value: '#6b7280' },
+] as const
+
+/**
  * Layout constants for canvas
  */
 export const CANVAS_LAYOUT = {
@@ -80,10 +124,14 @@ export const CANVAS_LAYOUT = {
   COLUMNS: 3,
   START_X: 50,
   START_Y: 50,
-  // Group section settings
-  GROUP_HEADER_HEIGHT: 40,
-  GROUP_GAP: 60,
-  GROUP_PADDING: 20,
+  // Section settings
+  SECTION_MIN_WIDTH: 400,
+  SECTION_MIN_HEIGHT: 200,
+  SECTION_DEFAULT_WIDTH: 800,
+  SECTION_DEFAULT_HEIGHT: 400,
+  SECTION_HEADER_HEIGHT: 48,
+  SECTION_PADDING: 16,
+  SECTION_GAP: 40,
   // Random placement bounds
   RANDOM_AREA_WIDTH: 1200,
   RANDOM_AREA_HEIGHT: 800,
@@ -91,80 +139,68 @@ export const CANVAS_LAYOUT = {
 } as const
 
 /**
- * Status group labels and order
+ * Calculate position for an item within a section
  */
-export const STATUS_GROUPS = ['generating', 'queued', 'completed'] as const
-export type StatusGroup = (typeof STATUS_GROUPS)[number]
-
-export const STATUS_GROUP_LABELS: Record<StatusGroup, string> = {
-  generating: 'Generating',
-  queued: 'Queued',
-  completed: 'Completed',
-}
-
-/**
- * Calculate position within a status group
- */
-export function calculateGroupedPosition(
-  status: StatusGroup,
-  indexInGroup: number,
-  groupStartY: number
+export function calculatePositionInSection(
+  index: number,
+  sectionWidth: number
 ): { x: number; y: number } {
-  const col = indexInGroup % CANVAS_LAYOUT.COLUMNS
-  const row = Math.floor(indexInGroup / CANVAS_LAYOUT.COLUMNS)
+  const itemWidth = CANVAS_LAYOUT.FRAME_WIDTH + CANVAS_LAYOUT.GAP
+  const cols = Math.max(1, Math.floor((sectionWidth - CANVAS_LAYOUT.SECTION_PADDING * 2) / itemWidth))
+  const col = index % cols
+  const row = Math.floor(index / cols)
 
   return {
-    x: CANVAS_LAYOUT.START_X + col * (CANVAS_LAYOUT.FRAME_WIDTH + CANVAS_LAYOUT.GAP),
-    y: groupStartY + CANVAS_LAYOUT.GROUP_HEADER_HEIGHT + row * (CANVAS_LAYOUT.FRAME_HEIGHT + CANVAS_LAYOUT.GAP),
+    x: CANVAS_LAYOUT.SECTION_PADDING + col * itemWidth,
+    y: CANVAS_LAYOUT.SECTION_HEADER_HEIGHT + CANVAS_LAYOUT.SECTION_PADDING + row * (CANVAS_LAYOUT.FRAME_HEIGHT + CANVAS_LAYOUT.GAP),
   }
 }
 
 /**
- * Calculate the Y position where each group starts
+ * Calculate the required height for a section based on item count
  */
-export function calculateGroupStartPositions(
-  generations: GenerationItem[]
-): Record<StatusGroup, { startY: number; count: number }> {
-  // Count items in each group
-  const counts: Record<StatusGroup, number> = {
-    generating: 0,
-    queued: 0,
-    completed: 0,
+export function calculateSectionHeight(
+  itemCount: number,
+  sectionWidth: number
+): number {
+  if (itemCount === 0) {
+    return CANVAS_LAYOUT.SECTION_MIN_HEIGHT
   }
 
-  generations.forEach(gen => {
-    counts[gen.status]++
-  })
+  const itemWidth = CANVAS_LAYOUT.FRAME_WIDTH + CANVAS_LAYOUT.GAP
+  const cols = Math.max(1, Math.floor((sectionWidth - CANVAS_LAYOUT.SECTION_PADDING * 2) / itemWidth))
+  const rows = Math.ceil(itemCount / cols)
 
-  // Calculate start Y for each group
-  let currentY = CANVAS_LAYOUT.START_Y
-  const result: Record<StatusGroup, { startY: number; count: number }> = {
-    generating: { startY: 0, count: 0 },
-    queued: { startY: 0, count: 0 },
-    completed: { startY: 0, count: 0 },
-  }
-
-  for (const status of STATUS_GROUPS) {
-    const count = counts[status]
-    result[status] = { startY: currentY, count }
-
-    if (count > 0) {
-      const rows = Math.ceil(count / CANVAS_LAYOUT.COLUMNS)
-      const groupHeight =
-        CANVAS_LAYOUT.GROUP_HEADER_HEIGHT +
-        rows * CANVAS_LAYOUT.FRAME_HEIGHT +
-        (rows - 1) * CANVAS_LAYOUT.GAP +
-        CANVAS_LAYOUT.GROUP_PADDING
-      currentY += groupHeight + CANVAS_LAYOUT.GROUP_GAP
-    }
-  }
-
-  return result
+  return Math.max(
+    CANVAS_LAYOUT.SECTION_MIN_HEIGHT,
+    CANVAS_LAYOUT.SECTION_HEADER_HEIGHT +
+      CANVAS_LAYOUT.SECTION_PADDING * 2 +
+      rows * CANVAS_LAYOUT.FRAME_HEIGHT +
+      (rows - 1) * CANVAS_LAYOUT.GAP
+  )
 }
 
 /**
- * Legacy: Calculate random position for canvas items (kept for asset nodes)
- * Uses seeded random so positions are consistent across renders
+ * Create a new section with default values
+ */
+export function createSection(
+  name: string,
+  position: { x: number; y: number },
+  colorIndex = 0
+): CanvasSection {
+  return {
+    id: `section-${Date.now()}`,
+    name,
+    color: SECTION_COLORS[colorIndex % SECTION_COLORS.length].value,
+    position,
+    width: CANVAS_LAYOUT.SECTION_DEFAULT_WIDTH,
+    height: CANVAS_LAYOUT.SECTION_DEFAULT_HEIGHT,
+    collapsed: false,
+  }
+}
+
+/**
+ * Calculate grid position for loose items (not in a section)
  */
 export function calculateGridPosition(index: number): { x: number; y: number } {
   const col = index % CANVAS_LAYOUT.COLUMNS

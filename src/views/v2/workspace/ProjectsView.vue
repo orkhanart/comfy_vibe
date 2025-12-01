@@ -21,21 +21,21 @@ type ViewMode = 'grid' | 'list'
 const viewMode = ref<ViewMode>('grid')
 
 // Sort
-type SortOption = 'name' | 'updated' | 'workflows'
+type SortOption = 'name' | 'updated' | 'canvases'
 const sortBy = ref<SortOption>('updated')
 
 const sortOptions = [
   { value: 'updated', label: 'Last updated' },
   { value: 'name', label: 'Name' },
-  { value: 'workflows', label: 'Workflow count' }
+  { value: 'canvases', label: 'Canvas count' }
 ]
 
 // Projects data
 const projects = ref([
-  { id: 'img-gen', name: 'Image Generation', description: 'AI image generation workflows', workflowCount: 5, modelCount: 12, updatedAt: '2 hours ago', updatedTimestamp: Date.now() - 2 * 60 * 60 * 1000, thumbnail: '/thumbnails/project-1.jpg' },
-  { id: 'video-proc', name: 'Video Processing', description: 'Video enhancement and editing', workflowCount: 3, modelCount: 8, updatedAt: '1 day ago', updatedTimestamp: Date.now() - 24 * 60 * 60 * 1000, thumbnail: '/thumbnails/project-2.jpg' },
-  { id: 'audio-enh', name: 'Audio Enhancement', description: 'Audio processing pipelines', workflowCount: 2, modelCount: 4, updatedAt: '3 days ago', updatedTimestamp: Date.now() - 3 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp' },
-  { id: 'upscale', name: 'Upscaling', description: 'Image and video upscaling', workflowCount: 4, modelCount: 6, updatedAt: '1 week ago', updatedTimestamp: Date.now() - 7 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/comfyui_workflow.jpg' }
+  { id: 'img-gen', name: 'Image Generation', description: 'AI image generation workflows', canvasCount: 5, modelCount: 12, updatedAt: '2 hours ago', updatedTimestamp: Date.now() - 2 * 60 * 60 * 1000, thumbnail: '/thumbnails/project-1.jpg' },
+  { id: 'video-proc', name: 'Video Processing', description: 'Video enhancement and editing', canvasCount: 3, modelCount: 8, updatedAt: '1 day ago', updatedTimestamp: Date.now() - 24 * 60 * 60 * 1000, thumbnail: '/thumbnails/project-2.jpg' },
+  { id: 'audio-enh', name: 'Audio Enhancement', description: 'Audio processing pipelines', canvasCount: 2, modelCount: 4, updatedAt: '3 days ago', updatedTimestamp: Date.now() - 3 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp' },
+  { id: 'upscale', name: 'Upscaling', description: 'Image and video upscaling', canvasCount: 4, modelCount: 6, updatedAt: '1 week ago', updatedTimestamp: Date.now() - 7 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/comfyui_workflow.jpg' }
 ])
 
 // Create dialog
@@ -47,7 +47,7 @@ function handleCreateProject(data: { name: string; description: string }): void 
     id,
     name: data.name,
     description: data.description,
-    workflowCount: 0,
+    canvasCount: 0,
     modelCount: 0,
     updatedAt: 'Just now',
     updatedTimestamp: Date.now()
@@ -76,8 +76,8 @@ const filteredProjects = computed(() => {
     switch (sortBy.value) {
       case 'name':
         return a.name.localeCompare(b.name)
-      case 'workflows':
-        return b.workflowCount - a.workflowCount
+      case 'canvases':
+        return b.canvasCount - a.canvasCount
       case 'updated':
       default:
         return b.updatedTimestamp - a.updatedTimestamp
@@ -134,7 +134,7 @@ const emptyStateDescription = computed(() =>
         :description="project.description"
         icon="pi pi-folder"
         :stats="[
-          { icon: 'pi pi-sitemap', value: project.workflowCount },
+          { icon: 'pi pi-objects-column', value: project.canvasCount },
           { icon: 'pi pi-box', value: project.modelCount }
         ]"
         @click="openProject(project.id)"
@@ -159,8 +159,8 @@ const emptyStateDescription = computed(() =>
           </div>
           <div class="flex items-center gap-6 text-sm text-zinc-400 dark:text-zinc-500">
             <span class="flex items-center gap-1">
-              <i class="pi pi-sitemap text-xs" />
-              {{ project.workflowCount }}
+              <i class="pi pi-objects-column text-xs" />
+              {{ project.canvasCount }}
             </span>
             <span class="flex items-center gap-1">
               <i class="pi pi-box text-xs" />

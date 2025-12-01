@@ -7,15 +7,16 @@ import '@vue-flow/core/dist/theme-default.css'
 
 import GenerationFrameNode from './GenerationFrameNode.vue'
 import AssetNode from './AssetNode.vue'
-import GroupHeaderNode from './GroupHeaderNode.vue'
+import SectionNode from './SectionNode.vue'
 import CanvasToolbar from './CanvasToolbar.vue'
 import {
-  calculateGroupedPosition,
-  calculateGroupStartPositions,
+  calculateGridPosition,
+  calculatePositionInSection,
+  createSection,
   CANVAS_LAYOUT,
-  STATUS_GROUPS,
+  SECTION_COLORS,
 } from '@/types/linearCanvas'
-import type { GenerationItem, AssetNodeData, StatusGroup } from '@/types/linearCanvas'
+import type { GenerationItem, AssetNodeData, CanvasSection, SectionHeaderData } from '@/types/linearCanvas'
 import type { Node } from '@vue-flow/core'
 
 interface Props {
@@ -37,7 +38,7 @@ const emit = defineEmits<{
 const nodeTypes = {
   generationFrame: markRaw(GenerationFrameNode),
   asset: markRaw(AssetNode),
-  groupHeader: markRaw(GroupHeaderNode),
+  section: markRaw(SectionNode),
 }
 
 // VueFlow hooks
@@ -52,60 +53,111 @@ const assetNodes = ref<Node<AssetNodeData>[]>([])
 // Track which images have been extracted (generationId:index)
 const extractedImages = ref<Set<string>>(new Set())
 
-// Calculate group positions
-const groupPositions = computed(() => calculateGroupStartPositions(props.generations))
+// User-defined sections for grouping media
+const sections = ref<CanvasSection[]>([
+  createSection('Favorites', { x: 50, y: 50 }, 0),
+  createSection('Work in Progress', { x: 50, y: 500 }, 4),
+])
 
-// Group header nodes
-const groupHeaderNodes = computed<Node[]>(() => {
-  const headers: Node[] = []
+// Section assignment map (generationId -> sectionId)
+const generationSections = ref<Map<string, string>>(new Map())
 
-  for (const status of STATUS_GROUPS) {
-    const group = groupPositions.value[status]
-    if (group.count > 0) {
-      headers.push({
-        id: `group-header-${status}`,
-        type: 'groupHeader',
-        position: {
-          x: CANVAS_LAYOUT.START_X,
-          y: group.startY,
-        },
-        data: {
-          status,
-          count: group.count,
-        },
-        draggable: false,
-        selectable: false,
-      })
+// Section nodes
+const sectionNodes = computed<Node<SectionHeaderData>[]>(() => {
+  return sections.value.map((section) => {
+    const itemCount = props.generations.filter(g =>
+      generationSections.value.get(g.id) === section.id
+    ).length
+
+    return {
+      id: section.id,
+      type: 'section',
+      position: section.position,
+      data: {
+        id: section.id,
+        name: section.name,
+        color: section.color,
+        width: section.width,
+        height: section.height,
+        itemCount,
+        collapsed: section.collapsed,
+      },
+      draggable: true,
+      selectable: true,
+      zIndex: -1, // Render behind other nodes
     }
-  }
-
-  return headers
+  })
 })
 
 // Convert generations to VueFlow nodes (filter out extracted images)
 const frameNodes = computed<Node[]>(() => {
-  // Track index within each status group
-  const statusIndex: Record<StatusGroup, number> = {
-    generating: 0,
-    queued: 0,
-    completed: 0,
-  }
+  // Group generations by section
+  const sectionItems: Map<string, GenerationItem[]> = new Map()
+  const unsectionedItems: GenerationItem[] = []
 
-  return props.generations.map((gen) => {
-    // Filter out extracted images from the generation
+  props.generations.forEach((gen) => {
+    const sectionId = generationSections.value.get(gen.id)
+    if (sectionId) {
+      const items = sectionItems.get(sectionId) ?? []
+      items.push(gen)
+      sectionItems.set(sectionId, items)
+    } else {
+      unsectionedItems.push(gen)
+    }
+  })
+
+  const nodes: Node[] = []
+
+  // Add nodes for items in sections
+  sections.value.forEach((section) => {
+    if (section.collapsed) return // Don't show items in collapsed sections
+
+    const items = sectionItems.get(section.id) ?? []
+    items.forEach((gen, index) => {
+      const remainingImages = gen.images.filter((_, imgIdx) =>
+        !extractedImages.value.has(`${gen.id}:${imgIdx}`)
+      )
+
+      const relativePos = calculatePositionInSection(index, section.width)
+
+      nodes.push({
+        id: gen.id,
+        type: 'generationFrame',
+        position: {
+          x: section.position.x + relativePos.x,
+          y: section.position.y + relativePos.y,
+        },
+        data: {
+          ...gen,
+          images: remainingImages,
+          batchSize: remainingImages.length || gen.batchSize,
+          sectionId: section.id,
+        },
+        draggable: true,
+        selectable: true,
+        parentId: section.id,
+      })
+    })
+  })
+
+  // Add unsectioned items in a grid
+  unsectionedItems.forEach((gen, index) => {
     const remainingImages = gen.images.filter((_, imgIdx) =>
       !extractedImages.value.has(`${gen.id}:${imgIdx}`)
     )
 
-    const indexInGroup = statusIndex[gen.status]
-    statusIndex[gen.status]++
+    // Position after sections
+    const lastSection = sections.value[sections.value.length - 1]
+    const startY = lastSection
+      ? lastSection.position.y + lastSection.height + CANVAS_LAYOUT.SECTION_GAP
+      : CANVAS_LAYOUT.START_Y
 
-    const groupStartY = groupPositions.value[gen.status].startY
+    const pos = calculateGridPosition(index)
 
-    return {
+    nodes.push({
       id: gen.id,
       type: 'generationFrame',
-      position: calculateGroupedPosition(gen.status, indexInGroup, groupStartY),
+      position: { x: pos.x, y: startY + pos.y - CANVAS_LAYOUT.START_Y },
       data: {
         ...gen,
         images: remainingImages,
@@ -113,12 +165,77 @@ const frameNodes = computed<Node[]>(() => {
       },
       draggable: true,
       selectable: true,
-    }
-  }).filter(node => node.data.images.length > 0 || node.data.status !== 'completed')
+    })
+  })
+
+  return nodes.filter(node => node.data.images.length > 0 || node.data.status !== 'completed')
 })
 
-// Combined nodes (headers + frames + assets)
-const nodes = computed(() => [...groupHeaderNodes.value, ...frameNodes.value, ...assetNodes.value])
+// Combined nodes (sections + frames + assets)
+const nodes = computed(() => [...sectionNodes.value, ...frameNodes.value, ...assetNodes.value])
+
+// Section management functions
+function addSection(): void {
+  const lastSection = sections.value[sections.value.length - 1]
+  const newY = lastSection
+    ? lastSection.position.y + lastSection.height + CANVAS_LAYOUT.SECTION_GAP
+    : CANVAS_LAYOUT.START_Y
+
+  sections.value.push(createSection(`Section ${sections.value.length + 1}`, { x: 50, y: newY }, sections.value.length))
+}
+
+function handleSectionRename(id: string, name: string): void {
+  const section = sections.value.find(s => s.id === id)
+  if (section) {
+    section.name = name
+  }
+}
+
+function handleSectionResize(id: string, width: number, height: number): void {
+  const section = sections.value.find(s => s.id === id)
+  if (section) {
+    section.width = width
+    section.height = height
+  }
+}
+
+function handleSectionDelete(id: string): void {
+  // Remove section assignment from all items in this section
+  generationSections.value.forEach((sectionId, genId) => {
+    if (sectionId === id) {
+      generationSections.value.delete(genId)
+    }
+  })
+
+  // Remove the section
+  const index = sections.value.findIndex(s => s.id === id)
+  if (index !== -1) {
+    sections.value.splice(index, 1)
+  }
+}
+
+function handleSectionColorChange(id: string, color: string): void {
+  const section = sections.value.find(s => s.id === id)
+  if (section) {
+    section.color = color
+  }
+}
+
+function handleSectionToggleCollapse(id: string): void {
+  const section = sections.value.find(s => s.id === id)
+  if (section) {
+    section.collapsed = !section.collapsed
+  }
+}
+
+// Assign a generation to a section
+function assignToSection(generationId: string, sectionId: string | null): void {
+  if (sectionId) {
+    generationSections.value.set(generationId, sectionId)
+  } else {
+    generationSections.value.delete(generationId)
+  }
+}
 
 // No edges for now (MVP)
 const edges = ref([])
@@ -176,17 +293,41 @@ function handleDelete(id: string): void {
   emit('delete', id)
 }
 
-// Helper to find a generation's position in the grouped layout
+// Helper to find a generation's position
 function getFramePosition(generationId: string): { x: number; y: number } {
   const gen = props.generations.find(g => g.id === generationId)
   if (!gen) return { x: 0, y: 0 }
 
-  // Find the index within its status group
-  const sameStatusGens = props.generations.filter(g => g.status === gen.status)
-  const indexInGroup = sameStatusGens.findIndex(g => g.id === generationId)
-  const groupStartY = groupPositions.value[gen.status].startY
+  const sectionId = generationSections.value.get(generationId)
 
-  return calculateGroupedPosition(gen.status, indexInGroup, groupStartY)
+  if (sectionId) {
+    const section = sections.value.find(s => s.id === sectionId)
+    if (section) {
+      const sectionGens = props.generations.filter(g =>
+        generationSections.value.get(g.id) === sectionId
+      )
+      const indexInSection = sectionGens.findIndex(g => g.id === generationId)
+      const relativePos = calculatePositionInSection(indexInSection, section.width)
+      return {
+        x: section.position.x + relativePos.x,
+        y: section.position.y + relativePos.y,
+      }
+    }
+  }
+
+  // Unsectioned items
+  const unsectionedGens = props.generations.filter(g =>
+    !generationSections.value.has(g.id)
+  )
+  const index = unsectionedGens.findIndex(g => g.id === generationId)
+
+  const lastSection = sections.value[sections.value.length - 1]
+  const startY = lastSection
+    ? lastSection.position.y + lastSection.height + CANVAS_LAYOUT.SECTION_GAP
+    : CANVAS_LAYOUT.START_Y
+
+  const pos = calculateGridPosition(index)
+  return { x: pos.x, y: startY + pos.y - CANVAS_LAYOUT.START_Y }
 }
 
 // Ungroup handler - extract all images from a frame
@@ -424,17 +565,34 @@ function handleAddImageToSection(targetGenerationId: string, imageUrl: string): 
         />
       </template>
 
-      <!-- Group Header Node -->
-      <template #node-groupHeader="nodeProps">
-        <GroupHeaderNode
+      <!-- Section Node -->
+      <template #node-section="nodeProps">
+        <SectionNode
           :id="nodeProps.id"
           :data="nodeProps.data"
+          :selected="selectedNodeId === nodeProps.id"
+          @rename="handleSectionRename"
+          @resize="handleSectionResize"
+          @delete="handleSectionDelete"
+          @change-color="handleSectionColorChange"
+          @toggle-collapse="handleSectionToggleCollapse"
         />
       </template>
     </VueFlow>
 
     <!-- Bottom Toolbar -->
     <CanvasToolbar />
+
+    <!-- Add Section Button -->
+    <div class="absolute left-4 top-4 z-10">
+      <button
+        class="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800/90 px-3 py-2 text-sm text-zinc-300 backdrop-blur transition-colors hover:bg-zinc-700 hover:text-white"
+        @click="addSection"
+      >
+        <i class="pi pi-plus text-xs" />
+        Add Section
+      </button>
+    </div>
 
     <!-- Zoom Controls -->
     <div class="absolute bottom-4 right-4 z-10 flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/90 p-1 backdrop-blur">
@@ -508,11 +666,15 @@ function handleAddImageToSection(targetGenerationId: string, imageUrl: string): 
   box-shadow: none;
 }
 
-/* Override default node styles - Group Header */
-.linear-canvas .vue-flow__node-groupHeader {
+/* Override default node styles - Section Node */
+.linear-canvas .vue-flow__node-section {
   background: transparent;
   border: none;
   padding: 0;
+  box-shadow: none;
+}
+
+.linear-canvas .vue-flow__node-section.selected {
   box-shadow: none;
 }
 

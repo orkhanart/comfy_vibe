@@ -32,7 +32,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-zinc-950 text-zinc-50">
+  <div class="min-h-screen bg-surface-ground text-surface-900">
     <!-- Global components -->
     <Toast />
     <ConfirmDialog />
@@ -41,3 +41,10 @@ onUnmounted(() => {
     <RouterView />
   </div>
 </template>
+
+<style>
+/* Dark mode color scheme */
+.dark {
+  color-scheme: dark;
+}
+</style>

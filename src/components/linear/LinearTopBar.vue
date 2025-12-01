@@ -2,13 +2,12 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/uiStore'
-import { useWorkspaceStore } from '@/stores/workspaceStore'
-import CanvasModeToggle from '@/components/common/CanvasModeToggle.vue'
 
 const router = useRouter()
 const uiStore = useUiStore()
-const workspaceStore = useWorkspaceStore()
 
+const sessionName = ref('Untitled session')
+const credits = ref(4625)
 const showMenu = ref(false)
 
 function handleLogoClick(): void {
@@ -82,7 +81,7 @@ function toggleExperimentalUI(): void {
         <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-zinc-500">Workspace</div>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="goToWorkspace">
           <i class="pi pi-home w-4 text-sm text-zinc-500" />
-          <span>Home</span>
+          <span>Dashboard</span>
         </button>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="goToProjects">
           <i class="pi pi-folder w-4 text-sm text-zinc-500" />
@@ -126,12 +125,6 @@ function toggleExperimentalUI(): void {
     <!-- Divider -->
     <div class="mx-1 h-5 w-px bg-zinc-800" />
 
-    <!-- Mode Toggle -->
-    <CanvasModeToggle />
-
-    <!-- Divider -->
-    <div class="mx-1 h-5 w-px bg-zinc-800" />
-
     <!-- Home Button -->
     <button
       v-tooltip.bottom="{ value: 'Home', showDelay: 50 }"
@@ -144,10 +137,10 @@ function toggleExperimentalUI(): void {
     <!-- Divider -->
     <div class="mx-1 h-5 w-px bg-zinc-800" />
 
-    <!-- Project Name -->
+    <!-- Session Name / Tabs Area -->
     <div class="flex flex-1 items-center">
       <div class="flex items-center gap-1">
-        <span class="rounded-md bg-zinc-800 px-3 py-1.5 text-xs text-zinc-100">{{ workspaceStore.currentProjectName }}</span>
+        <span class="rounded-md bg-zinc-800 px-3 py-1.5 text-xs text-zinc-100">{{ sessionName }}</span>
         <button class="p-1 text-zinc-500 transition-colors hover:text-zinc-300">
           <i class="pi pi-ellipsis-h text-xs" />
         </button>
@@ -157,10 +150,20 @@ function toggleExperimentalUI(): void {
     <!-- Right Section -->
     <div class="flex items-center gap-2">
       <button
-        v-tooltip.bottom="{ value: 'Share', showDelay: 50 }"
+        v-tooltip.bottom="{ value: 'Help', showDelay: 50 }"
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
       >
-        <i class="pi pi-share-alt text-sm" />
+        <i class="pi pi-question-circle text-sm" />
+      </button>
+      <button
+        v-tooltip.bottom="{ value: 'Open in new window', showDelay: 50 }"
+        class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+      >
+        <i class="pi pi-external-link text-sm" />
+      </button>
+      <span class="text-xs text-zinc-400">{{ credits.toLocaleString() }} credits</span>
+      <button class="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-500">
+        Upgrade
       </button>
     </div>
   </header>

@@ -14,7 +14,7 @@ type ViewMode = 'grid' | 'list'
 interface RecentItem {
   id: string
   name: string
-  type: 'workflow' | 'asset' | 'project'
+  type: 'canvas' | 'workflow' | 'asset' | 'project'
   icon: string
   updatedAt: string
   thumbnail: string
@@ -33,17 +33,18 @@ const sortOptions = [
 
 const filterOptions = [
   { value: 'all', label: 'All Types' },
+  { value: 'canvas', label: 'Canvas' },
   { value: 'workflow', label: 'Workflow' },
   { value: 'project', label: 'Project' },
   { value: 'asset', label: 'Asset' },
 ]
 
 const recentItems = ref<RecentItem[]>([
-  { id: '1', name: 'Portrait Generation', type: 'workflow', icon: 'pi pi-sitemap', updatedAt: '2 minutes ago', thumbnail: '/thumbnails/workflow-1.jpg' },
+  { id: '1', name: 'Portrait Generation', type: 'canvas', icon: 'pi pi-objects-column', updatedAt: '2 minutes ago', thumbnail: '/thumbnails/canvas-1.jpg' },
   { id: '2', name: 'SDXL Workflow', type: 'workflow', icon: 'pi pi-sitemap', updatedAt: '15 minutes ago', thumbnail: '/thumbnails/workflow-1.jpg' },
   { id: '3', name: 'Product Shots', type: 'project', icon: 'pi pi-folder', updatedAt: '1 hour ago', thumbnail: '/thumbnails/project-1.jpg' },
   { id: '4', name: 'reference_image.png', type: 'asset', icon: 'pi pi-image', updatedAt: '2 hours ago', thumbnail: '/thumbnails/asset-1.jpg' },
-  { id: '5', name: 'Inpainting Workflow', type: 'workflow', icon: 'pi pi-sitemap', updatedAt: '3 hours ago', thumbnail: '/thumbnails/workflow-2.jpg' },
+  { id: '5', name: 'Inpainting Canvas', type: 'canvas', icon: 'pi pi-objects-column', updatedAt: '3 hours ago', thumbnail: '/thumbnails/canvas-2.jpg' },
   { id: '6', name: 'ControlNet Pipeline', type: 'workflow', icon: 'pi pi-sitemap', updatedAt: '5 hours ago', thumbnail: '/thumbnails/workflow-2.jpg' },
   { id: '7', name: 'Marketing Assets', type: 'project', icon: 'pi pi-folder', updatedAt: 'Yesterday', thumbnail: '/thumbnails/project-2.jpg' },
   { id: '8', name: 'logo_v2.png', type: 'asset', icon: 'pi pi-image', updatedAt: 'Yesterday', thumbnail: '/thumbnails/asset-2.jpg' },
@@ -75,6 +76,7 @@ const filteredItems = computed(() => {
 
 function getTypeLabel(type: string): string {
   const labels: Record<string, string> = {
+    canvas: 'Canvas',
     workflow: 'Workflow',
     asset: 'Asset',
     project: 'Project'
@@ -84,6 +86,7 @@ function getTypeLabel(type: string): string {
 
 function getTypeColor(type: string): string {
   const colors: Record<string, string> = {
+    canvas: 'bg-blue-500/20 text-blue-400',
     workflow: 'bg-purple-500/20 text-purple-400',
     asset: 'bg-green-500/20 text-green-400',
     project: 'bg-amber-500/20 text-amber-400'
