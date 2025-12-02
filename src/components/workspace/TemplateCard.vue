@@ -11,46 +11,72 @@ defineProps<Props>()
 const emit = defineEmits<{
   open: [id: string]
 }>()
+
+function formatUses(uses: number): string {
+  if (uses >= 1000) {
+    return `${(uses / 1000).toFixed(1)}k`
+  }
+  return uses.toString()
+}
 </script>
 
 <template>
   <div
-    class="group cursor-pointer overflow-hidden rounded-xl border border-zinc-200 bg-white transition-all hover:border-zinc-300 hover:shadow-md dark:border-border dark:bg-card dark:hover:border-zinc-600"
+    class="group cursor-pointer"
     @click="emit('open', template.id)"
   >
-    <!-- Thumbnail -->
-    <div class="relative aspect-square overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+    <!-- Thumbnail with hover overlay -->
+    <div class="relative aspect-square overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800">
       <img
         :src="template.thumbnail"
         :alt="template.name"
-        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        class="h-full w-full object-cover"
       />
-      <!-- Tags at bottom-right -->
-      <div class="absolute bottom-2 right-2 flex flex-wrap justify-end gap-1">
-        <span
-          v-for="tag in template.tags"
-          :key="tag"
-          class="rounded bg-zinc-800/80 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm"
-        >
-          {{ tag }}
-        </span>
+      <!-- Hover overlay -->
+      <div class="absolute inset-0 flex flex-col justify-between bg-black/0 p-2 transition-all group-hover:bg-black/40">
+        <!-- Top row -->
+        <div class="flex items-start justify-between">
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-1">
+            <span
+              v-for="tag in template.tags.slice(0, 2)"
+              :key="tag"
+              class="rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm"
+            >
+              {{ tag }}
+            </span>
+          </div>
+          <div />
+        </div>
+        <!-- Bottom row -->
+        <div class="flex items-end justify-between">
+          <!-- Uses count -->
+          <span class="inline-flex items-center gap-1 rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+            <Icon name="users" size="xs" />
+            {{ formatUses(template.uses) }}
+          </span>
+          <!-- Hover actions -->
+          <div class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+            <button
+              class="flex h-8 items-center gap-1.5 rounded-lg bg-white/90 px-3 font-medium text-zinc-700 backdrop-blur-sm transition-colors hover:bg-white"
+              @click.stop="emit('open', template.id)"
+            >
+              <Icon name="clone" size="xs" />
+              <span class="text-xs">Use</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-    <!-- Content -->
-    <div class="flex items-start justify-between gap-2 p-3">
-      <div class="min-w-0 flex-1">
-        <h3 class="font-medium text-zinc-900 dark:text-foreground">{{ template.name }}</h3>
-        <p class="mt-1 line-clamp-2 text-sm text-zinc-500 dark:text-muted-foreground">
-          {{ template.description }}
-        </p>
-      </div>
-      <!-- Open button on hover -->
-      <button
-        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 opacity-0 transition-all hover:bg-zinc-100 hover:text-zinc-900 group-hover:opacity-100 dark:hover:bg-zinc-800 dark:hover:text-white"
-        @click.stop="emit('open', template.id)"
+    <!-- Name -->
+    <div class="mt-2 px-1">
+      <h3
+        :title="template.name"
+        class="line-clamp-2 text-sm font-medium leading-tight text-zinc-900 dark:text-foreground"
       >
-        <Icon name="external-link" size="sm" />
-      </button>
+        {{ template.name }}
+      </h3>
+      <p class="mt-0.5 text-xs text-muted-foreground">{{ template.category }}</p>
     </div>
   </div>
 </template>

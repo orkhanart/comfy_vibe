@@ -20,5 +20,11 @@ export { default as AssetContextMenu } from './AssetContextMenu.vue'
 export { default as AssetFileInfoSidebar } from './AssetFileInfoSidebar.vue'
 export { default as ImportModelDialog } from './ImportModelDialog.vue'
 
+// Folder components
+export { default as FolderCard } from './FolderCard.vue'
+export { default as FolderBreadcrumbs } from './FolderBreadcrumbs.vue'
+export { default as FolderContextMenu } from './FolderContextMenu.vue'
+export { default as CreateFolderDialog } from './CreateFolderDialog.vue'
+
 // Legacy type export (use types from @/data/workspaceMockData instead)
 export type { Workflow } from './WorkflowCard.vue'

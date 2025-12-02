@@ -9,14 +9,13 @@ import {
   BRAND_ASSETS_DATA,
   createSharedWorkflowsData,
   createTeamModelsData,
-  NODE_PACKS_DATA,
 } from '@/data/sidebarMockData'
 
 interface LibraryItem {
   id: string
   name: string
   description?: string
-  type: 'workflow' | 'model' | 'nodepack' | 'brand'
+  type: 'workflow' | 'model' | 'brand'
   subtype?: string
   thumbnail?: string
   icon: string
@@ -51,7 +50,6 @@ const sortOptions = [
 const filterOptions = [
   { label: 'Workflows', value: 'workflow', icon: 'sitemap', color: 'text-blue-400' },
   { label: 'Models', value: 'model', icon: 'box', color: 'text-green-400' },
-  { label: 'Nodepacks', value: 'nodepack', icon: 'code', color: 'text-purple-400' },
   { label: 'Brand Kit', value: 'brand', icon: 'palette', color: 'text-amber-400' },
 ]
 
@@ -132,22 +130,6 @@ const allItems = computed<LibraryItem[]>(() => {
       badge: typeLabels[m.type] || m.type,
       badgeClass: typeColors[m.type] || 'bg-muted text-muted-foreground',
       meta: m.size,
-    })
-  })
-
-  // Add nodepacks
-  NODE_PACKS_DATA.forEach(p => {
-    items.push({
-      id: `nodepack-${p.id}`,
-      name: p.name,
-      description: p.description,
-      type: 'nodepack',
-      thumbnail: p.thumbnail,
-      icon: 'code',
-      iconClass: 'text-purple-400',
-      badge: p.installed ? 'Installed' : `${p.nodes} nodes`,
-      badgeClass: p.installed ? 'bg-green-500/30 text-green-300' : 'bg-muted text-muted-foreground',
-      meta: `v${p.version}`,
     })
   })
 

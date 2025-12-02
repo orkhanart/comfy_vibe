@@ -98,12 +98,22 @@ function getTypeLabel(type: string): string {
 
 function getTypeColor(type: string): string {
   const colors: Record<string, string> = {
-    workflow: 'bg-purple-500/20 text-purple-400',
-    asset: 'bg-green-500/20 text-green-400',
-    model: 'bg-blue-500/20 text-blue-400',
-    template: 'bg-amber-500/20 text-amber-400'
+    workflow: 'bg-purple-500/80 text-white',
+    asset: 'bg-green-500/80 text-white',
+    model: 'bg-blue-500/80 text-white',
+    template: 'bg-amber-500/80 text-white'
   }
-  return colors[type] || 'bg-muted-foreground/20 text-muted-foreground'
+  return colors[type] || 'bg-zinc-900/70 text-white'
+}
+
+function getIconClass(type: string): string {
+  const classes: Record<string, string> = {
+    workflow: 'bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400',
+    asset: 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400',
+    model: 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400',
+    template: 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400'
+  }
+  return classes[type] || 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'
 }
 
 </script>
@@ -129,7 +139,7 @@ function getTypeColor(type: string): string {
     <!-- Grid View -->
     <div
       v-if="viewMode === 'grid'"
-      class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+      class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));"
     >
       <WorkspaceCard
         v-for="item in filteredItems"
@@ -137,6 +147,7 @@ function getTypeColor(type: string): string {
         :thumbnail="item.thumbnail"
         :title="item.name"
         :icon="item.icon"
+        :icon-class="getIconClass(item.type)"
         :badge="getTypeLabel(item.type)"
         :badge-class="getTypeColor(item.type)"
         :updated-at="item.updatedAt"

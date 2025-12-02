@@ -151,7 +151,7 @@ function openTemplate(templateId: string): void {
     <!-- Grid View -->
     <div
       v-if="viewMode === 'grid'"
-      class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+      class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));"
     >
       <TemplateCard
         v-for="template in filteredTemplates"

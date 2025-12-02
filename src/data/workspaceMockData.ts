@@ -5,6 +5,15 @@
 // TYPES
 // ============================================
 
+export interface Folder {
+  id: string
+  name: string
+  parentId: string | null  // null = root level
+  type: 'workflows' | 'assets' | 'models'
+  createdAt: number
+  updatedAt: number
+}
+
 export interface Template {
   id: string
   name: string
@@ -40,6 +49,7 @@ export interface Model {
   favorite: boolean
   versions?: ModelVersion[]
   source: 'builtin' | 'imported'
+  folderId?: string | null
 }
 
 export interface Asset {
@@ -54,6 +64,7 @@ export interface Asset {
   updatedTimestamp: number
   thumbnail: string
   favorite: boolean
+  folderId?: string | null
 }
 
 export interface Workflow {
@@ -68,6 +79,7 @@ export interface Workflow {
   runtime: string
   cost: string
   tags: string[]
+  folderId?: string | null
 }
 
 export interface RecentItem {
@@ -271,4 +283,80 @@ export function getRecentItemColor(type: RecentItem['type']): string {
     template: 'bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400',
   }
   return colors[type] || 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+}
+
+// ============================================
+// FOLDER DATA & HELPERS
+// ============================================
+
+export const MOCK_FOLDERS: Folder[] = [
+  // Workflow folders
+  { id: 'wf-folder-1', name: 'Production', parentId: null, type: 'workflows', createdAt: Date.now() - 30 * 24 * 60 * 60 * 1000, updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000 },
+  { id: 'wf-folder-2', name: 'Experiments', parentId: null, type: 'workflows', createdAt: Date.now() - 20 * 24 * 60 * 60 * 1000, updatedAt: Date.now() - 5 * 24 * 60 * 60 * 1000 },
+  { id: 'wf-folder-3', name: 'Archive', parentId: null, type: 'workflows', createdAt: Date.now() - 60 * 24 * 60 * 60 * 1000, updatedAt: Date.now() - 14 * 24 * 60 * 60 * 1000 },
+  { id: 'wf-folder-4', name: 'Client Projects', parentId: 'wf-folder-1', type: 'workflows', createdAt: Date.now() - 15 * 24 * 60 * 60 * 1000, updatedAt: Date.now() - 1 * 24 * 60 * 60 * 1000 },
+  { id: 'wf-folder-5', name: 'Internal Tools', parentId: 'wf-folder-1', type: 'workflows', createdAt: Date.now() - 10 * 24 * 60 * 60 * 1000, updatedAt: Date.now() - 3 * 24 * 60 * 60 * 1000 },
+
+  // Asset folders
+  { id: 'as-folder-1', name: 'References', parentId: null, type: 'assets', createdAt: Date.now() - 25 * 24 * 60 * 60 * 1000, updatedAt: Date.now() - 1 * 24 * 60 * 60 * 1000 },
+  { id: 'as-folder-2', name: 'Generated Outputs', parentId: null, type: 'assets', createdAt: Date.now() - 20 * 24 * 60 * 60 * 1000, updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000 },
+  { id: 'as-folder-3', name: 'Portraits', parentId: 'as-folder-2', type: 'assets', createdAt: Date.now() - 10 * 24 * 60 * 60 * 1000, updatedAt: Date.now() - 3 * 24 * 60 * 60 * 1000 },
+
+  // Model folders
+  { id: 'md-folder-1', name: 'Favorites', parentId: null, type: 'models', createdAt: Date.now() - 30 * 24 * 60 * 60 * 1000, updatedAt: Date.now() - 1 * 24 * 60 * 60 * 1000 },
+  { id: 'md-folder-2', name: 'SDXL Collection', parentId: null, type: 'models', createdAt: Date.now() - 20 * 24 * 60 * 60 * 1000, updatedAt: Date.now() - 4 * 24 * 60 * 60 * 1000 },
+  { id: 'md-folder-3', name: 'LoRAs', parentId: 'md-folder-2', type: 'models', createdAt: Date.now() - 15 * 24 * 60 * 60 * 1000, updatedAt: Date.now() - 2 * 24 * 60 * 60 * 1000 },
+]
+
+/**
+ * Get all folders of a specific type at a given parent level
+ */
+export function getChildFolders(parentId: string | null, type: Folder['type']): Folder[] {
+  return MOCK_FOLDERS.filter(f => f.type === type && f.parentId === parentId)
+}
+
+/**
+ * Get the full path from root to a folder (for breadcrumbs)
+ */
+export function getFolderPath(folderId: string | null): Folder[] {
+  if (!folderId) return []
+
+  const path: Folder[] = []
+  let currentId: string | null = folderId
+
+  while (currentId) {
+    const folder = MOCK_FOLDERS.find(f => f.id === currentId)
+    if (folder) {
+      path.unshift(folder)
+      currentId = folder.parentId
+    } else {
+      break
+    }
+  }
+
+  return path
+}
+
+/**
+ * Get a folder by ID
+ */
+export function getFolderById(folderId: string): Folder | undefined {
+  return MOCK_FOLDERS.find(f => f.id === folderId)
+}
+
+/**
+ * Count items in a folder (for display purposes)
+ */
+export function countItemsInFolder<T extends { folderId?: string | null }>(
+  folderId: string,
+  items: T[]
+): number {
+  return items.filter(item => item.folderId === folderId).length
+}
+
+/**
+ * Count subfolders in a folder
+ */
+export function countSubfolders(folderId: string, type: Folder['type']): number {
+  return MOCK_FOLDERS.filter(f => f.parentId === folderId && f.type === type).length
 }

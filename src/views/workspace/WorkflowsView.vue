@@ -6,12 +6,59 @@ import {
   WorkflowCard,
   WorkflowContextMenu,
   WorkflowFileInfoSidebar,
+  FolderCard,
+  FolderBreadcrumbs,
+  FolderContextMenu,
+  CreateFolderDialog,
 } from '@/components/workspace'
 import { MOCK_WORKFLOWS, type Workflow } from '@/data/workspaceMockData'
+import { useFolders } from '@/composables/common/useFolders'
 
 const route = useRoute()
 const router = useRouter()
 const workspaceId = computed(() => route.params.workspaceId as string)
+
+// Folder functionality
+const {
+  currentFolderId,
+  breadcrumbPath,
+  foldersAtCurrentLevel,
+  navigateToFolder,
+  filterItemsByFolder,
+  createFolder,
+  deleteFolder,
+  getItemCount,
+  getSubfolderCount,
+} = useFolders('workflows')
+
+// Create folder dialog
+const showCreateFolderDialog = ref(false)
+
+function handleCreateFolder(name: string) {
+  createFolder(name)
+  showCreateFolderDialog.value = false
+}
+
+// Folder context menu
+const openFolderMenuId = ref<string | null>(null)
+
+function handleOpenFolderMenu(folderId: string, _event: MouseEvent) {
+  openFolderMenuId.value = openFolderMenuId.value === folderId ? null : folderId
+}
+
+function closeFolderMenu() {
+  openFolderMenuId.value = null
+}
+
+function handleFolderOpen(folderId: string) {
+  navigateToFolder(folderId)
+  closeFolderMenu()
+}
+
+function handleFolderDelete(folderId: string) {
+  deleteFolder(folderId)
+  closeFolderMenu()
+}
 
 // View mode
 type ViewMode = 'grid' | 'list'
@@ -43,7 +90,8 @@ function toggleFavorite(workflowId: string) {
 // Search and sort
 const searchQuery = ref('')
 const filteredWorkflows = computed(() => {
-  let result = workflows.value
+  // First filter by current folder
+  let result = filterItemsByFolder(workflows.value)
 
   // Filter by favorites
   if (showFavoritesOnly.value) {
@@ -85,6 +133,7 @@ function handleOpenMenu(workflowId: string, _event: MouseEvent) {
 
 function closeMenu() {
   openMenuId.value = null
+  openFolderMenuId.value = null
 }
 
 function handleMenuAction(action: string, workflowId: string) {
@@ -140,6 +189,13 @@ function openInMode(workflowId: string, mode: 'node' | 'linear') {
       <div class="flex items-center gap-2">
         <button
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-border dark:bg-muted dark:text-foreground dark:hover:bg-accent"
+          @click="showCreateFolderDialog = true"
+        >
+          <Icon name="folder-plus" size="xs" />
+          New Folder
+        </button>
+        <button
+          class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-border dark:bg-muted dark:text-foreground dark:hover:bg-accent"
         >
           <Icon name="upload" size="xs" />
           Import Workflow
@@ -152,6 +208,15 @@ function openInMode(workflowId: string, mode: 'node' | 'linear') {
         </button>
       </div>
     </div>
+
+    <!-- Breadcrumbs (when in subfolder) -->
+    <FolderBreadcrumbs
+      v-if="currentFolderId"
+      :path="breadcrumbPath"
+      root-label="Workflows"
+      class="mb-4"
+      @navigate="navigateToFolder"
+    />
 
     <!-- Search, Sort & View Toggle -->
     <div class="mb-6 flex items-center gap-3">
@@ -218,9 +283,35 @@ function openInMode(workflowId: string, mode: 'node' | 'linear') {
       </button>
     </div>
 
+    <!-- Folders Section -->
+    <div v-if="foldersAtCurrentLevel.length > 0" class="mb-6">
+      <h3 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Folders</h3>
+      <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+        <div v-for="folder in foldersAtCurrentLevel" :key="folder.id" class="relative">
+          <FolderCard
+            :folder="folder"
+            :item-count="getItemCount(folder.id, workflows)"
+            :subfolder-count="getSubfolderCount(folder.id)"
+            @open="handleFolderOpen"
+            @open-menu="handleOpenFolderMenu"
+          />
+          <!-- Folder Context Menu -->
+          <FolderContextMenu
+            v-if="openFolderMenuId === folder.id"
+            :folder-id="folder.id"
+            class="absolute right-0 top-full z-50"
+            @open="handleFolderOpen"
+            @rename="closeFolderMenu"
+            @delete="handleFolderDelete"
+            @close="closeFolderMenu"
+          />
+        </div>
+      </div>
+    </div>
+
     <!-- Empty State -->
     <div
-      v-if="filteredWorkflows.length === 0"
+      v-if="filteredWorkflows.length === 0 && foldersAtCurrentLevel.length === 0"
       class="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 py-16 dark:border-border"
     >
       <div class="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-muted">
@@ -232,10 +323,18 @@ function openInMode(workflowId: string, mode: 'node' | 'linear') {
       </p>
     </div>
 
+    <!-- Workflows Section Header (when we have both folders and workflows) -->
+    <h3
+      v-if="foldersAtCurrentLevel.length > 0 && filteredWorkflows.length > 0"
+      class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300"
+    >
+      Workflows
+    </h3>
+
     <!-- Grid View -->
     <div
-      v-else-if="viewMode === 'grid'"
-      class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+      v-if="filteredWorkflows.length > 0 && viewMode === 'grid'"
+      class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));"
     >
       <div v-for="workflow in filteredWorkflows" :key="workflow.id" class="relative">
         <WorkflowCard
@@ -264,7 +363,7 @@ function openInMode(workflowId: string, mode: 'node' | 'linear') {
     </div>
 
     <!-- List View -->
-    <div v-else class="rounded-xl border border-zinc-200 bg-white dark:border-border dark:bg-card">
+    <div v-if="filteredWorkflows.length > 0 && viewMode === 'list'" class="rounded-xl border border-zinc-200 bg-white dark:border-border dark:bg-card">
       <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
         <div
           v-for="workflow in filteredWorkflows"
@@ -331,6 +430,12 @@ function openInMode(workflowId: string, mode: 'node' | 'linear') {
       @close="closeFileInfo"
       @open="openWorkflow"
       @toggle-favorite="toggleFavorite"
+    />
+
+    <!-- Create Folder Dialog -->
+    <CreateFolderDialog
+      v-model:visible="showCreateFolderDialog"
+      @create="handleCreateFolder"
     />
   </div>
 </template>

@@ -18,79 +18,82 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="group cursor-pointer rounded-xl bg-white transition-all hover:shadow-md dark:bg-card"
+    class="group cursor-pointer"
     @click="emit('open', model.id)"
   >
-    <!-- Thumbnail -->
-    <div class="relative aspect-square overflow-hidden rounded-t-xl bg-zinc-100 dark:bg-zinc-800">
+    <!-- Thumbnail with hover overlay -->
+    <div class="relative aspect-square overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800">
       <img
         v-if="model.thumbnail"
         :src="model.thumbnail"
         :alt="model.name"
-        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        class="h-full w-full object-cover"
       />
       <div v-else class="flex h-full w-full items-center justify-center">
         <Icon :name="getModelIcon(model.type)" size="2xl" class="text-zinc-400" />
       </div>
-      <!-- Base model badge (top-left) -->
-      <div class="absolute left-2 top-2">
-        <span
-          :class="[
-            'inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium backdrop-blur-sm',
-            getBaseModelColor(model.baseModel)
-          ]"
-        >
-          {{ model.baseModel }}
-        </span>
-      </div>
-      <!-- Favorite button (top-right) -->
-      <div class="absolute right-2 top-2">
-        <FavoriteButton
-          :is-favorite="model.favorite"
-          variant="overlay"
-          size="md"
-          @toggle="emit('toggleFavorite', model.id)"
-        />
-      </div>
-      <!-- Type badge (bottom-left) -->
-      <div class="absolute bottom-2 left-2 flex items-center gap-1">
-        <span class="inline-flex items-center gap-1 rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium capitalize text-white backdrop-blur-sm">
-          <Icon :name="getModelIcon(model.type)" size="xs" />
-          {{ model.type }}
-        </span>
-      </div>
-      <!-- Version & size (bottom-right) -->
-      <div class="absolute bottom-2 right-2 flex items-center gap-1.5">
-        <span class="rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
-          v{{ model.version }}
-        </span>
-        <span class="rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
-          {{ model.size }}
-        </span>
+      <!-- Hover overlay -->
+      <div class="absolute inset-0 flex flex-col justify-between bg-black/0 p-2 transition-all group-hover:bg-black/40">
+        <!-- Top row -->
+        <div class="flex items-start justify-between">
+          <!-- Base model badge -->
+          <span
+            :class="[
+              'inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-medium backdrop-blur-sm',
+              getBaseModelColor(model.baseModel)
+            ]"
+          >
+            {{ model.baseModel }}
+          </span>
+          <!-- Favorite -->
+          <FavoriteButton
+            :is-favorite="model.favorite"
+            variant="overlay"
+            size="md"
+            @toggle="emit('toggleFavorite', model.id)"
+          />
+        </div>
+        <!-- Bottom row -->
+        <div class="flex items-end justify-between">
+          <!-- Meta badges -->
+          <div class="flex items-center gap-1">
+            <span class="inline-flex items-center gap-0.5 rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium capitalize text-white backdrop-blur-sm">
+              <Icon :name="getModelIcon(model.type)" size="xs" />
+              {{ model.type }}
+            </span>
+            <span class="rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+              {{ model.size }}
+            </span>
+          </div>
+          <!-- Hover actions -->
+          <div class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+            <button
+              class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-zinc-700 backdrop-blur-sm transition-colors hover:bg-white"
+              title="More options"
+              @click.stop="emit('menu', model.id, $event)"
+            >
+              <Icon name="ellipsis-h" size="sm" />
+            </button>
+            <button
+              class="flex h-8 items-center gap-1.5 rounded-lg bg-white/90 px-3 font-medium text-zinc-700 backdrop-blur-sm transition-colors hover:bg-white"
+              @click.stop="emit('open', model.id)"
+            >
+              <Icon name="info-circle" size="xs" />
+              <span class="text-xs">Info</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-    <!-- Content -->
-    <div class="flex items-center gap-2 px-3 py-2.5">
-      <!-- Icon -->
-      <div :class="['flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', getModelColor(model.type)]">
-        <Icon :name="getModelIcon(model.type)" size="sm" />
-      </div>
-      <!-- Title -->
-      <h3 class="min-w-0 flex-1 truncate text-sm font-medium text-zinc-900 dark:text-foreground">{{ model.name }}</h3>
-      <!-- Right side: Open & Menu buttons -->
-      <button
-        class="flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-zinc-900 px-3 text-xs font-medium text-white opacity-0 transition-all hover:bg-zinc-800 group-hover:opacity-100 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
-        @click.stop="emit('open', model.id)"
+    <!-- Name -->
+    <div class="mt-2 px-1">
+      <h3
+        :title="model.name"
+        class="line-clamp-2 text-sm font-medium leading-tight text-zinc-900 dark:text-foreground"
       >
-        <Icon name="external-link" size="xs" />
-        Open
-      </button>
-      <button
-        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-zinc-400 opacity-0 transition-all hover:bg-zinc-100 hover:text-zinc-600 group-hover:opacity-100 dark:hover:bg-zinc-800 dark:hover:text-white"
-        @click.stop="emit('menu', model.id, $event)"
-      >
-        <Icon name="ellipsis-h" size="sm" />
-      </button>
+        {{ model.name }}
+      </h3>
+      <p class="mt-0.5 text-xs text-muted-foreground">{{ model.updatedAt }}</p>
     </div>
   </div>
 </template>

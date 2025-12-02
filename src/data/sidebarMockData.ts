@@ -258,17 +258,6 @@ export interface TeamModel {
   thumbnail?: string
 }
 
-export interface NodePack {
-  id: string
-  name: string
-  description: string
-  version: string
-  nodes: number
-  author: string
-  installed: boolean
-  thumbnail?: string
-}
-
 export const TEMPLATE_CATEGORIES_DATA: TemplateCategory[] = [
   {
     id: 'official',
@@ -440,35 +429,3 @@ export function createTeamModelsData(members: TeamMember[]): TeamModel[] {
   ]
 }
 
-export const NODE_PACKS_DATA: NodePack[] = [
-  {
-    id: '1',
-    name: 'Netflix Brand Tools',
-    description: 'Custom nodes for brand compliance checking and color matching',
-    version: '1.2.0',
-    nodes: 8,
-    author: 'Netflix Creative Tech',
-    installed: true,
-    thumbnail: '/assets/card_images/can-you-rate-my-comfyui-workflow-v0-o9clchhji39c1.webp',
-  },
-  {
-    id: '2',
-    name: 'Thumbnail Validator',
-    description: 'Validates generated thumbnails against brand guidelines',
-    version: '2.0.1',
-    nodes: 4,
-    author: 'Netflix Creative Tech',
-    installed: true,
-    thumbnail: '/assets/card_images/dda28581-37c8-44da-8822-57d1ccc2118c_2130x1658.png',
-  },
-  {
-    id: '3',
-    name: 'Asset Exporter Pro',
-    description: 'Export to Netflix-standard formats and dimensions',
-    version: '1.5.3',
-    nodes: 6,
-    author: 'Netflix Creative Tech',
-    installed: false,
-    thumbnail: '/assets/card_images/workflow_01.webp',
-  },
-]

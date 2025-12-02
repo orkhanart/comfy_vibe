@@ -4,20 +4,18 @@ import { Icon } from '@/components/ui/icon'
 interface Props {
   thumbnail: string
   title: string
-  description?: string
   icon?: string
+  iconClass?: string
   badge?: string
   badgeClass?: string
-  stats?: Array<{ icon: string; value: string | number }>
   updatedAt?: string
 }
 
 withDefaults(defineProps<Props>(), {
-  description: undefined,
-  icon: undefined,
+  icon: 'file',
+  iconClass: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400',
   badge: undefined,
-  badgeClass: 'bg-muted-foreground/20 text-muted-foreground',
-  stats: () => [],
+  badgeClass: 'bg-zinc-900/70 text-white',
   updatedAt: undefined
 })
 
@@ -29,67 +27,63 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="group cursor-pointer overflow-hidden rounded-lg border border-zinc-200 bg-white text-left transition-all hover:border-zinc-300 hover:shadow-sm dark:border-border dark:bg-card dark:hover:border-border"
+    class="group cursor-pointer"
+    @click="emit('open')"
   >
-    <div class="relative aspect-square overflow-hidden">
+    <!-- Thumbnail with hover overlay -->
+    <div class="relative aspect-square overflow-hidden rounded-xl bg-zinc-100 dark:bg-zinc-800">
       <img
         :src="thumbnail"
         :alt="title"
-        class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+        class="h-full w-full object-cover"
       />
-      <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
-      <!-- Open button (bottom-right) -->
-      <button
-        class="absolute bottom-2 right-2 inline-flex items-center gap-1.5 rounded-md bg-white px-3 py-1.5 text-xs font-medium text-zinc-900 shadow-lg opacity-0 transition-all hover:scale-105 group-hover:opacity-100"
-        @click.stop="emit('open')"
-      >
-        <Icon name="external-link" size="xs" />
-        Open
-      </button>
-
-      <!-- Type icon badge (bottom-left) -->
-      <div
-        v-if="icon"
-        class="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-md bg-popover/30 backdrop-blur-sm"
-      >
-        <Icon :name="icon" size="sm" />
-      </div>
-
-      <!-- Menu button (top-right) -->
-      <button
-        class="absolute right-2 top-2 rounded p-1 text-white/70 opacity-0 transition-opacity hover:bg-popover/20 hover:text-white group-hover:opacity-100"
-        @click.stop="emit('menu', $event)"
-      >
-        <Icon name="ellipsis-h" size="sm" />
-      </button>
-    </div>
-
-    <div class="p-3">
-      <div>
-        <h3 class="truncate font-medium text-zinc-900 dark:text-foreground">{{ title }}</h3>
-        <p v-if="description" class="mt-0.5 line-clamp-1 text-sm text-muted-foreground dark:text-muted-foreground">
-          {{ description }}
-        </p>
-      </div>
-
-      <div v-if="badge || stats.length > 0 || updatedAt" class="mt-2 flex items-center gap-2 text-xs text-muted-foreground dark:text-muted-foreground">
-        <!-- Badge -->
-        <span v-if="badge" :class="['rounded px-1.5 py-0.5 text-[10px] font-medium', badgeClass]">
-          {{ badge }}
-        </span>
-
-        <!-- Stats -->
-        <template v-if="stats.length > 0">
-          <span v-for="(stat, idx) in stats" :key="idx" class="flex items-center gap-1">
-            <i v-if="stat.icon" :class="[stat.icon, 'text-[10px]']" />
-            {{ stat.value }}
+      <!-- Hover overlay -->
+      <div class="absolute inset-0 flex flex-col justify-between bg-black/0 p-2 transition-all group-hover:bg-black/40">
+        <!-- Top row -->
+        <div class="flex items-start justify-between">
+          <!-- Badge -->
+          <span v-if="badge" :class="['rounded px-1.5 py-0.5 text-[10px] font-medium backdrop-blur-sm', badgeClass]">
+            {{ badge }}
           </span>
-        </template>
-
-        <!-- Updated time -->
-        <span v-if="updatedAt" class="ml-auto">{{ updatedAt }}</span>
+          <div v-else />
+          <div />
+        </div>
+        <!-- Bottom row -->
+        <div class="flex items-end justify-between">
+          <!-- Updated time -->
+          <span v-if="updatedAt" class="rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
+            {{ updatedAt }}
+          </span>
+          <div v-else />
+          <!-- Hover actions -->
+          <div class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+            <button
+              class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/90 text-zinc-700 backdrop-blur-sm transition-colors hover:bg-white"
+              title="More options"
+              @click.stop="emit('menu', $event)"
+            >
+              <Icon name="ellipsis-h" size="sm" />
+            </button>
+            <button
+              class="flex h-8 items-center gap-1.5 rounded-lg bg-white/90 px-3 font-medium text-zinc-700 backdrop-blur-sm transition-colors hover:bg-white"
+              @click.stop="emit('open')"
+            >
+              <Icon name="external-link" size="xs" />
+              <span class="text-xs">Open</span>
+            </button>
+          </div>
+        </div>
       </div>
+    </div>
+    <!-- Name -->
+    <div class="mt-2 px-1">
+      <h3
+        :title="title"
+        class="line-clamp-2 text-sm font-medium leading-tight text-zinc-900 dark:text-foreground"
+      >
+        {{ title }}
+      </h3>
+      <p v-if="updatedAt" class="mt-0.5 text-xs text-muted-foreground">{{ updatedAt }}</p>
     </div>
   </div>
 </template>

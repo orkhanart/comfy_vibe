@@ -29,13 +29,28 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./views/workspace/WorkflowsView.vue')
       },
       {
+        path: 'workflows/folder/:folderId',
+        name: 'workspace-workflows-folder',
+        component: () => import('./views/workspace/WorkflowsView.vue')
+      },
+      {
         path: 'assets',
         name: 'workspace-assets',
         component: () => import('./views/workspace/AssetsView.vue')
       },
       {
+        path: 'assets/folder/:folderId',
+        name: 'workspace-assets-folder',
+        component: () => import('./views/workspace/AssetsView.vue')
+      },
+      {
         path: 'models',
         name: 'workspace-models',
+        component: () => import('./views/workspace/ModelsView.vue')
+      },
+      {
+        path: 'models/folder/:folderId',
+        name: 'workspace-models-folder',
         component: () => import('./views/workspace/ModelsView.vue')
       },
       {
@@ -57,6 +72,11 @@ const routes: RouteRecordRaw[] = [
         path: 'settings',
         name: 'workspace-settings',
         component: () => import('./views/workspace/SettingsView.vue')
+      },
+      {
+        path: 'projects/:projectId',
+        name: 'workspace-project',
+        component: () => import('./views/workspace/ProjectView.vue')
       },
     ]
   },

@@ -2,12 +2,63 @@
 import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { FavoriteButton } from '@/components/common'
-import { AssetCard, AssetContextMenu, AssetFileInfoSidebar } from '@/components/workspace'
+import {
+  AssetCard,
+  AssetContextMenu,
+  AssetFileInfoSidebar,
+  FolderCard,
+  FolderBreadcrumbs,
+  FolderContextMenu,
+  CreateFolderDialog,
+} from '@/components/workspace'
 import {
   MOCK_ASSETS,
   getAssetIcon,
   type Asset,
 } from '@/data/workspaceMockData'
+import { useFolders } from '@/composables/common/useFolders'
+
+// Folder functionality
+const {
+  currentFolderId,
+  breadcrumbPath,
+  foldersAtCurrentLevel,
+  navigateToFolder,
+  filterItemsByFolder,
+  createFolder,
+  deleteFolder,
+  getItemCount,
+  getSubfolderCount,
+} = useFolders('assets')
+
+// Create folder dialog
+const showCreateFolderDialog = ref(false)
+
+function handleCreateFolder(name: string) {
+  createFolder(name)
+  showCreateFolderDialog.value = false
+}
+
+// Folder context menu
+const openFolderMenuId = ref<string | null>(null)
+
+function handleOpenFolderMenu(folderId: string, _event: MouseEvent) {
+  openFolderMenuId.value = openFolderMenuId.value === folderId ? null : folderId
+}
+
+function closeFolderMenu() {
+  openFolderMenuId.value = null
+}
+
+function handleFolderOpen(folderId: string) {
+  navigateToFolder(folderId)
+  closeFolderMenu()
+}
+
+function handleFolderDelete(folderId: string) {
+  deleteFolder(folderId)
+  closeFolderMenu()
+}
 
 // View mode
 type ViewMode = 'grid' | 'list'
@@ -60,7 +111,8 @@ function toggleFavorite(assetId: string) {
 // Search, filter and sort
 const searchQuery = ref('')
 const filteredAssets = computed(() => {
-  let result = assets.value
+  // First filter by current folder
+  let result = filterItemsByFolder(assets.value)
 
   // Filter by favorites
   if (showFavoritesOnly.value) {
@@ -114,6 +166,7 @@ function handleOpenMenu(assetId: string, _event: MouseEvent) {
 
 function closeMenu() {
   openMenuId.value = null
+  openFolderMenuId.value = null
 }
 
 function handleMenuAction(action: string, assetId: string) {
@@ -154,13 +207,31 @@ function closeFileInfo() {
           {{ assets.length }} files
         </p>
       </div>
-      <button
-        class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-      >
-        <Icon name="upload" size="xs" />
-        Upload
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-border dark:bg-muted dark:text-foreground dark:hover:bg-accent"
+          @click="showCreateFolderDialog = true"
+        >
+          <Icon name="folder-plus" size="xs" />
+          New Folder
+        </button>
+        <button
+          class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+        >
+          <Icon name="upload" size="xs" />
+          Upload
+        </button>
+      </div>
     </div>
+
+    <!-- Breadcrumbs (when in subfolder) -->
+    <FolderBreadcrumbs
+      v-if="currentFolderId"
+      :path="breadcrumbPath"
+      root-label="Assets"
+      class="mb-4"
+      @navigate="navigateToFolder"
+    />
 
     <!-- Search, Filter, Sort & View Toggle -->
     <div class="mb-6 flex items-center gap-3">
@@ -253,9 +324,35 @@ function closeFileInfo() {
       </button>
     </div>
 
+    <!-- Folders Section -->
+    <div v-if="foldersAtCurrentLevel.length > 0" class="mb-6">
+      <h3 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Folders</h3>
+      <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+        <div v-for="folder in foldersAtCurrentLevel" :key="folder.id" class="relative">
+          <FolderCard
+            :folder="folder"
+            :item-count="getItemCount(folder.id, assets)"
+            :subfolder-count="getSubfolderCount(folder.id)"
+            @open="handleFolderOpen"
+            @open-menu="handleOpenFolderMenu"
+          />
+          <!-- Folder Context Menu -->
+          <FolderContextMenu
+            v-if="openFolderMenuId === folder.id"
+            :folder-id="folder.id"
+            class="absolute right-0 top-full z-50"
+            @open="handleFolderOpen"
+            @rename="closeFolderMenu"
+            @delete="handleFolderDelete"
+            @close="closeFolderMenu"
+          />
+        </div>
+      </div>
+    </div>
+
     <!-- Empty State -->
     <div
-      v-if="filteredAssets.length === 0"
+      v-if="filteredAssets.length === 0 && foldersAtCurrentLevel.length === 0"
       class="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 py-16 dark:border-border"
     >
       <div class="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-muted">
@@ -267,10 +364,18 @@ function closeFileInfo() {
       </p>
     </div>
 
+    <!-- Assets Section Header (when we have both folders and assets) -->
+    <h3
+      v-if="foldersAtCurrentLevel.length > 0 && filteredAssets.length > 0"
+      class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300"
+    >
+      Assets
+    </h3>
+
     <!-- Grid View -->
     <div
-      v-else-if="viewMode === 'grid'"
-      class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+      v-if="filteredAssets.length > 0 && viewMode === 'grid'"
+      class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));"
     >
       <div v-for="asset in filteredAssets" :key="asset.id" class="relative">
         <AssetCard
@@ -297,7 +402,7 @@ function closeFileInfo() {
     </div>
 
     <!-- List View -->
-    <div v-else class="rounded-lg border border-zinc-200 bg-white dark:border-border dark:bg-card">
+    <div v-if="filteredAssets.length > 0 && viewMode === 'list'" class="rounded-lg border border-zinc-200 bg-white dark:border-border dark:bg-card">
       <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
         <div
           v-for="asset in filteredAssets"
@@ -346,6 +451,12 @@ function closeFileInfo() {
       @close="closeFileInfo"
       @view="openAsset"
       @download="handleMenuAction('download', $event)"
+    />
+
+    <!-- Create Folder Dialog -->
+    <CreateFolderDialog
+      v-model:visible="showCreateFolderDialog"
+      @create="handleCreateFolder"
     />
   </div>
 </template>
