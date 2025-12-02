@@ -19,10 +19,6 @@ const project = computed(() => ({
       : projectId.value === 'proj-2' ? 'Product Launch'
       : projectId.value === 'proj-3' ? 'Social Media'
       : 'New Project',
-  emoji: projectId.value === 'proj-1' ? '📢'
-       : projectId.value === 'proj-2' ? '🚀'
-       : projectId.value === 'proj-3' ? '📱'
-       : '📁',
   description: 'A collection of workflows and assets for this project.',
   createdAt: 'Nov 15, 2024',
   updatedAt: '2 hours ago',
@@ -307,8 +303,9 @@ function handleProjectAction(action: string) {
             <Icon name="arrow-left" size="sm" />
           </button>
           <div>
-            <h1 class="text-xl font-semibold tracking-tight text-zinc-900 dark:text-foreground">
-              <span v-if="project.emoji" class="mr-2">{{ project.emoji }}</span>{{ project.name }}
+            <h1 class="flex items-center gap-2 text-xl font-semibold tracking-tight text-zinc-900 dark:text-foreground">
+              <Icon name="folder" size="lg" class="text-zinc-400" />
+              {{ project.name }}
               <span v-if="activeView !== 'home'" class="text-zinc-400"> / {{ activeView.charAt(0).toUpperCase() + activeView.slice(1) }}</span>
             </h1>
           </div>

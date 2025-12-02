@@ -25,37 +25,28 @@ interface MenuGroup {
 interface Project {
   id: string
   name: string
-  emoji: string
 }
 
 const projects = ref<Project[]>([
-  { id: 'proj-1', name: 'Marketing Campaign', emoji: '📢' },
-  { id: 'proj-2', name: 'Product Launch', emoji: '🚀' },
-  { id: 'proj-3', name: 'Social Media', emoji: '📱' },
+  { id: 'proj-1', name: 'Marketing Campaign' },
+  { id: 'proj-2', name: 'Product Launch' },
+  { id: 'proj-3', name: 'Social Media' },
 ])
 
 // Create project dialog state
 const showCreateProject = ref(false)
 const newProjectName = ref('')
-const newProjectEmoji = ref('📁')
-
-const projectEmojis = [
-  '📁', '📂', '🚀', '💡', '🎨', '📢', '📱', '💻',
-  '🎯', '⭐', '🔥', '💎', '🎬', '📸', '🎵', '✨'
-]
 
 function createProject() {
   showCreateProject.value = true
   newProjectName.value = ''
-  newProjectEmoji.value = '📁'
 }
 
 function confirmCreateProject() {
   if (newProjectName.value.trim()) {
     projects.value.push({
       id: `proj-${Date.now()}`,
-      name: newProjectName.value.trim(),
-      emoji: newProjectEmoji.value
+      name: newProjectName.value.trim()
     })
     showCreateProject.value = false
   }
@@ -90,8 +81,7 @@ function handleProjectAction(action: string, projectId: string) {
       if (project) {
         projects.value.push({
           id: `proj-${Date.now()}`,
-          name: `${project.name} (Copy)`,
-          emoji: project.emoji
+          name: `${project.name} (Copy)`
         })
       }
       break
@@ -322,26 +312,6 @@ function signOut(): void {
             <PopoverContent align="start" class="w-64 p-3">
               <p class="mb-3 text-sm font-medium text-zinc-900 dark:text-foreground">New Project</p>
 
-              <!-- Emoji Picker -->
-              <div class="mb-3">
-                <p class="mb-1.5 text-xs text-muted-foreground">Icon</p>
-                <div class="grid grid-cols-8 gap-1">
-                  <button
-                    v-for="emoji in projectEmojis"
-                    :key="emoji"
-                    :class="[
-                      'flex h-7 w-7 items-center justify-center rounded text-base transition-colors',
-                      newProjectEmoji === emoji
-                        ? 'bg-zinc-900 dark:bg-zinc-100'
-                        : 'hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                    ]"
-                    @click="newProjectEmoji = emoji"
-                  >
-                    {{ emoji }}
-                  </button>
-                </div>
-              </div>
-
               <!-- Project Name -->
               <div class="mb-3">
                 <p class="mb-1.5 text-xs text-muted-foreground">Name</p>
@@ -385,7 +355,7 @@ function signOut(): void {
                   : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-foreground'
               ]"
             >
-              <span class="text-base">{{ project.emoji }}</span>
+              <Icon name="folder" size="md" />
               <span class="flex-1 truncate">{{ project.name }}</span>
             </RouterLink>
 
