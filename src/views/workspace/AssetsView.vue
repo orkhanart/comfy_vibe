@@ -141,7 +141,9 @@ function closeFileInfo() {
 </script>
 
 <template>
-  <div class="p-6" @click="closeMenu">
+  <div class="flex h-full">
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto p-6 transition-all duration-300 ease-out" @click="closeMenu(); closeFileInfo()">
     <!-- Header -->
     <div class="mb-6 flex items-center justify-between">
       <div>
@@ -333,6 +335,8 @@ function closeFileInfo() {
           </button>
         </div>
       </div>
+    </div>
+
     </div>
 
     <!-- File Info Sidebar -->

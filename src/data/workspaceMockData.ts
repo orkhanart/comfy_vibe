@@ -15,15 +15,31 @@ export interface Template {
   tags: string[]
 }
 
+export interface ModelVersion {
+  id: string
+  version: string
+  size: string
+  downloadUrl?: string
+  releaseDate: string
+  isInstalled: boolean
+  isCurrent: boolean
+}
+
 export interface Model {
   id: string
   name: string
   type: 'checkpoint' | 'lora' | 'vae' | 'controlnet'
+  baseModel: 'SD1.5' | 'SDXL' | 'Flux' | 'Pony' | 'unknown'
   size: string
   sizeBytes: number
   version: string
   updatedAt: string
   updatedTimestamp: number
+  thumbnail?: string
+  triggerWords?: string[]
+  favorite: boolean
+  versions?: ModelVersion[]
+  source: 'builtin' | 'imported'
 }
 
 export interface Asset {
@@ -104,6 +120,8 @@ export const RUNS_ON_OPTIONS = [
 
 export const MODEL_TYPES = ['all', 'checkpoint', 'lora', 'vae', 'controlnet'] as const
 
+export const BASE_MODEL_TYPES = ['all', 'SD1.5', 'SDXL', 'Flux', 'Pony'] as const
+
 export const ASSET_TYPES = ['all', 'image', 'video', 'audio'] as const
 
 // ============================================
@@ -127,12 +145,43 @@ export const MOCK_TEMPLATES: Template[] = [
 ]
 
 export const MOCK_MODELS: Model[] = [
-  { id: 'model-1', name: 'SDXL Base 1.0', type: 'checkpoint', size: '6.94 GB', sizeBytes: 7452139315, version: '1.0', updatedAt: '2 weeks ago', updatedTimestamp: Date.now() - 14 * 24 * 60 * 60 * 1000 },
-  { id: 'model-2', name: 'SDXL Refiner 1.0', type: 'checkpoint', size: '6.08 GB', sizeBytes: 6529336320, version: '1.0', updatedAt: '2 weeks ago', updatedTimestamp: Date.now() - 14 * 24 * 60 * 60 * 1000 },
-  { id: 'model-3', name: 'SDXL Lightning', type: 'lora', size: '393 MB', sizeBytes: 412090368, version: '4-step', updatedAt: '1 week ago', updatedTimestamp: Date.now() - 7 * 24 * 60 * 60 * 1000 },
-  { id: 'model-4', name: 'Detail Tweaker', type: 'lora', size: '144 MB', sizeBytes: 150994944, version: '1.0', updatedAt: '3 days ago', updatedTimestamp: Date.now() - 3 * 24 * 60 * 60 * 1000 },
-  { id: 'model-5', name: 'SDXL VAE', type: 'vae', size: '335 MB', sizeBytes: 351272960, version: 'fp16', updatedAt: '1 month ago', updatedTimestamp: Date.now() - 30 * 24 * 60 * 60 * 1000 },
-  { id: 'model-6', name: 'ControlNet Canny', type: 'controlnet', size: '2.5 GB', sizeBytes: 2684354560, version: '1.1', updatedAt: '2 weeks ago', updatedTimestamp: Date.now() - 14 * 24 * 60 * 60 * 1000 },
+  {
+    id: 'model-1', name: 'SDXL Base 1.0', type: 'checkpoint', baseModel: 'SDXL', size: '6.94 GB', sizeBytes: 7452139315, version: '1.0', updatedAt: '2 weeks ago', updatedTimestamp: Date.now() - 14 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/workflow_01.webp', favorite: true, source: 'builtin',
+    versions: [
+      { id: 'v1.0', version: '1.0', size: '6.94 GB', releaseDate: 'Jul 26, 2023', isInstalled: true, isCurrent: true },
+      { id: 'v0.9', version: '0.9', size: '6.94 GB', releaseDate: 'Jun 22, 2023', isInstalled: false, isCurrent: false },
+    ]
+  },
+  { id: 'model-2', name: 'SDXL Refiner 1.0', type: 'checkpoint', baseModel: 'SDXL', size: '6.08 GB', sizeBytes: 6529336320, version: '1.0', updatedAt: '2 weeks ago', updatedTimestamp: Date.now() - 14 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp', favorite: false, source: 'builtin' },
+  {
+    id: 'model-3', name: 'SDXL Lightning', type: 'lora', baseModel: 'SDXL', size: '393 MB', sizeBytes: 412090368, version: '4-step', updatedAt: '1 week ago', updatedTimestamp: Date.now() - 7 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp', triggerWords: ['lightning', 'fast'], favorite: true, source: 'builtin',
+    versions: [
+      { id: 'v4-step', version: '4-step', size: '393 MB', releaseDate: 'Feb 21, 2024', isInstalled: true, isCurrent: true },
+      { id: 'v2-step', version: '2-step', size: '393 MB', releaseDate: 'Feb 21, 2024', isInstalled: false, isCurrent: false },
+      { id: 'v8-step', version: '8-step', size: '393 MB', releaseDate: 'Feb 21, 2024', isInstalled: false, isCurrent: false },
+    ]
+  },
+  { id: 'model-4', name: 'Detail Tweaker', type: 'lora', baseModel: 'SD1.5', size: '144 MB', sizeBytes: 150994944, version: '1.0', updatedAt: '3 days ago', updatedTimestamp: Date.now() - 3 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/228616f4-12ad-426d-84fb-f20e488ba7ee.webp', triggerWords: ['detailed', 'sharp'], favorite: false, source: 'builtin' },
+  { id: 'model-5', name: 'SDXL VAE', type: 'vae', baseModel: 'SDXL', size: '335 MB', sizeBytes: 351272960, version: 'fp16', updatedAt: '1 month ago', updatedTimestamp: Date.now() - 30 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/683255d3-1d10-43d9-a6ff-ef142061e88a.webp', favorite: false, source: 'builtin' },
+  { id: 'model-6', name: 'ControlNet Canny', type: 'controlnet', baseModel: 'SDXL', size: '2.5 GB', sizeBytes: 2684354560, version: '1.1', updatedAt: '2 weeks ago', updatedTimestamp: Date.now() - 14 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/91f1f589-ddb4-4c4f-b3a7-ba30fc271987.webp', favorite: false, source: 'builtin' },
+  {
+    id: 'model-7', name: 'Realistic Vision', type: 'checkpoint', baseModel: 'SD1.5', size: '2.1 GB', sizeBytes: 2254857830, version: '5.1', updatedAt: '1 week ago', updatedTimestamp: Date.now() - 7 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp', favorite: true, source: 'imported',
+    versions: [
+      { id: 'v5.1', version: '5.1', size: '2.1 GB', releaseDate: 'Nov 15, 2024', isInstalled: true, isCurrent: true },
+      { id: 'v5.0', version: '5.0', size: '2.1 GB', releaseDate: 'Sep 20, 2024', isInstalled: true, isCurrent: false },
+      { id: 'v4.0', version: '4.0', size: '2.0 GB', releaseDate: 'Jun 10, 2024', isInstalled: false, isCurrent: false },
+      { id: 'v3.0', version: '3.0', size: '1.9 GB', releaseDate: 'Mar 5, 2024', isInstalled: false, isCurrent: false },
+    ]
+  },
+  { id: 'model-8', name: 'Flux Dev', type: 'checkpoint', baseModel: 'Flux', size: '23.8 GB', sizeBytes: 25551392358, version: '1.0', updatedAt: '5 days ago', updatedTimestamp: Date.now() - 5 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/comfyui_workflow.jpg', favorite: false, source: 'builtin' },
+  {
+    id: 'model-9', name: 'Pony Diffusion', type: 'checkpoint', baseModel: 'Pony', size: '4.2 GB', sizeBytes: 4509715660, version: '6.0', updatedAt: '4 days ago', updatedTimestamp: Date.now() - 4 * 24 * 60 * 60 * 1000, thumbnail: '/assets/card_images/can-you-rate-my-comfyui-workflow-v0-o9clchhji39c1.webp', favorite: false, source: 'builtin',
+    versions: [
+      { id: 'v6.0', version: '6.0', size: '4.2 GB', releaseDate: 'Nov 25, 2024', isInstalled: true, isCurrent: true },
+      { id: 'v5.5', version: '5.5', size: '4.0 GB', releaseDate: 'Oct 1, 2024', isInstalled: false, isCurrent: false },
+      { id: 'v5.0', version: '5.0', size: '3.8 GB', releaseDate: 'Aug 15, 2024', isInstalled: false, isCurrent: false },
+    ]
+  },
 ]
 
 export const MOCK_ASSETS: Asset[] = [
@@ -182,6 +231,17 @@ export function getModelColor(type: Model['type']): string {
     controlnet: 'bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400',
   }
   return colors[type] || 'bg-zinc-100 text-muted-foreground/50 dark:bg-muted dark:text-muted-foreground'
+}
+
+export function getBaseModelColor(baseModel: Model['baseModel']): string {
+  const colors: Record<Model['baseModel'], string> = {
+    'SD1.5': 'bg-zinc-500/80 text-white',
+    'SDXL': 'bg-blue-500/80 text-white',
+    'Flux': 'bg-purple-500/80 text-white',
+    'Pony': 'bg-pink-500/80 text-white',
+    'unknown': 'bg-zinc-400/80 text-white',
+  }
+  return colors[baseModel] || 'bg-zinc-400/80 text-white'
 }
 
 export function getAssetIcon(type: Asset['type']): string {

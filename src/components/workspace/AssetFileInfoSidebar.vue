@@ -14,11 +14,8 @@ const emit = defineEmits<{
   download: [id: string]
 }>()
 
-// Mock version history
-const versions = [
-  { version: 'v2', label: 'Re-uploaded with fixes', date: 'updatedAt', isLatest: true },
-  { version: 'v1', label: 'Initial upload', date: '1 week ago', isLatest: false }
-]
+// Mock created by workflow (for generated assets)
+const createdByWorkflow = { id: 'wf-3', name: 'AI Image Generator', nodeCount: 15 }
 
 // Mock usage in workflows
 const usedInWorkflows = [
@@ -28,14 +25,9 @@ const usedInWorkflows = [
 </script>
 
 <template>
-  <Teleport to="body">
-    <Transition name="sidebar">
-      <div class="fixed inset-0 z-50 flex justify-end">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/30" @click="emit('close')" />
-
-        <!-- Sidebar -->
-        <div class="relative z-10 flex h-full w-96 flex-col bg-white shadow-2xl dark:bg-zinc-900">
+  <Transition name="sidebar">
+    <!-- Sidebar -->
+    <div class="flex h-full w-96 shrink-0 flex-col border-l border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
           <!-- Header -->
           <div class="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
             <h2 class="text-lg font-semibold text-zinc-900 dark:text-foreground">File Info</h2>
@@ -106,53 +98,6 @@ const usedInWorkflows = [
                 </div>
               </div>
 
-              <!-- Version History -->
-              <div class="mt-6">
-                <h4 class="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-foreground">
-                  <Icon name="history" size="sm" />
-                  Version History
-                </h4>
-                <div class="mt-3 space-y-2">
-                  <div
-                    v-for="ver in versions"
-                    :key="ver.version"
-                    :class="[
-                      'flex items-center gap-3 rounded-lg p-3',
-                      ver.isLatest ? 'bg-zinc-50 dark:bg-zinc-800/50' : 'transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
-                    ]"
-                  >
-                    <div
-                      :class="[
-                        'flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold',
-                        ver.isLatest
-                          ? 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400'
-                          : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
-                      ]"
-                    >
-                      {{ ver.version }}
-                    </div>
-                    <div class="flex-1">
-                      <p class="text-sm font-medium text-zinc-900 dark:text-foreground">{{ ver.label }}</p>
-                      <p class="text-xs text-zinc-500 dark:text-zinc-400">
-                        {{ ver.date === 'updatedAt' ? asset.updatedAt : ver.date }}
-                      </p>
-                    </div>
-                    <span
-                      v-if="ver.isLatest"
-                      class="rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600 dark:bg-blue-500/20 dark:text-blue-400"
-                    >
-                      Latest
-                    </span>
-                    <button
-                      v-else
-                      class="text-xs text-blue-600 hover:underline dark:text-blue-400"
-                    >
-                      Restore
-                    </button>
-                  </div>
-                </div>
-              </div>
-
               <!-- File Details -->
               <div class="mt-6">
                 <h4 class="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-foreground">
@@ -179,6 +124,28 @@ const usedInWorkflows = [
                   <div class="flex justify-between border-t border-zinc-100 py-1.5 dark:border-zinc-800">
                     <span class="text-zinc-500 dark:text-zinc-400">Location</span>
                     <span class="truncate text-zinc-900 dark:text-foreground">/assets/{{ asset.type }}s/</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Created with Workflow (for generated assets) -->
+              <div v-if="asset.source === 'generated'" class="mt-6">
+                <h4 class="flex items-center gap-2 text-sm font-semibold text-zinc-900 dark:text-foreground">
+                  <Icon name="magic" size="sm" />
+                  Created with
+                </h4>
+                <div class="mt-3">
+                  <div
+                    class="flex cursor-pointer items-center gap-3 rounded-lg bg-violet-50 p-3 transition-colors hover:bg-violet-100 dark:bg-violet-500/10 dark:hover:bg-violet-500/20"
+                  >
+                    <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-100 dark:bg-violet-500/20">
+                      <Icon name="sitemap" size="sm" class="text-violet-600 dark:text-violet-400" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="truncate text-sm font-medium text-zinc-900 dark:text-foreground">{{ createdByWorkflow.name }}</p>
+                      <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ createdByWorkflow.nodeCount }} nodes</p>
+                    </div>
+                    <Icon name="chevron-right" size="sm" class="text-violet-400" />
                   </div>
                 </div>
               </div>
@@ -235,35 +202,21 @@ const usedInWorkflows = [
               </button>
             </div>
           </div>
-        </div>
-      </div>
-    </Transition>
-  </Teleport>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>
-.sidebar-enter-active,
+.sidebar-enter-active {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .sidebar-leave-active {
-  transition: all 0.3s ease;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidebar-enter-active > div:first-child,
-.sidebar-leave-active > div:first-child {
-  transition: opacity 0.3s ease;
-}
-
-.sidebar-enter-active > div:last-child,
-.sidebar-leave-active > div:last-child {
-  transition: transform 0.3s ease;
-}
-
-.sidebar-enter-from > div:first-child,
-.sidebar-leave-to > div:first-child {
-  opacity: 0;
-}
-
-.sidebar-enter-from > div:last-child,
-.sidebar-leave-to > div:last-child {
+.sidebar-enter-from,
+.sidebar-leave-to {
   transform: translateX(100%);
 }
 </style>

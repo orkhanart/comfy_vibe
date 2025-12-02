@@ -14,9 +14,11 @@ export { default as WorkflowFileInfoSidebar } from './WorkflowFileInfoSidebar.vu
 // Other item cards
 export { default as TemplateCard } from './TemplateCard.vue'
 export { default as ModelCard } from './ModelCard.vue'
+export { default as ModelInfoSidebar } from './ModelInfoSidebar.vue'
 export { default as AssetCard } from './AssetCard.vue'
 export { default as AssetContextMenu } from './AssetContextMenu.vue'
 export { default as AssetFileInfoSidebar } from './AssetFileInfoSidebar.vue'
+export { default as ImportModelDialog } from './ImportModelDialog.vue'
 
 // Legacy type export (use types from @/data/workspaceMockData instead)
 export type { Workflow } from './WorkflowCard.vue'
