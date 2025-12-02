@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-export type InterfaceVersion = 'v1' | 'v2'
-
 export type SidebarTabId = 'nodes' | 'models' | 'workflows' | 'assets' | 'templates' | 'library' | 'packages' | null
 
 export interface SidebarTab {
@@ -207,7 +205,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
   },
 ]
 
-// Legacy sidebar tabs (for workspace navigation, not nodes)
+// Sidebar tabs (for workspace navigation)
 export const SIDEBAR_TABS: SidebarTab[] = [
   { id: 'nodes', label: 'Nodes', icon: 'sitemap', tooltip: 'Node Library' },
   { id: 'models', label: 'Models', icon: 'box', tooltip: 'Model Library' },
@@ -217,20 +215,9 @@ export const SIDEBAR_TABS: SidebarTab[] = [
   { id: 'library', label: 'Library', icon: 'bookmark', tooltip: 'Library' },
 ]
 
-// V2 bottom bar tabs
-export const BOTTOM_BAR_TABS: SidebarTab[] = [
-  { id: 'workflows', label: 'Workflows', icon: 'sitemap', tooltip: 'Canvas Workflows' },
-  { id: 'assets', label: 'Assets', icon: 'images', tooltip: 'Assets (Generated, Imported)' },
-  { id: 'models', label: 'Models', icon: 'box', tooltip: 'Model Library' },
-  { id: 'packages', label: 'Packages', icon: 'th-large', tooltip: 'Node Packages' },
-  { id: 'templates', label: 'Templates', icon: 'clone', tooltip: 'Templates' },
-]
-
 export type ThemeMode = 'light' | 'dark' | 'system'
 
 export const useUiStore = defineStore('ui', () => {
-  // Interface version: v1 = legacy, v2 = experimental
-  const interfaceVersion = ref<InterfaceVersion>('v1')
   const leftSidebarOpen = ref(true)
   const rightSidebarOpen = ref(false)
 
@@ -241,22 +228,13 @@ export const useUiStore = defineStore('ui', () => {
   // Sidebar tab state (left sidebar)
   const activeSidebarTab = ref<SidebarTabId>(null)
 
-  // Bottom bar tab state (v2 only)
-  const activeBottomTab = ref<SidebarTabId>(null)
-
   // Node category state (TouchDesigner/Houdini-style)
   const activeNodeCategory = ref<NodeCategoryId>(null)
   const expandedSubcategories = ref<Set<string>>(new Set())
   const nodeSearchQuery = ref('')
 
-  // Computed for backwards compatibility
-  const interface2Enabled = computed(() => interfaceVersion.value === 'v2')
-
   // Sidebar panel is expanded when a tab is active
   const sidebarPanelExpanded = computed(() => activeSidebarTab.value !== null)
-
-  // Bottom panel is expanded when a tab is active
-  const bottomPanelExpanded = computed(() => activeBottomTab.value !== null)
 
   // Node panel is expanded when a category is active
   const nodePanelExpanded = computed(() => activeNodeCategory.value !== null)
@@ -265,14 +243,6 @@ export const useUiStore = defineStore('ui', () => {
   const activeNodeCategoryData = computed(() =>
     NODE_CATEGORIES.find(cat => cat.id === activeNodeCategory.value) ?? null
   )
-
-  function setInterfaceVersion(version: InterfaceVersion): void {
-    interfaceVersion.value = version
-  }
-
-  function toggleInterfaceVersion(): void {
-    interfaceVersion.value = interfaceVersion.value === 'v1' ? 'v2' : 'v1'
-  }
 
   function toggleLeftSidebar(): void {
     leftSidebarOpen.value = !leftSidebarOpen.value
@@ -292,18 +262,6 @@ export const useUiStore = defineStore('ui', () => {
 
   function closeSidebarPanel(): void {
     activeSidebarTab.value = null
-  }
-
-  function toggleBottomTab(tabId: Exclude<SidebarTabId, null>): void {
-    activeBottomTab.value = activeBottomTab.value === tabId ? null : tabId
-  }
-
-  function setBottomTab(tabId: SidebarTabId): void {
-    activeBottomTab.value = tabId
-  }
-
-  function closeBottomPanel(): void {
-    activeBottomTab.value = null
   }
 
   // Node category functions
@@ -357,14 +315,10 @@ export const useUiStore = defineStore('ui', () => {
   applyTheme(themeMode.value)
 
   return {
-    interfaceVersion,
-    interface2Enabled,
     leftSidebarOpen,
     rightSidebarOpen,
     activeSidebarTab,
     sidebarPanelExpanded,
-    activeBottomTab,
-    bottomPanelExpanded,
     // Node category exports
     activeNodeCategory,
     activeNodeCategoryData,
@@ -374,16 +328,11 @@ export const useUiStore = defineStore('ui', () => {
     // Theme
     themeMode,
     // Functions
-    setInterfaceVersion,
-    toggleInterfaceVersion,
     toggleLeftSidebar,
     toggleRightSidebar,
     toggleSidebarTab,
     setSidebarTab,
     closeSidebarPanel,
-    toggleBottomTab,
-    setBottomTab,
-    closeBottomPanel,
     toggleNodeCategory,
     setNodeCategory,
     closeNodePanel,

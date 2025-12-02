@@ -15,9 +15,9 @@ const props = withDefaults(defineProps<Props>(), {
   subtitle: undefined,
   thumbnail: undefined,
   icon: undefined,
-  iconClass: 'text-zinc-400',
+  iconClass: 'text-muted-foreground',
   badge: undefined,
-  badgeClass: 'bg-zinc-700 text-zinc-400',
+  badgeClass: 'bg-muted text-muted-foreground',
   starred: false,
   draggable: true,
 })
@@ -29,12 +29,12 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="group cursor-pointer overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/80 transition-all hover:border-zinc-600 hover:bg-zinc-800/80"
+    class="group cursor-pointer overflow-hidden rounded-lg border border-border bg-card/80 transition-all hover:border-border/80 hover:bg-accent/80"
     :draggable="props.draggable"
     @click="emit('click')"
   >
     <!-- Thumbnail -->
-    <div class="relative aspect-[4/3] overflow-hidden bg-zinc-800">
+    <div class="relative aspect-[4/3] overflow-hidden bg-muted">
       <img
         v-if="props.thumbnail"
         :src="props.thumbnail"
@@ -79,7 +79,7 @@ const emit = defineEmits<{
 
       <!-- Add button (bottom-right, on hover) -->
       <button
-        class="absolute bottom-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded bg-white/90 text-zinc-800 opacity-0 transition-all hover:bg-white group-hover:opacity-100"
+        class="absolute bottom-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded bg-background/90 text-foreground opacity-0 transition-all hover:bg-background group-hover:opacity-100"
         @click.stop
       >
         <Icon name="plus" size="xs" />
@@ -88,10 +88,10 @@ const emit = defineEmits<{
 
     <!-- Content -->
     <div class="p-2">
-      <div class="truncate text-xs font-medium text-zinc-200 group-hover:text-white">
+      <div class="truncate text-xs font-medium text-foreground group-hover:text-foreground">
         {{ props.title }}
       </div>
-      <div v-if="props.subtitle" class="mt-0.5 truncate text-[10px] text-zinc-500">
+      <div v-if="props.subtitle" class="mt-0.5 truncate text-[10px] text-muted-foreground">
         {{ props.subtitle }}
       </div>
     </div>

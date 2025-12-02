@@ -116,12 +116,12 @@ export function getSlotColor(type: SlotType): string {
   return SLOT_COLORS[type] || SLOT_COLORS['*']
 }
 
-// Node state colors
+// Node state colors - uses CSS variable syntax for theme support
 export const NODE_STATE_COLORS: Record<NodeState, string> = {
-  idle: '#3f3f46',
-  executing: '#3b82f6',
+  idle: 'hsl(var(--muted))',
+  executing: 'hsl(var(--primary))',
   completed: '#22c55e',
-  error: '#ef4444',
+  error: 'hsl(var(--destructive))',
   bypassed: '#f59e0b',
-  muted: '#71717a',
+  muted: 'hsl(var(--muted-foreground))',
 }

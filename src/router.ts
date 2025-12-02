@@ -2,110 +2,71 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 import type { RouteRecordRaw } from 'vue-router'
 
-// Interface 2.0 (Experimental) Routes
-const v2Routes: RouteRecordRaw[] = [
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'auth',
-    component: () => import('./views/v2/AuthView.vue')
+    component: () => import('./views/AuthView.vue')
   },
   {
     path: '/home',
     name: 'home',
-    component: () => import('./views/v2/HomeView.vue')
+    component: () => import('./views/HomeView.vue')
   },
   {
     path: '/:workspaceId',
-    component: () => import('./views/v2/WorkspaceView.vue'),
+    component: () => import('./views/WorkspaceView.vue'),
     props: true,
     children: [
       {
         path: '',
         name: 'workspace-dashboard',
-        component: () => import('./views/v2/workspace/DashboardView.vue')
-      },
-      {
-        path: 'projects',
-        name: 'workspace-projects',
-        component: () => import('./views/v2/workspace/ProjectsView.vue')
-      },
-      {
-        path: 'canvases',
-        name: 'workspace-canvases',
-        component: () => import('./views/v2/workspace/CanvasesView.vue')
+        component: () => import('./views/workspace/DashboardView.vue')
       },
       {
         path: 'workflows',
         name: 'workspace-workflows',
-        component: () => import('./views/v2/workspace/WorkflowsView.vue')
+        component: () => import('./views/workspace/WorkflowsView.vue')
       },
       {
         path: 'assets',
         name: 'workspace-assets',
-        component: () => import('./views/v2/workspace/AssetsView.vue')
+        component: () => import('./views/workspace/AssetsView.vue')
       },
       {
         path: 'models',
         name: 'workspace-models',
-        component: () => import('./views/v2/workspace/ModelsView.vue')
+        component: () => import('./views/workspace/ModelsView.vue')
       },
       {
         path: 'recents',
         name: 'workspace-recents',
-        component: () => import('./views/v2/workspace/RecentsView.vue')
+        component: () => import('./views/workspace/RecentsView.vue')
       },
       {
         path: 'templates',
         name: 'workspace-templates',
-        component: () => import('./views/v2/workspace/TemplatesView.vue')
-      },
-      {
-        path: 'library',
-        name: 'workspace-library',
-        component: () => import('./views/v2/workspace/LibraryView.vue')
+        component: () => import('./views/workspace/TemplatesView.vue')
       },
       {
         path: 'trash',
         name: 'workspace-trash',
-        component: () => import('./views/v2/workspace/TrashView.vue')
+        component: () => import('./views/workspace/TrashView.vue')
       },
       {
         path: 'settings',
         name: 'workspace-settings',
-        component: () => import('./views/v2/workspace/SettingsView.vue')
+        component: () => import('./views/workspace/SettingsView.vue')
       },
-      {
-        path: ':projectId',
-        name: 'project-detail',
-        component: () => import('./views/v2/workspace/ProjectDetailView.vue'),
-        props: true
-      }
     ]
   },
   {
-    path: '/nodemode/:workspaceId/:canvasId',
-    name: 'canvas',
-    component: () => import('./views/v2/CanvasView.vue'),
-    props: true
-  },
-  {
-    path: '/linear',
-    name: 'linear',
-    component: () => import('./views/linear/LinearView.vue')
-  },
-  {
-    path: '/:workspaceId/linear',
-    name: 'workspace-linear',
-    component: () => import('./views/linear/LinearView.vue'),
+    path: '/nodemode/:workspaceId/:workflowId',
+    name: 'node-editor',
+    component: () => import('./views/CanvasView.vue'),
     props: true
   }
 ]
-
-// Interface 1.0 (Legacy) Routes - TODO: Add when v1 views are created
-// const v1Routes: RouteRecordRaw[] = []
-
-// Currently using v2 routes
-const routes: RouteRecordRaw[] = v2Routes
 
 const router = createRouter({
   history: createWebHistory(),

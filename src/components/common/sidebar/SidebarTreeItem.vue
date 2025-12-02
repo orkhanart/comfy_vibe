@@ -25,7 +25,7 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="group flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-zinc-800"
+    class="group flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-accent"
     :draggable="props.draggable"
     @click="emit('click')"
   >
@@ -34,21 +34,21 @@ const emit = defineEmits<{
       v-if="props.iconType === 'dot'"
       name="circle-fill"
       size="xs"
-      class="text-zinc-600 group-hover:text-zinc-400"
+      class="text-muted-foreground/50 group-hover:text-muted-foreground"
     />
     <Icon
       v-else-if="props.icon"
       :name="props.icon"
       size="xs"
-      class="text-zinc-600 group-hover:text-zinc-400"
+      class="text-muted-foreground/50 group-hover:text-muted-foreground"
     />
 
     <!-- Content -->
     <div class="min-w-0 flex-1">
-      <div class="truncate text-xs text-zinc-400 group-hover:text-zinc-200">
+      <div class="truncate text-xs text-muted-foreground group-hover:text-foreground">
         {{ props.label }}
       </div>
-      <div v-if="props.sublabel" class="truncate text-[10px] text-zinc-600">
+      <div v-if="props.sublabel" class="truncate text-[10px] text-muted-foreground/50">
         {{ props.sublabel }}
       </div>
     </div>
@@ -56,7 +56,7 @@ const emit = defineEmits<{
     <!-- Badge -->
     <span
       v-if="props.badge !== undefined"
-      class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-600"
+      class="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground/50"
     >
       {{ props.badge }}
     </span>
@@ -65,7 +65,7 @@ const emit = defineEmits<{
     <Icon
       :name="props.actionIcon"
       size="xs"
-      class="text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100"
+      class="text-muted-foreground/50 opacity-0 transition-opacity group-hover:opacity-100"
       @click.stop="emit('action')"
     />
   </div>

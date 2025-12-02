@@ -136,6 +136,10 @@
   --button-surface: #ffffff;
   --button-hover-surface: #f3f4f6;
 
+  /* Node colors - Light mode */
+  --node-widget-bg: #e5e7eb;
+  --node-header-bg: #f3f4f6;
+
   /* shadcn semantic mappings - reuse existing tokens */
   --background: var(--base-background);
   --foreground: var(--base-foreground);
@@ -181,6 +185,10 @@
   --interface-stroke: #27272a;
   --button-surface: #27272a;
   --button-hover-surface: #3f3f46;
+
+  /* Node colors - Dark mode */
+  --node-widget-bg: #27272a;
+  --node-header-bg: #1f1f23;
 
   /* shadcn semantic mappings - dark mode overrides */
   --background: var(--base-background);

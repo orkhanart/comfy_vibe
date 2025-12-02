@@ -44,15 +44,16 @@ function createTooltip(el: TooltipElement, binding: DirectiveBinding): void {
   tooltip.setAttribute('data-position', position)
   tooltip.textContent = config.value
 
-  // Basic styling
+  // Basic styling - uses CSS variables for theme support
   tooltip.style.cssText = `
     position: fixed;
     z-index: 9999;
     padding: 6px 10px;
     font-size: 12px;
     font-weight: 500;
-    color: white;
-    background: #18181b;
+    color: hsl(var(--popover-foreground));
+    background: hsl(var(--popover));
+    border: 1px solid hsl(var(--border));
     border-radius: 6px;
     pointer-events: none;
     opacity: 0;
