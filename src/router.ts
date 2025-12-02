@@ -84,6 +84,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./views/workspace/CardDesignsView.vue')
       },
       {
+        path: 'clean',
+        name: 'workspace-clean',
+        component: () => import('./views/workspace/CleanView.vue')
+      },
+      {
         path: 'projects/:projectId',
         name: 'workspace-project',
         component: () => import('./views/workspace/ProjectView.vue')
@@ -94,6 +99,12 @@ const routes: RouteRecordRaw[] = [
     path: '/nodemode/:workflowId?',
     name: 'node-editor',
     component: () => import('./views/CanvasView.vue'),
+    props: true
+  },
+  {
+    path: '/linear/:workflowId?',
+    name: 'linear',
+    component: () => import('./views/linear/LinearView.vue'),
     props: true
   }
 ]
