@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
+import { FavoriteButton } from '@/components/common'
 import type { Template } from '@/data/workspaceMockData'
 
 interface Props {
@@ -10,6 +11,7 @@ defineProps<Props>()
 
 const emit = defineEmits<{
   open: [id: string]
+  toggleFavorite: [id: string]
   menu: [id: string, event: MouseEvent]
 }>()
 
@@ -47,7 +49,13 @@ function formatUses(uses: number): string {
               {{ tag }}
             </span>
           </div>
-          <div />
+          <!-- Favorite -->
+          <FavoriteButton
+            :is-favorite="template.favorite"
+            variant="overlay"
+            size="md"
+            @toggle="emit('toggleFavorite', template.id)"
+          />
         </div>
         <!-- Bottom row -->
         <div class="flex items-end justify-between">

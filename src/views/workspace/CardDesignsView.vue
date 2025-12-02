@@ -109,6 +109,7 @@ function handleAction(action: string, id?: string) {
           :key="template.id"
           :template="template"
           @open="handleAction('open', $event)"
+          @toggle-favorite="handleAction('toggleFavorite', $event)"
           @menu="handleAction('menu', $event)"
         />
       </div>

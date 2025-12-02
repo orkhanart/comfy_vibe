@@ -22,6 +22,7 @@ export interface Template {
   thumbnail: string
   uses: number
   tags: string[]
+  favorite?: boolean
 }
 
 export interface ModelVersion {
@@ -96,7 +97,6 @@ export interface RecentItem {
 // ============================================
 
 export const TEMPLATE_CATEGORIES = [
-  { value: 'all', label: 'All Templates' },
   { value: 'getting-started', label: 'Getting Started' },
   { value: 'image', label: 'Image' },
   { value: 'video', label: 'Video' },
@@ -141,19 +141,30 @@ export const ASSET_TYPES = ['all', 'image', 'video', 'audio'] as const
 // ============================================
 
 export const MOCK_TEMPLATES: Template[] = [
-  { id: 'txt2img', name: 'Text to Image', description: 'Generate images from text prompts using AI models', category: 'getting-started', thumbnail: '/assets/card_images/workflow_01.webp', uses: 12500, tags: ['Text to Image', 'Image'] },
-  { id: 'img2img', name: 'Image to Image', description: 'Transform existing images with AI enhancement', category: 'getting-started', thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp', uses: 8900, tags: ['Image to Image', 'Image Edit'] },
-  { id: 'upscale', name: 'Upscale 4x', description: '4x image upscaling workflow with detail enhancement', category: 'image', thumbnail: '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp', uses: 7200, tags: ['Image', 'Upscale'] },
-  { id: 'inpaint', name: 'Inpainting', description: 'Edit specific parts of an image seamlessly', category: 'image', thumbnail: '/assets/card_images/228616f4-12ad-426d-84fb-f20e488ba7ee.webp', uses: 6100, tags: ['Image Edit', 'Inpaint'] },
-  { id: 'controlnet', name: 'ControlNet Pose', description: 'Pose-guided image generation with precise control', category: 'image', thumbnail: '/assets/card_images/683255d3-1d10-43d9-a6ff-ef142061e88a.webp', uses: 5400, tags: ['ControlNet', 'Image'] },
-  { id: 'video-gen', name: 'Video Generation', description: 'Create videos from text prompts', category: 'video', thumbnail: '/assets/card_images/91f1f589-ddb4-4c4f-b3a7-ba30fc271987.webp', uses: 4800, tags: ['Text to Video', 'Video'] },
-  { id: 'sdxl-turbo', name: 'SDXL Turbo', description: 'Fast SDXL generation with turbo mode', category: 'image', thumbnail: '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp', uses: 4200, tags: ['Text to Image', 'SDXL'] },
-  { id: 'canny', name: 'ControlNet Canny', description: 'Edge-guided generation using canny detection', category: 'image', thumbnail: '/assets/card_images/comfyui_workflow.jpg', uses: 3800, tags: ['ControlNet', 'Image'] },
-  { id: 'depth', name: 'ControlNet Depth', description: 'Depth-guided generation for 3D-aware results', category: 'image', thumbnail: '/assets/card_images/can-you-rate-my-comfyui-workflow-v0-o9clchhji39c1.webp', uses: 3500, tags: ['ControlNet', 'Depth'] },
-  { id: 'sdxl-refiner', name: 'SDXL + Refiner', description: 'Two-stage SDXL workflow with refinement pass', category: 'image', thumbnail: '/assets/card_images/dda28581-37c8-44da-8822-57d1ccc2118c_2130x1658.png', uses: 3200, tags: ['SDXL', 'Refiner'] },
-  { id: 'animatediff', name: 'AnimateDiff', description: 'Animate still images into dynamic videos', category: 'video', thumbnail: '/thumbnails/workflow-1.jpg', uses: 2900, tags: ['Image to Video', 'Video'] },
-  { id: 'audio-gen', name: 'Audio Generation', description: 'Generate audio and music from prompts', category: 'audio', thumbnail: '/thumbnails/workflow-2.jpg', uses: 2600, tags: ['Text to Audio', 'Audio'] },
-  { id: '3d-model', name: '3D Model Generation', description: 'Generate 3D models from images or text', category: '3d', thumbnail: '/thumbnails/workflow-1.jpg', uses: 2400, tags: ['Image to 3D', '3D'] },
+  // Getting Started - beginner friendly templates
+  { id: 'txt2img', name: 'Text to Image', description: 'Generate images from text prompts using AI models', category: 'getting-started', thumbnail: '/assets/card_images/workflow_01.webp', uses: 12500, tags: ['Text to Image', 'Beginner'], favorite: true },
+  { id: 'img2img', name: 'Image to Image', description: 'Transform existing images with AI enhancement', category: 'getting-started', thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp', uses: 8900, tags: ['Image to Image', 'Beginner'], favorite: false },
+  { id: 'simple-upscale', name: 'Simple Upscale', description: 'Easily upscale your images to higher resolution', category: 'getting-started', thumbnail: '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp', uses: 7800, tags: ['Upscale', 'Beginner'], favorite: false },
+  { id: 'simple-inpaint', name: 'Simple Inpainting', description: 'Remove or replace objects in your images', category: 'getting-started', thumbnail: '/assets/card_images/228616f4-12ad-426d-84fb-f20e488ba7ee.webp', uses: 6500, tags: ['Inpaint', 'Beginner'], favorite: false },
+  { id: 'face-swap', name: 'Face Swap', description: 'Swap faces between images with one click', category: 'getting-started', thumbnail: '/assets/card_images/683255d3-1d10-43d9-a6ff-ef142061e88a.webp', uses: 5900, tags: ['Face', 'Beginner'], favorite: true },
+  { id: 'bg-remove', name: 'Background Removal', description: 'Remove backgrounds from any image instantly', category: 'getting-started', thumbnail: '/assets/card_images/91f1f589-ddb4-4c4f-b3a7-ba30fc271987.webp', uses: 5500, tags: ['Background', 'Beginner'], favorite: false },
+  { id: 'style-transfer', name: 'Style Transfer', description: 'Apply artistic styles to your photos', category: 'getting-started', thumbnail: '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp', uses: 4900, tags: ['Style', 'Beginner'], favorite: false },
+  { id: 'portrait-enhance', name: 'Portrait Enhancement', description: 'Enhance and beautify portrait photos', category: 'getting-started', thumbnail: '/assets/card_images/comfyui_workflow.jpg', uses: 4500, tags: ['Portrait', 'Beginner'], favorite: false },
+  // Image category
+  { id: 'upscale', name: 'Upscale 4x Pro', description: '4x image upscaling workflow with detail enhancement', category: 'image', thumbnail: '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp', uses: 7200, tags: ['Image', 'Upscale'], favorite: true },
+  { id: 'inpaint', name: 'Advanced Inpainting', description: 'Edit specific parts of an image seamlessly', category: 'image', thumbnail: '/assets/card_images/228616f4-12ad-426d-84fb-f20e488ba7ee.webp', uses: 6100, tags: ['Image Edit', 'Inpaint'], favorite: false },
+  { id: 'controlnet', name: 'ControlNet Pose', description: 'Pose-guided image generation with precise control', category: 'image', thumbnail: '/assets/card_images/683255d3-1d10-43d9-a6ff-ef142061e88a.webp', uses: 5400, tags: ['ControlNet', 'Image'], favorite: false },
+  { id: 'sdxl-turbo', name: 'SDXL Turbo', description: 'Fast SDXL generation with turbo mode', category: 'image', thumbnail: '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp', uses: 4200, tags: ['Text to Image', 'SDXL'], favorite: false },
+  { id: 'canny', name: 'ControlNet Canny', description: 'Edge-guided generation using canny detection', category: 'image', thumbnail: '/assets/card_images/comfyui_workflow.jpg', uses: 3800, tags: ['ControlNet', 'Image'], favorite: false },
+  { id: 'depth', name: 'ControlNet Depth', description: 'Depth-guided generation for 3D-aware results', category: 'image', thumbnail: '/assets/card_images/can-you-rate-my-comfyui-workflow-v0-o9clchhji39c1.webp', uses: 3500, tags: ['ControlNet', 'Depth'], favorite: false },
+  { id: 'sdxl-refiner', name: 'SDXL + Refiner', description: 'Two-stage SDXL workflow with refinement pass', category: 'image', thumbnail: '/assets/card_images/dda28581-37c8-44da-8822-57d1ccc2118c_2130x1658.png', uses: 3200, tags: ['SDXL', 'Refiner'], favorite: false },
+  // Video category
+  { id: 'video-gen', name: 'Video Generation', description: 'Create videos from text prompts', category: 'video', thumbnail: '/assets/card_images/91f1f589-ddb4-4c4f-b3a7-ba30fc271987.webp', uses: 4800, tags: ['Text to Video', 'Video'], favorite: true },
+  { id: 'animatediff', name: 'AnimateDiff', description: 'Animate still images into dynamic videos', category: 'video', thumbnail: '/assets/card_images/workflow_01.webp', uses: 2900, tags: ['Image to Video', 'Video'], favorite: false },
+  // Audio category
+  { id: 'audio-gen', name: 'Audio Generation', description: 'Generate audio and music from prompts', category: 'audio', thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp', uses: 2600, tags: ['Text to Audio', 'Audio'], favorite: false },
+  // 3D category
+  { id: '3d-model', name: '3D Model Generation', description: 'Generate 3D models from images or text', category: '3d', thumbnail: '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp', uses: 2400, tags: ['Image to 3D', '3D'], favorite: false },
 ]
 
 export const MOCK_MODELS: Model[] = [

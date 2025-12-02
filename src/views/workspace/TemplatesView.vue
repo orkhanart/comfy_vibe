@@ -26,10 +26,11 @@ type ViewMode = 'grid' | 'list'
 const searchQuery = ref('')
 const viewMode = ref<ViewMode>('grid')
 const sortBy = ref('newest')
-const filterBy = ref('all')
+const filterBy = ref('getting-started')
 const modelFilter = ref('all')
 const useCaseFilter = ref('all')
 const runsOnFilter = ref('all')
+const showFavoritesOnly = ref(false)
 
 const sortOptions = [
   { value: 'newest', label: 'Newest' },
@@ -39,8 +40,20 @@ const sortOptions = [
 
 const templates = ref<Template[]>([...MOCK_TEMPLATES])
 
+function toggleFavorite(templateId: string) {
+  const template = templates.value.find(t => t.id === templateId)
+  if (template) {
+    template.favorite = !template.favorite
+  }
+}
+
 const filteredTemplates = computed(() => {
   let result = [...templates.value]
+
+  // Filter by favorites
+  if (showFavoritesOnly.value) {
+    result = result.filter(t => t.favorite)
+  }
 
   if (filterBy.value !== 'all') {
     result = result.filter(t => t.category === filterBy.value)
@@ -127,6 +140,18 @@ function openTemplate(templateId: string): void {
       <div class="ml-auto flex items-center gap-2">
         <WorkspaceViewToggle v-model="viewMode" />
         <WorkspaceSortSelect v-model="sortBy" :options="sortOptions" />
+        <!-- Favorites Filter -->
+        <button
+          :class="[
+            'flex h-9 w-9 items-center justify-center rounded-lg border transition-colors',
+            showFavoritesOnly
+              ? 'border-amber-500 bg-amber-50 text-amber-500 dark:border-amber-500 dark:bg-amber-500/10'
+              : 'border-zinc-200 bg-white text-zinc-400 hover:border-zinc-300 hover:text-amber-500 dark:border-border dark:bg-muted dark:hover:border-zinc-600'
+          ]"
+          @click="showFavoritesOnly = !showFavoritesOnly"
+        >
+          <Icon :name="showFavoritesOnly ? 'star-fill' : 'star'" size="sm" />
+        </button>
       </div>
     </div>
 
@@ -157,6 +182,7 @@ function openTemplate(templateId: string): void {
         :key="template.id"
         :template="template"
         @open="openTemplate"
+        @toggle-favorite="toggleFavorite"
       />
     </div>
 
