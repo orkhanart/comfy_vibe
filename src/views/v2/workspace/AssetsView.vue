@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { WorkspaceCard } from '@/components/v2/workspace'
@@ -70,10 +71,10 @@ const filteredAssets = computed(() => {
 
 function getAssetIcon(type: string): string {
   switch (type) {
-    case 'image': return 'pi pi-image'
-    case 'video': return 'pi pi-video'
-    case 'audio': return 'pi pi-volume-up'
-    default: return 'pi pi-file'
+    case 'image': return 'image'
+    case 'video': return 'video'
+    case 'audio': return 'volume-up'
+    default: return 'file'
   }
 }
 </script>
@@ -95,20 +96,20 @@ function getAssetIcon(type: string): string {
           :to="`/${workspaceId}/create`"
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
-          <i class="pi pi-bolt text-xs" />
+          <Icon name="bolt" size="xs" />
           Linear
         </RouterLink>
         <RouterLink
           :to="`/${workspaceId}/canvas`"
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
-          <i class="pi pi-share-alt text-xs" />
+          <Icon name="share-alt" size="xs" />
           Node
         </RouterLink>
         <button
           class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
-          <i class="pi pi-upload text-xs" />
+          <Icon name="upload" size="xs" />
           Upload
         </button>
       </div>
@@ -117,7 +118,7 @@ function getAssetIcon(type: string): string {
     <!-- Search, Filter, Sort & View Toggle -->
     <div class="mb-6 flex items-center gap-3">
       <div class="relative flex-1">
-        <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400" />
+        <Icon name="search" size="sm" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
         <input
           v-model="searchQuery"
           type="text"
@@ -153,7 +154,7 @@ function getAssetIcon(type: string): string {
             {{ option.label }}
           </option>
         </select>
-        <i class="pi pi-chevron-down pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-zinc-400" />
+        <Icon name="chevron-down" size="xs" class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
       </div>
 
       <!-- View Toggle -->
@@ -167,7 +168,7 @@ function getAssetIcon(type: string): string {
           ]"
           @click="viewMode = 'grid'"
         >
-          <i class="pi pi-th-large" />
+          <Icon name="th-large" size="md" />
         </button>
         <button
           :class="[
@@ -178,7 +179,7 @@ function getAssetIcon(type: string): string {
           ]"
           @click="viewMode = 'list'"
         >
-          <i class="pi pi-list" />
+          <Icon name="list" size="md" />
         </button>
       </div>
     </div>
@@ -189,7 +190,7 @@ function getAssetIcon(type: string): string {
       class="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 py-16 dark:border-zinc-700"
     >
       <div class="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-        <i class="pi pi-images text-xl text-zinc-400" />
+        <Icon name="images" size="xl" class="text-zinc-400" />
       </div>
       <h3 class="mt-4 text-sm font-medium text-zinc-900 dark:text-zinc-100">No assets found</h3>
       <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -224,7 +225,7 @@ function getAssetIcon(type: string): string {
           class="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
         >
           <div class="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
-            <i :class="[getAssetIcon(asset.type), 'text-zinc-500 dark:text-zinc-400']" />
+            <Icon :name="getAssetIcon(asset.type)" size="md" />
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ asset.name }}</p>
@@ -233,7 +234,7 @@ function getAssetIcon(type: string): string {
           <span class="text-sm text-zinc-400 dark:text-zinc-500">{{ asset.size }}</span>
           <span class="text-sm text-zinc-400 dark:text-zinc-500">{{ asset.updatedAt }}</span>
           <button class="rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-300">
-            <i class="pi pi-download text-sm" />
+            <Icon name="download" size="sm" />
           </button>
         </div>
       </div>

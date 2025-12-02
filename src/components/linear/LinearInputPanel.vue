@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useLinearModeStore } from '@/stores/linearModeStore'
 import type { WidgetDefinition } from '@/types/node'
@@ -136,7 +137,7 @@ function randomizeSeed(): void {
       v-if="!workflow"
       class="flex flex-1 flex-col items-center justify-center text-zinc-500"
     >
-      <i class="pi pi-arrow-left mb-3 text-4xl" />
+      <Icon name="arrow-left" size="md" class="mb-3 text-4xl" />
       <p class="text-sm">Select a workflow to get started</p>
     </div>
 
@@ -160,7 +161,7 @@ function randomizeSeed(): void {
             class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-500"
             @click="handleGenerate"
           >
-            <i class="pi pi-play text-xs" />
+            <Icon name="play" size="xs" />
             Generate
           </button>
           <button
@@ -168,7 +169,7 @@ function randomizeSeed(): void {
             class="flex items-center gap-2 rounded-lg bg-red-600/20 px-4 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-600/30"
             @click="handleCancel"
           >
-            <i class="pi pi-times text-xs" />
+            <Icon name="times" size="xs" />
             Cancel
           </button>
         </div>
@@ -215,18 +216,13 @@ function randomizeSeed(): void {
               @click="showAdvanced = !showAdvanced"
             >
               <div class="flex items-center gap-2">
-                <i class="pi pi-sliders-h text-xs text-zinc-500" />
+                <Icon name="sliders-h" size="xs" class="text-zinc-500" />
                 <span class="text-xs font-medium text-zinc-300">Advanced Settings</span>
                 <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-500">
                   {{ advancedWidgets.length }}
                 </span>
               </div>
-              <i
-                :class="[
-                  'pi text-xs text-zinc-500 transition-transform',
-                  showAdvanced ? 'pi-chevron-up' : 'pi-chevron-down'
-                ]"
-              />
+              <Icon :name="showAdvanced ? 'chevron-up' : 'chevron-down'" size="xs" class="text-zinc-500 transition-transform" />
             </button>
 
             <!-- Advanced Widgets -->
@@ -240,7 +236,7 @@ function randomizeSeed(): void {
                   class="flex items-center gap-1.5 rounded bg-zinc-800 px-2 py-1 text-[10px] text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
                   @click="randomizeSeed"
                 >
-                  <i class="pi pi-sync text-[10px]" />
+                  <Icon name="sync" size="xs" />
                   Random Seed
                 </button>
               </div>

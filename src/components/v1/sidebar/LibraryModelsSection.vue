@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import type { TeamModel } from '@/data/sidebarMockData'
 import { LibraryGridCard } from '@/components/common/sidebar'
 
@@ -41,11 +42,12 @@ function getModelBadgeClass(type: TeamModel['type']): string {
       class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left transition-colors hover:bg-zinc-800"
       @click="emit('toggle')"
     >
-      <i
-        class="text-[10px] text-zinc-500 transition-transform"
-        :class="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+      <Icon
+        :name="expanded ? 'chevron-down' : 'chevron-right'"
+        size="xs"
+        class="text-zinc-500 transition-transform"
       />
-      <i class="pi pi-box text-xs text-green-400" />
+      <Icon name="box" size="xs" class="text-green-400" />
       <span class="flex-1 text-xs font-medium text-zinc-300">Team Models</span>
       <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-500">
         {{ models.length }}
@@ -60,7 +62,7 @@ function getModelBadgeClass(type: TeamModel['type']): string {
         class="group flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-zinc-800"
         draggable="true"
       >
-        <i class="pi pi-file text-[10px] text-zinc-600 group-hover:text-zinc-400" />
+        <Icon name="file" size="xs" class="text-zinc-600 group-hover:text-zinc-400" />
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2">
             <span class="truncate text-xs text-zinc-400 group-hover:text-zinc-200">{{ model.name }}</span>
@@ -73,7 +75,7 @@ function getModelBadgeClass(type: TeamModel['type']): string {
             <span>{{ model.downloads }} downloads</span>
           </div>
         </div>
-        <i class="pi pi-download text-[10px] text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
+        <Icon name="download" size="xs" class="text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
       </div>
     </div>
   </template>
@@ -82,7 +84,7 @@ function getModelBadgeClass(type: TeamModel['type']): string {
   <template v-else>
     <div class="mb-2 flex items-center justify-between px-1">
       <div class="flex items-center gap-2">
-        <i class="pi pi-box text-xs text-green-400" />
+        <Icon name="box" size="xs" class="text-green-400" />
         <span class="text-[10px] font-medium uppercase tracking-wider text-zinc-500">Models</span>
       </div>
       <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[9px] text-zinc-500">
@@ -96,7 +98,7 @@ function getModelBadgeClass(type: TeamModel['type']): string {
         :title="model.name"
         :subtitle="`${model.size} · ${model.downloads} downloads`"
         :thumbnail="model.thumbnail"
-        icon="pi pi-box"
+        icon="box"
         icon-class="text-green-400"
         :badge="getModelTypeLabel(model.type)"
         :badge-class="getModelBadgeClass(model.type)"

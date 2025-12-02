@@ -44,7 +44,7 @@ function handleClose(tabId: string, event: MouseEvent): void {
           class="flex h-4 w-4 items-center justify-center rounded text-zinc-600 opacity-0 transition-all hover:bg-zinc-700 hover:text-zinc-300 group-hover:opacity-100"
           @click="handleClose(tab.id, $event)"
         >
-          <i class="pi pi-times text-[10px]" />
+          <Icon name="times" size="xs" />
         </span>
       </button>
     </div>
@@ -55,7 +55,7 @@ function handleClose(tabId: string, event: MouseEvent): void {
       class="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-zinc-800 hover:text-zinc-400"
       @click="emit('new')"
     >
-      <i class="pi pi-plus text-xs" />
+      <Icon name="plus" size="xs" />
     </button>
   </div>
 </template>

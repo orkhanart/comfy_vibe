@@ -59,7 +59,7 @@ export const NODE_CATEGORIES_DATA: NodeCategory[] = [
   {
     id: 'loaders',
     label: 'Loaders',
-    icon: 'pi pi-download',
+    icon: 'download',
     expanded: true,
     nodes: [
       { name: 'CheckpointLoaderSimple', display: 'Load Checkpoint' },
@@ -73,7 +73,7 @@ export const NODE_CATEGORIES_DATA: NodeCategory[] = [
   {
     id: 'conditioning',
     label: 'Conditioning',
-    icon: 'pi pi-sliders-h',
+    icon: 'sliders-h',
     expanded: false,
     nodes: [
       { name: 'CLIPTextEncode', display: 'CLIP Text Encode (Prompt)' },
@@ -85,7 +85,7 @@ export const NODE_CATEGORIES_DATA: NodeCategory[] = [
   {
     id: 'sampling',
     label: 'Sampling',
-    icon: 'pi pi-box',
+    icon: 'box',
     expanded: false,
     nodes: [
       { name: 'KSampler', display: 'KSampler' },
@@ -96,7 +96,7 @@ export const NODE_CATEGORIES_DATA: NodeCategory[] = [
   {
     id: 'latent',
     label: 'Latent',
-    icon: 'pi pi-th-large',
+    icon: 'th-large',
     expanded: false,
     nodes: [
       { name: 'EmptyLatentImage', display: 'Empty Latent Image' },
@@ -109,7 +109,7 @@ export const NODE_CATEGORIES_DATA: NodeCategory[] = [
   {
     id: 'image',
     label: 'Image',
-    icon: 'pi pi-image',
+    icon: 'image',
     expanded: false,
     nodes: [
       { name: 'LoadImage', display: 'Load Image' },
@@ -122,7 +122,7 @@ export const NODE_CATEGORIES_DATA: NodeCategory[] = [
   {
     id: 'masking',
     label: 'Masking',
-    icon: 'pi pi-clone',
+    icon: 'clone',
     expanded: false,
     nodes: [
       { name: 'LoadImageMask', display: 'Load Image (as Mask)' },
@@ -136,7 +136,7 @@ export const MODEL_CATEGORIES_DATA: ModelCategory[] = [
   {
     id: 'checkpoints',
     label: 'Checkpoints',
-    icon: 'pi pi-box',
+    icon: 'box',
     expanded: true,
     models: [
       { name: 'sd_v1-5', display: 'SD 1.5', size: '4.27 GB' },
@@ -149,7 +149,7 @@ export const MODEL_CATEGORIES_DATA: ModelCategory[] = [
   {
     id: 'loras',
     label: 'LoRAs',
-    icon: 'pi pi-link',
+    icon: 'link',
     expanded: false,
     models: [
       { name: 'add_detail', display: 'Add Detail', size: '144 MB' },
@@ -161,7 +161,7 @@ export const MODEL_CATEGORIES_DATA: ModelCategory[] = [
   {
     id: 'vae',
     label: 'VAE',
-    icon: 'pi pi-sitemap',
+    icon: 'sitemap',
     expanded: false,
     models: [
       { name: 'vae-ft-mse-840000', display: 'VAE ft MSE', size: '335 MB' },
@@ -171,7 +171,7 @@ export const MODEL_CATEGORIES_DATA: ModelCategory[] = [
   {
     id: 'controlnet',
     label: 'ControlNet',
-    icon: 'pi pi-sliders-v',
+    icon: 'sliders-v',
     expanded: false,
     models: [
       { name: 'control_v11p_sd15_canny', display: 'Canny (SD1.5)', size: '1.45 GB' },
@@ -183,7 +183,7 @@ export const MODEL_CATEGORIES_DATA: ModelCategory[] = [
   {
     id: 'embeddings',
     label: 'Embeddings',
-    icon: 'pi pi-tag',
+    icon: 'tag',
     expanded: false,
     models: [
       { name: 'easynegative', display: 'EasyNegative', size: '24 KB' },
@@ -194,7 +194,7 @@ export const MODEL_CATEGORIES_DATA: ModelCategory[] = [
   {
     id: 'upscale',
     label: 'Upscale Models',
-    icon: 'pi pi-expand',
+    icon: 'expand',
     expanded: false,
     models: [
       { name: '4x_ultrasharp', display: '4x UltraSharp', size: '67 MB' },
@@ -273,7 +273,7 @@ export const TEMPLATE_CATEGORIES_DATA: TemplateCategory[] = [
   {
     id: 'official',
     label: 'Official',
-    icon: 'pi pi-verified',
+    icon: 'verified',
     expanded: true,
     templates: [
       { name: 'txt2img-basic', display: 'Text to Image (Basic)', description: 'Simple text-to-image generation', nodes: 6 },
@@ -285,7 +285,7 @@ export const TEMPLATE_CATEGORIES_DATA: TemplateCategory[] = [
   {
     id: 'sdxl',
     label: 'SDXL',
-    icon: 'pi pi-star',
+    icon: 'star',
     expanded: false,
     templates: [
       { name: 'sdxl-txt2img', display: 'SDXL Text to Image', description: 'SDXL base workflow', nodes: 8 },
@@ -296,7 +296,7 @@ export const TEMPLATE_CATEGORIES_DATA: TemplateCategory[] = [
   {
     id: 'controlnet',
     label: 'ControlNet',
-    icon: 'pi pi-sliders-v',
+    icon: 'sliders-v',
     expanded: false,
     templates: [
       { name: 'cn-canny', display: 'Canny Edge', description: 'Edge detection control', nodes: 12 },
@@ -308,7 +308,7 @@ export const TEMPLATE_CATEGORIES_DATA: TemplateCategory[] = [
   {
     id: 'video',
     label: 'Video',
-    icon: 'pi pi-video',
+    icon: 'video',
     expanded: false,
     templates: [
       { name: 'svd-basic', display: 'SVD Image to Video', description: 'Stable Video Diffusion', nodes: 10 },
@@ -318,7 +318,7 @@ export const TEMPLATE_CATEGORIES_DATA: TemplateCategory[] = [
   {
     id: 'community',
     label: 'Community',
-    icon: 'pi pi-users',
+    icon: 'users',
     expanded: false,
     templates: [
       { name: 'portrait-enhance', display: 'Portrait Enhancer', description: 'Face restoration workflow', nodes: 12 },

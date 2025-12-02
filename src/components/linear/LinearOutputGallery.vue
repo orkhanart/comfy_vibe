@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import type { LinearOutput } from '@/types/linear'
 
@@ -47,7 +48,7 @@ function formatDate(date: Date): string {
     <!-- Gallery header -->
     <div class="gallery-header">
       <h3 class="gallery-title">
-        <i class="pi pi-images" />
+        <Icon name="images" size="md" />
         Generated Images
       </h3>
       <span class="gallery-count">{{ outputs.length }} images</span>
@@ -75,7 +76,7 @@ function formatDate(date: Date): string {
               title="Delete"
               @click="deleteOutput(output.id, $event)"
             >
-              <i class="pi pi-trash" />
+              <Icon name="trash" size="md" />
             </button>
           </div>
           <div class="overlay-bottom">
@@ -85,7 +86,7 @@ function formatDate(date: Date): string {
               title="Download"
               @click.stop="downloadImage(output)"
             >
-              <i class="pi pi-download" />
+              <Icon name="download" size="md" />
             </button>
           </div>
         </div>
@@ -94,7 +95,7 @@ function formatDate(date: Date): string {
 
     <!-- Empty state -->
     <div v-else class="empty-state">
-      <i class="pi pi-image text-4xl text-zinc-700" />
+      <Icon name="image" size="md" class="text-4xl text-zinc-700" />
       <p class="empty-text">Your generated images will appear here</p>
     </div>
 
@@ -103,7 +104,7 @@ function formatDate(date: Date): string {
       <div v-if="selectedOutput" class="lightbox" @click="closeLightbox">
         <div class="lightbox-content" @click.stop>
           <button class="lightbox-close" @click="closeLightbox">
-            <i class="pi pi-times" />
+            <Icon name="times" size="md" />
           </button>
 
           <img
@@ -145,7 +146,7 @@ function formatDate(date: Date): string {
                 Close
               </button>
               <button class="action-btn primary" @click="downloadImage(selectedOutput)">
-                <i class="pi pi-download" />
+                <Icon name="download" size="md" />
                 Download
               </button>
             </div>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed, watch } from 'vue'
 import { CANVAS_LAYOUT, SECTION_COLORS } from '@/types/linearCanvas'
 import type { SectionHeaderData } from '@/types/linearCanvas'
@@ -146,12 +147,7 @@ function handleResizeEnd(): void {
         class="flex h-6 w-6 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-white/10 hover:text-zinc-200"
         @click="toggleCollapse"
       >
-        <i
-          :class="[
-            'pi text-xs transition-transform',
-            props.data.collapsed ? 'pi-chevron-right' : 'pi-chevron-down'
-          ]"
-        />
+        <Icon :name="props.data.collapsed ? 'chevron-right' : 'chevron-down'" size="xs" class="transition-transform" />
       </button>
 
       <!-- Color indicator/picker -->
@@ -211,14 +207,14 @@ function handleResizeEnd(): void {
           title="Edit name"
           @click="startEditing"
         >
-          <i class="pi pi-pencil text-xs" />
+          <Icon name="pencil" size="xs" />
         </button>
         <button
           class="flex h-6 w-6 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-red-500/20 hover:text-red-400"
           title="Delete section"
           @click="handleDelete"
         >
-          <i class="pi pi-trash text-xs" />
+          <Icon name="trash" size="xs" />
         </button>
       </div>
     </div>

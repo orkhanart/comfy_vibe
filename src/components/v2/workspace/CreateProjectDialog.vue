@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import Dialog from 'primevue/dialog'
-import InputText from 'primevue/inputtext'
-import Textarea from 'primevue/textarea'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 
 defineProps<{
   visible: boolean
@@ -34,57 +40,36 @@ function handleClose(): void {
 
 <template>
   <Dialog
-    :visible="visible"
-    :modal="true"
-    :draggable="false"
-    :closable="true"
-    :style="{ width: '420px' }"
-    :pt="{
-      root: { class: 'dialog-root' },
-      mask: { class: 'dialog-mask' },
-      header: { class: 'dialog-header' },
-      title: { class: 'dialog-title' },
-      headerActions: { class: 'dialog-header-actions' },
-      content: { class: 'dialog-content' },
-      footer: { class: 'dialog-footer' }
-    }"
-    @update:visible="$emit('update:visible', $event)"
+    :open="visible"
+    @update:open="$emit('update:visible', $event)"
   >
-    <template #header>
-      <span class="dialog-title-text">Create Project</span>
-    </template>
+    <DialogContent class="max-w-[420px]">
+      <DialogHeader>
+        <DialogTitle>Create Project</DialogTitle>
+      </DialogHeader>
 
-    <div class="dialog-form">
-      <div class="dialog-field">
-        <label class="dialog-label">Name</label>
-        <InputText
-          v-model="newProject.name"
-          placeholder="Project name"
-          class="dialog-input"
-          :pt="{
-            root: { class: 'dialog-input-root' }
-          }"
-          @keyup.enter="handleCreate"
-        />
+      <div class="space-y-4 py-4">
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Name</label>
+          <Input
+            v-model="newProject.name"
+            placeholder="Project name"
+            @keyup.enter="handleCreate"
+          />
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Description</label>
+          <Textarea
+            v-model="newProject.description"
+            placeholder="Optional description"
+            :rows="3"
+          />
+        </div>
       </div>
-      <div class="dialog-field">
-        <label class="dialog-label">Description</label>
-        <Textarea
-          v-model="newProject.description"
-          placeholder="Optional description"
-          rows="3"
-          class="dialog-textarea"
-          :pt="{
-            root: { class: 'dialog-textarea-root' }
-          }"
-        />
-      </div>
-    </div>
 
-    <template #footer>
-      <div class="dialog-actions">
+      <DialogFooter>
         <button
-          class="dialog-btn dialog-btn-secondary"
+          class="rounded-lg border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
           @click="handleClose"
         >
           Cancel
@@ -92,14 +77,16 @@ function handleClose(): void {
         <button
           :disabled="!newProject.name.trim()"
           :class="[
-            'dialog-btn',
-            newProject.name.trim() ? 'dialog-btn-primary' : 'dialog-btn-disabled'
+            'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
+            newProject.name.trim()
+              ? 'bg-blue-600 text-white hover:bg-blue-500'
+              : 'cursor-not-allowed bg-zinc-200 text-zinc-400 dark:bg-zinc-700 dark:text-zinc-500'
           ]"
           @click="handleCreate"
         >
           Create
         </button>
-      </div>
-    </template>
+      </DialogFooter>
+    </DialogContent>
   </Dialog>
 </template>

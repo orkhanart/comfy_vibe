@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { computed } from 'vue'
 import { Handle, Position } from '@vue-flow/core'
 import type { SlotDefinition } from '@/types/node'
@@ -79,19 +80,23 @@ const hasOutputs = computed(() => props.outputs.length > 0)
             class="flex h-4 w-4 shrink-0 items-center justify-center text-zinc-500 transition-colors hover:text-zinc-300"
             @click.stop="emit('expand')"
           >
-            <i class="pi pi-chevron-down -rotate-90 text-[10px]" />
+            <Icon name="chevron-down" size="xs" class="-rotate-90" />
           </button>
           <span class="truncate font-medium text-xs">{{ title }}</span>
         </div>
 
         <div v-if="isExecuting || hasError" class="flex shrink-0 items-center gap-1">
-          <i
+          <Icon
             v-if="isExecuting"
-            class="pi pi-spin pi-spinner text-[9px] text-blue-400"
+            name="spinner"
+            size="xs"
+            class="animate-spin text-blue-400"
           />
-          <i
+          <Icon
             v-if="hasError"
-            class="pi pi-exclamation-triangle text-[9px] text-red-400"
+            name="exclamation-circle"
+            size="xs"
+            class="text-red-400"
           />
         </div>
       </div>

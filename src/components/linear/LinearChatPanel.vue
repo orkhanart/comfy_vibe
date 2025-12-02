@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
-import Popover from 'primevue/popover'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import ChatPromptBar, { type Workflow, type AgentMode } from './chat/ChatPromptBar.vue'
 import ChatParametersPanel from './chat/ChatParametersPanel.vue'
 import ChatMessageList, { type ChatMessage } from './chat/ChatMessageList.vue'
@@ -24,7 +25,7 @@ const messages = ref<ChatMessage[]>([
 
 const inputText = ref('')
 const isGenerating = ref(false)
-const chatSelectorRef = ref()
+const chatSelectorOpen = ref(false)
 
 // Chat sessions
 const chatSessions = ref<ChatSession[]>([
@@ -49,21 +50,21 @@ const currentChat = computed(() =>
 
 // Workflows
 const workflows = ref<Workflow[]>([
-  { id: 'txt2img', name: 'Text to Image', description: 'Generate images from text prompts', icon: 'pi-image', category: 'image' },
-  { id: 'img2img', name: 'Image to Image', description: 'Transform images with prompts', icon: 'pi-images', category: 'image' },
-  { id: 'inpaint', name: 'Inpainting', description: 'Edit specific parts of images', icon: 'pi-pencil', category: 'image' },
-  { id: 'upscale', name: 'Upscale', description: 'Enhance image resolution', icon: 'pi-expand', category: 'image' },
-  { id: 'txt2vid', name: 'Text to Video', description: 'Generate videos from prompts', icon: 'pi-video', category: 'video' },
-  { id: 'img2vid', name: 'Image to Video', description: 'Animate still images', icon: 'pi-play', category: 'video' },
+  { id: 'txt2img', name: 'Text to Image', description: 'Generate images from text prompts', icon: 'image', category: 'image' },
+  { id: 'img2img', name: 'Image to Image', description: 'Transform images with prompts', icon: 'images', category: 'image' },
+  { id: 'inpaint', name: 'Inpainting', description: 'Edit specific parts of images', icon: 'pencil', category: 'image' },
+  { id: 'upscale', name: 'Upscale', description: 'Enhance image resolution', icon: 'expand', category: 'image' },
+  { id: 'txt2vid', name: 'Text to Video', description: 'Generate videos from prompts', icon: 'video', category: 'video' },
+  { id: 'img2vid', name: 'Image to Video', description: 'Animate still images', icon: 'play', category: 'video' },
 ])
 const selectedWorkflowId = ref('txt2img')
 
 // Agent modes
 const agentModes = ref<AgentMode[]>([
-  { id: 'creative', name: 'Creative', description: 'Free-form creative generation', icon: 'pi-sparkles' },
-  { id: 'precise', name: 'Precise', description: 'Follow prompts exactly', icon: 'pi-bullseye' },
-  { id: 'iterate', name: 'Iterate', description: 'Refine and improve results', icon: 'pi-refresh' },
-  { id: 'agent', name: 'Agent', description: 'Multi-step autonomous workflow', icon: 'pi-bolt' },
+  { id: 'creative', name: 'Creative', description: 'Free-form creative generation', icon: 'sparkles' },
+  { id: 'precise', name: 'Precise', description: 'Follow prompts exactly', icon: 'circle-fill' },
+  { id: 'iterate', name: 'Iterate', description: 'Refine and improve results', icon: 'refresh' },
+  { id: 'agent', name: 'Agent', description: 'Multi-step autonomous workflow', icon: 'bolt' },
 ])
 const selectedModeId = ref('creative')
 
@@ -77,13 +78,9 @@ const suggestions = [
   'Abstract art with vibrant colors',
 ]
 
-function toggleChatSelector(event: Event): void {
-  chatSelectorRef.value?.toggle(event)
-}
-
 function selectChat(chatId: string): void {
   currentChatId.value = chatId
-  chatSelectorRef.value?.hide()
+  chatSelectorOpen.value = false
 }
 
 function createNewChat(): void {
@@ -96,7 +93,7 @@ function createNewChat(): void {
   chatSessions.value.unshift(newChat)
   currentChatId.value = newChat.id
   messages.value = [messages.value[0]!]
-  chatSelectorRef.value?.hide()
+  chatSelectorOpen.value = false
 }
 
 async function sendMessage(): Promise<void> {
@@ -151,62 +148,63 @@ function stopGeneration(): void {
   <div class="flex h-full w-96 flex-col border-r border-zinc-800 bg-zinc-950">
     <!-- Header -->
     <div class="flex items-center justify-between border-b border-zinc-800 px-3 py-2">
-      <button
-        class="flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-800"
-        @click="toggleChatSelector"
-      >
-        {{ currentChat?.name ?? 'AI Chat' }}
-        <i class="pi pi-chevron-down text-[10px] text-zinc-500" />
-      </button>
+      <Popover v-model:open="chatSelectorOpen">
+        <PopoverTrigger as-child>
+          <button
+            class="flex items-center gap-2 rounded-lg px-2 py-1 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-800"
+          >
+            {{ currentChat?.name ?? 'AI Chat' }}
+            <Icon name="chevron-down" size="xs" class="text-zinc-500" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent align="start" class="w-64 p-0">
+          <div class="flex flex-col">
+            <div class="border-b border-zinc-800 p-2">
+              <button
+                class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+                @click="createNewChat"
+              >
+                <Icon name="plus" size="xs" />
+                <span>New Chat</span>
+              </button>
+            </div>
+            <div class="max-h-64 overflow-y-auto p-2">
+              <p class="mb-1.5 px-2 text-[10px] font-medium uppercase tracking-wide text-zinc-500">Recent Chats</p>
+              <button
+                v-for="chat in chatSessions"
+                :key="chat.id"
+                :class="[
+                  'flex w-full flex-col rounded-lg px-2.5 py-2 text-left transition-colors',
+                  chat.id === currentChatId
+                    ? 'bg-zinc-800 text-zinc-200'
+                    : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-300'
+                ]"
+                @click="selectChat(chat.id)"
+              >
+                <span class="text-xs font-medium">{{ chat.name }}</span>
+                <span class="truncate text-[10px] text-zinc-500">{{ chat.lastMessage || 'No messages' }}</span>
+              </button>
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
       <div class="flex items-center gap-0.5">
         <button
           v-tooltip.bottom="'New chat'"
           class="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
           @click="createNewChat"
         >
-          <i class="pi pi-plus text-xs" />
+          <Icon name="plus" size="xs" />
         </button>
         <button
           v-tooltip.bottom="'Clear chat'"
           class="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
           @click="messages = [messages[0]!]"
         >
-          <i class="pi pi-trash text-xs" />
+          <Icon name="trash" size="xs" />
         </button>
       </div>
     </div>
-
-    <!-- Chat Selector Popover -->
-    <Popover ref="chatSelectorRef" class="w-64">
-      <div class="flex flex-col">
-        <div class="border-b border-zinc-800 p-2">
-          <button
-            class="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
-            @click="createNewChat"
-          >
-            <i class="pi pi-plus text-[10px]" />
-            <span>New Chat</span>
-          </button>
-        </div>
-        <div class="max-h-64 overflow-y-auto p-2">
-          <p class="mb-1.5 px-2 text-[10px] font-medium uppercase tracking-wide text-zinc-500">Recent Chats</p>
-          <button
-            v-for="chat in chatSessions"
-            :key="chat.id"
-            :class="[
-              'flex w-full flex-col rounded-lg px-2.5 py-2 text-left transition-colors',
-              chat.id === currentChatId
-                ? 'bg-zinc-800 text-zinc-200'
-                : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-300'
-            ]"
-            @click="selectChat(chat.id)"
-          >
-            <span class="text-xs font-medium">{{ chat.name }}</span>
-            <span class="truncate text-[10px] text-zinc-500">{{ chat.lastMessage || 'No messages' }}</span>
-          </button>
-        </div>
-      </div>
-    </Popover>
 
     <!-- Messages -->
     <ChatMessageList

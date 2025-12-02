@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import type { LinearWorkflowTemplate } from '@/types/linear'
 
 interface Props {
@@ -26,7 +27,7 @@ const emit = defineEmits<{
         class="thumbnail-img"
       />
       <div v-else class="thumbnail-placeholder">
-        <i :class="['pi', template.icon, 'text-2xl text-zinc-500']" />
+        <Icon :name="template.icon" size="2xl" class="text-zinc-500" />
       </div>
 
       <!-- Featured badge -->
@@ -43,7 +44,7 @@ const emit = defineEmits<{
     <!-- Content -->
     <div class="content">
       <div class="header">
-        <i :class="['pi', template.icon, 'text-sm text-zinc-400']" />
+        <Icon :name="template.icon" size="sm" class="text-zinc-400" />
         <h3 class="title">{{ template.name }}</h3>
       </div>
       <p class="description">{{ template.description }}</p>

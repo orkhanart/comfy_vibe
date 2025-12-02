@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import LinearCanvasView from './canvas/LinearCanvasView.vue'
 
@@ -205,7 +206,7 @@ function getGridCols(count: number): string {
           ]"
           @click="viewMode = 'list'"
         >
-          <i class="pi pi-list text-xs" />
+          <Icon name="list" size="xs" />
           Timeline View
           <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-500">
             {{ generations.length }}
@@ -223,7 +224,7 @@ function getGridCols(count: number): string {
           ]"
           @click="viewMode = 'canvas'"
         >
-          <i class="pi pi-th-large text-xs" />
+          <Icon name="th-large" size="xs" />
           Canvas View
           <span
             v-if="viewMode === 'canvas'"
@@ -236,7 +237,7 @@ function getGridCols(count: number): string {
           v-tooltip.bottom="'Clear all'"
           class="flex h-7 w-7 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
         >
-          <i class="pi pi-trash text-xs" />
+          <Icon name="trash" size="xs" />
         </button>
       </div>
     </div>
@@ -280,7 +281,7 @@ function getGridCols(count: number): string {
                 class="flex h-5 w-5 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
                 @click="handleRerun(gen)"
               >
-                <i class="pi pi-refresh text-[9px]" />
+                <Icon name="refresh" size="md" class="text-[9px]" />
               </button>
               <button
                 v-if="gen.images.length > 0"
@@ -288,14 +289,14 @@ function getGridCols(count: number): string {
                 class="flex h-5 w-5 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
                 @click="handleDownload(gen)"
               >
-                <i class="pi pi-download text-[9px]" />
+                <Icon name="download" size="md" class="text-[9px]" />
               </button>
               <button
                 v-tooltip.top="'Delete'"
                 class="flex h-5 w-5 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-red-400"
                 @click="handleDelete(gen.id)"
               >
-                <i class="pi pi-trash text-[9px]" />
+                <Icon name="trash" size="md" class="text-[9px]" />
               </button>
             </div>
           </div>
@@ -322,13 +323,13 @@ function getGridCols(count: number): string {
                   class="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
                   @click.stop="handleDownload(gen, idx)"
                 >
-                  <i class="pi pi-download text-[10px]" />
+                  <Icon name="download" size="xs" />
                 </button>
                 <button
                   v-tooltip.top="'Expand'"
                   class="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
                 >
-                  <i class="pi pi-expand text-[10px]" />
+                  <Icon name="expand" size="xs" />
                 </button>
               </div>
             </div>
@@ -345,7 +346,7 @@ function getGridCols(count: number): string {
               class="flex aspect-square items-center justify-center overflow-hidden rounded bg-zinc-800"
             >
               <div class="flex flex-col items-center">
-                <i class="pi pi-spin pi-spinner text-base text-blue-400" />
+                <Icon name="spinner" size="md" class="animate-spin text-blue-400" />
                 <span class="mt-1 text-[10px] text-zinc-500">{{ gen.progress }}%</span>
               </div>
             </div>
@@ -361,7 +362,7 @@ function getGridCols(count: number): string {
               :key="i"
               class="flex aspect-square items-center justify-center overflow-hidden rounded bg-zinc-800"
             >
-              <i class="pi pi-clock text-base text-zinc-600" />
+              <Icon name="clock" size="md" class="text-zinc-600" />
             </div>
           </div>
 
@@ -423,7 +424,7 @@ function getGridCols(count: number): string {
         v-if="generations.length === 0"
         class="flex flex-1 flex-col items-center justify-center py-12 text-zinc-500"
       >
-        <i class="pi pi-images mb-2 text-3xl" />
+        <Icon name="images" size="md" class="mb-2 text-3xl" />
         <span class="text-sm">No generations yet</span>
         <p class="mt-1 text-center text-xs text-zinc-600">
           Start a chat to generate images

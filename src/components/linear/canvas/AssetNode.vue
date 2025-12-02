@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { computed } from 'vue'
 import type { AssetNodeData } from '@/types/linearCanvas'
 
@@ -73,21 +74,21 @@ function handleDragStart(event: DragEvent): void {
           class="flex h-6 w-6 items-center justify-center rounded bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
           @click.stop="emit('preview', data.imageUrl)"
         >
-          <i class="pi pi-expand text-[10px]" />
+          <Icon name="expand" size="xs" />
         </button>
         <button
           v-tooltip.top="'Download'"
           class="flex h-6 w-6 items-center justify-center rounded bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
           @click.stop="emit('download', id)"
         >
-          <i class="pi pi-download text-[10px]" />
+          <Icon name="download" size="xs" />
         </button>
         <button
           v-tooltip.top="'Delete'"
           class="flex h-6 w-6 items-center justify-center rounded bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-red-500/50"
           @click.stop="emit('delete', id)"
         >
-          <i class="pi pi-trash text-[10px]" />
+          <Icon name="trash" size="xs" />
         </button>
       </div>
     </div>

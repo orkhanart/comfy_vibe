@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 
 export type LinearTab = 'chat' | 'workflows' | 'apps' | 'models'
@@ -14,10 +15,10 @@ const emit = defineEmits<{
 const isExpanded = ref(false)
 
 const tabs: Array<{ id: LinearTab; icon: string; label: string }> = [
-  { id: 'chat', icon: 'pi-comments', label: 'Chat' },
-  { id: 'workflows', icon: 'pi-play', label: 'Workflows' },
-  { id: 'apps', icon: 'pi-th-large', label: 'Apps' },
-  { id: 'models', icon: 'pi-box', label: 'Models' },
+  { id: 'chat', icon: 'comments', label: 'Chat' },
+  { id: 'workflows', icon: 'play', label: 'Workflows' },
+  { id: 'apps', icon: 'th-large', label: 'Apps' },
+  { id: 'models', icon: 'box', label: 'Models' },
 ]
 
 function selectTab(tab: LinearTab): void {
@@ -51,7 +52,7 @@ function toggleExpand(): void {
         ]"
         @click="selectTab(tab.id)"
       >
-        <i :class="['pi', tab.icon, 'text-base shrink-0']" />
+        <Icon :name="tab.icon" size="md" />
         <span
           v-if="isExpanded"
           class="truncate text-xs font-medium"
@@ -75,7 +76,7 @@ function toggleExpand(): void {
         ]"
         @click="toggleExpand"
       >
-        <i :class="['pi text-base shrink-0', isExpanded ? 'pi-chevron-left' : 'pi-chevron-right']" />
+        <Icon :name="isExpanded ? 'chevron-left' : 'chevron-right'" size="md" class="shrink-0" />
         <span v-if="isExpanded" class="text-xs font-medium">Collapse</span>
       </button>
 
@@ -87,7 +88,7 @@ function toggleExpand(): void {
           isExpanded ? 'px-3' : 'justify-center'
         ]"
       >
-        <i class="pi pi-cog text-base shrink-0" />
+        <Icon name="cog" size="md" class="shrink-0" />
         <span v-if="isExpanded" class="text-xs font-medium">Settings</span>
       </button>
     </div>

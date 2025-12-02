@@ -47,7 +47,7 @@ const emit = defineEmits<{
         v-if="icon"
         class="absolute bottom-2 left-2 flex h-8 w-8 items-center justify-center rounded-md bg-black/30 backdrop-blur-sm"
       >
-        <i :class="[icon, 'text-sm text-white/90']" />
+        <Icon :name="icon" size="sm" />
       </div>
 
       <!-- Menu button (top-right) -->
@@ -55,7 +55,7 @@ const emit = defineEmits<{
         class="absolute right-2 top-2 rounded p-1 text-white/70 opacity-0 transition-opacity hover:bg-black/20 hover:text-white group-hover:opacity-100"
         @click.stop="emit('menu', $event)"
       >
-        <i class="pi pi-ellipsis-h text-sm" />
+        <Icon name="ellipsis-h" size="sm" />
       </button>
     </div>
 

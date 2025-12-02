@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useLinearModeStore } from '@/stores/linearModeStore'
 import { TEMPLATE_CATEGORIES } from '@/data/linearTemplates'
@@ -58,7 +59,7 @@ function clearCategory(): void {
 
       <!-- Search -->
       <div class="search-wrapper">
-        <i class="pi pi-search search-icon" />
+        <Icon name="search" size="md" class="search-icon" />
         <input
           v-model="searchQuery"
           type="text"
@@ -82,7 +83,7 @@ function clearCategory(): void {
         :class="['category-chip', { active: selectedCategory === category.id }]"
         @click="selectedCategory = category.id"
       >
-        <i :class="['pi', category.icon]" />
+        <Icon :name="category.icon" size="sm" />
         {{ category.name }}
       </button>
     </div>
@@ -90,7 +91,7 @@ function clearCategory(): void {
     <!-- Featured Section (only when no filter) -->
     <section v-if="!selectedCategory && !searchQuery && featuredTemplates.length" class="section">
       <h2 class="section-title">
-        <i class="pi pi-star-fill text-yellow-500" />
+        <Icon name="star-fill" size="md" class="text-yellow-500" />
         Featured
       </h2>
       <div class="template-grid featured-grid">
@@ -106,15 +107,15 @@ function clearCategory(): void {
     <!-- All Templates -->
     <section class="section">
       <h2 v-if="!selectedCategory && !searchQuery" class="section-title">
-        <i class="pi pi-th-large" />
+        <Icon name="th-large" size="md" />
         All Workflows
       </h2>
       <h2 v-else-if="selectedCategory" class="section-title">
-        <i :class="['pi', TEMPLATE_CATEGORIES.find(c => c.id === selectedCategory)?.icon]" />
+        <Icon :name="TEMPLATE_CATEGORIES.find(c => c.id === selectedCategory)?.icon ?? 'th-large'" size="md" />
         {{ TEMPLATE_CATEGORIES.find(c => c.id === selectedCategory)?.name }}
       </h2>
       <h2 v-else class="section-title">
-        <i class="pi pi-search" />
+        <Icon name="search" size="md" />
         Search Results
       </h2>
 
@@ -128,7 +129,7 @@ function clearCategory(): void {
       </div>
 
       <div v-else class="empty-state">
-        <i class="pi pi-inbox text-4xl text-zinc-600" />
+        <Icon name="inbox" size="md" class="text-4xl text-zinc-600" />
         <p>No workflows found</p>
       </div>
     </section>

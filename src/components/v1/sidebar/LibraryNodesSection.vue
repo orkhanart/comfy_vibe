@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import type { NodePack } from '@/data/sidebarMockData'
 import { LibraryGridCard } from '@/components/common/sidebar'
 
@@ -21,11 +22,12 @@ const emit = defineEmits<{
       class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left transition-colors hover:bg-zinc-800"
       @click="emit('toggle')"
     >
-      <i
-        class="text-[10px] text-zinc-500 transition-transform"
-        :class="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+      <Icon
+        :name="expanded ? 'chevron-down' : 'chevron-right'"
+        size="xs"
+        class="text-zinc-500 transition-transform"
       />
-      <i class="pi pi-code text-xs text-purple-400" />
+      <Icon name="code" size="xs" class="text-purple-400" />
       <span class="flex-1 text-xs font-medium text-zinc-300">Custom Nodes</span>
       <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-500">
         {{ packs.length }}
@@ -39,7 +41,7 @@ const emit = defineEmits<{
         :key="pack.id"
         class="group flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-zinc-800"
       >
-        <i class="pi pi-circle-fill text-[5px] text-zinc-600 group-hover:text-zinc-400" />
+        <Icon name="circle-fill" size="md" class="text-[5px] text-zinc-600 group-hover:text-zinc-400" />
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2">
             <span class="truncate text-xs text-zinc-400 group-hover:text-zinc-200">{{ pack.name }}</span>
@@ -60,7 +62,7 @@ const emit = defineEmits<{
               : 'bg-blue-600 text-white hover:bg-blue-500'
           ]"
         >
-          <i :class="pack.installed ? 'pi pi-check' : 'pi pi-download'" class="text-[9px]" />
+          <Icon :name="pack.installed ? 'check' : 'download'" size="xs" />
           {{ pack.installed ? 'Installed' : 'Install' }}
         </button>
       </div>
@@ -71,7 +73,7 @@ const emit = defineEmits<{
   <template v-else>
     <div class="mb-2 flex items-center justify-between px-1">
       <div class="flex items-center gap-2">
-        <i class="pi pi-code text-xs text-purple-400" />
+        <Icon name="code" size="xs" class="text-purple-400" />
         <span class="text-[10px] font-medium uppercase tracking-wider text-zinc-500">Nodepacks</span>
       </div>
       <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[9px] text-zinc-500">
@@ -85,7 +87,7 @@ const emit = defineEmits<{
         :title="pack.name"
         :subtitle="`${pack.nodes} nodes · v${pack.version}`"
         :thumbnail="pack.thumbnail"
-        icon="pi pi-code"
+        icon="code"
         icon-class="text-purple-400"
         :badge="pack.installed ? 'Installed' : 'Available'"
         :badge-class="pack.installed ? 'bg-green-500/30 text-green-300' : 'bg-zinc-700 text-zinc-400'"

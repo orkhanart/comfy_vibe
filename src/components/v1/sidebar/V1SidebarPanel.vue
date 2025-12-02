@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
-import Button from 'primevue/button'
+import { X } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
 import { useUiStore, SIDEBAR_TABS } from '@/stores/uiStore'
 import { SidebarSearchBox, SidebarViewToggle } from '@/components/common/sidebar'
 import V1SidebarNodesTab from './V1SidebarNodesTab.vue'
@@ -111,14 +113,9 @@ function setFilter(value: string): void {
         <span class="text-xs font-semibold uppercase tracking-wide text-zinc-400">
           {{ SIDEBAR_TABS.find(t => t.id === activeSidebarTab)?.label }}
         </span>
-        <Button
-          icon="pi pi-times"
-          text
-          severity="secondary"
-          size="small"
-          class="!h-6 !w-6"
-          @click="uiStore.closeSidebarPanel()"
-        />
+        <Button variant="ghost" size="icon" class="h-6 w-6" @click="uiStore.closeSidebarPanel()">
+          <X class="size-3" />
+        </Button>
       </div>
 
       <!-- Search & Controls -->
@@ -142,9 +139,9 @@ function setFilter(value: string): void {
                 class="flex h-6 items-center gap-1 rounded bg-zinc-800 px-2 text-[10px] text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
                 @click="showFilterMenu = !showFilterMenu"
               >
-                <i class="pi pi-filter text-[10px]" />
+                <Icon name="filter" size="xs" />
                 <span>{{ activeFilter }}</span>
-                <i class="pi pi-chevron-down text-[8px]" />
+                <Icon name="chevron-down" size="md" class="text-[8px]" />
               </button>
               <div
                 v-if="showFilterMenu"
@@ -168,9 +165,9 @@ function setFilter(value: string): void {
                 class="flex h-6 items-center gap-1 rounded bg-zinc-800 px-2 text-[10px] text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
                 @click="showSortMenu = !showSortMenu"
               >
-                <i class="pi pi-sort-alt text-[10px]" />
+                <Icon name="sort-alt" size="xs" />
                 <span>{{ sortOptions.find(o => o.value === sortBy)?.label }}</span>
-                <i class="pi pi-chevron-down text-[8px]" />
+                <Icon name="chevron-down" size="md" class="text-[8px]" />
               </button>
               <div
                 v-if="showSortMenu"

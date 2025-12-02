@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
@@ -124,7 +125,7 @@ const emptyStateDescription = computed(() =>
     <!-- Empty State -->
     <WorkspaceEmptyState
       v-if="filteredCanvases.length === 0"
-      icon="pi pi-sitemap"
+      icon="sitemap"
       title="No canvases found"
       :description="emptyStateDescription"
     />
@@ -143,20 +144,20 @@ const emptyStateDescription = computed(() =>
         <div class="flex h-full flex-col">
           <div class="flex items-start justify-between">
             <div class="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
-              <i class="pi pi-sitemap text-zinc-500 dark:text-zinc-400" />
+              <Icon name="sitemap" size="md" class="text-zinc-500 dark:text-zinc-400" />
             </div>
             <button
               class="rounded p-1 text-zinc-400 opacity-0 transition-opacity hover:bg-zinc-100 hover:text-zinc-600 group-hover:opacity-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
               @click.stop
             >
-              <i class="pi pi-ellipsis-h text-sm" />
+              <Icon name="ellipsis-h" size="sm" />
             </button>
           </div>
           <div class="mt-auto">
             <h3 class="font-medium text-zinc-900 dark:text-zinc-100">{{ canvas.name }}</h3>
             <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
               <span class="inline-flex items-center gap-1">
-                <i class="pi pi-folder text-xs" />
+                <Icon name="folder" size="xs" />
                 {{ canvas.projectName }}
               </span>
             </p>
@@ -176,13 +177,13 @@ const emptyStateDescription = computed(() =>
           @click="openCanvas(canvas)"
         >
           <div class="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
-            <i class="pi pi-sitemap text-zinc-500 dark:text-zinc-400" />
+            <Icon name="sitemap" size="md" class="text-zinc-500 dark:text-zinc-400" />
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ canvas.name }}</p>
             <p class="text-sm text-zinc-500 dark:text-zinc-400">
               <span class="inline-flex items-center gap-1">
-                <i class="pi pi-folder text-xs" />
+                <Icon name="folder" size="xs" />
                 {{ canvas.projectName }}
               </span>
             </p>

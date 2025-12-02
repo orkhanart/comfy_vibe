@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -70,11 +71,11 @@ const filteredModels = computed(() => {
 
 function getModelIcon(type: string): string {
   switch (type) {
-    case 'checkpoint': return 'pi pi-box'
-    case 'lora': return 'pi pi-bolt'
-    case 'vae': return 'pi pi-sliders-h'
-    case 'controlnet': return 'pi pi-sitemap'
-    default: return 'pi pi-cube'
+    case 'checkpoint': return 'box'
+    case 'lora': return 'bolt'
+    case 'vae': return 'sliders-h'
+    case 'controlnet': return 'sitemap'
+    default: return 'box'
   }
 }
 
@@ -106,20 +107,20 @@ function getModelColor(type: string): string {
           :to="`/${workspaceId}/create`"
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
-          <i class="pi pi-bolt text-xs" />
+          <Icon name="bolt" size="xs" />
           Linear
         </RouterLink>
         <RouterLink
           :to="`/${workspaceId}/canvas`"
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
-          <i class="pi pi-share-alt text-xs" />
+          <Icon name="share-alt" size="xs" />
           Node
         </RouterLink>
         <button
           class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
-          <i class="pi pi-plus text-xs" />
+          <Icon name="plus" size="xs" />
           Add Model
         </button>
       </div>
@@ -128,7 +129,7 @@ function getModelColor(type: string): string {
     <!-- Search, Filter, Sort & View Toggle -->
     <div class="mb-6 flex items-center gap-3">
       <div class="relative flex-1">
-        <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400" />
+        <Icon name="search" size="sm" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
         <input
           v-model="searchQuery"
           type="text"
@@ -164,7 +165,7 @@ function getModelColor(type: string): string {
             {{ option.label }}
           </option>
         </select>
-        <i class="pi pi-chevron-down pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-zinc-400" />
+        <Icon name="chevron-down" size="xs" class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
       </div>
 
       <!-- View Toggle -->
@@ -178,7 +179,7 @@ function getModelColor(type: string): string {
           ]"
           @click="viewMode = 'grid'"
         >
-          <i class="pi pi-th-large" />
+          <Icon name="th-large" size="md" />
         </button>
         <button
           :class="[
@@ -189,7 +190,7 @@ function getModelColor(type: string): string {
           ]"
           @click="viewMode = 'list'"
         >
-          <i class="pi pi-list" />
+          <Icon name="list" size="md" />
         </button>
       </div>
     </div>
@@ -200,7 +201,7 @@ function getModelColor(type: string): string {
       class="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 py-16 dark:border-zinc-700"
     >
       <div class="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-        <i class="pi pi-box text-xl text-zinc-400" />
+        <Icon name="box" size="xl" class="text-zinc-400" />
       </div>
       <h3 class="mt-4 text-sm font-medium text-zinc-900 dark:text-zinc-100">No models found</h3>
       <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -227,7 +228,7 @@ function getModelColor(type: string): string {
               class="rounded p-1 text-zinc-400 opacity-0 transition-opacity hover:bg-zinc-100 hover:text-zinc-600 group-hover:opacity-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
               @click.stop
             >
-              <i class="pi pi-ellipsis-h text-sm" />
+              <Icon name="ellipsis-h" size="sm" />
             </button>
           </div>
           <div class="mt-auto">

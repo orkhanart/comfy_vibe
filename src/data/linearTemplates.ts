@@ -12,7 +12,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
     id: 'txt2img-basic',
     name: 'Text to Image',
     description: 'Generate images from text prompts using Stable Diffusion',
-    icon: 'pi-image',
+    icon: 'image',
     category: 'text-to-image',
     tags: ['basic', 'sd1.5', 'sdxl'],
     featured: true,
@@ -23,7 +23,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'LoadCheckpoint',
         displayName: 'Model',
         description: 'Choose your AI model',
-        icon: 'pi-box',
+        icon: 'box',
         exposedWidgets: ['ckpt_name'],
         defaultValues: {
           ckpt_name: 'sd_xl_base_1.0.safetensors',
@@ -34,7 +34,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'CLIPTextEncode',
         displayName: 'Prompt',
         description: 'Describe what you want to create',
-        icon: 'pi-pencil',
+        icon: 'pencil',
         exposedWidgets: ['text'],
         defaultValues: {
           text: 'A beautiful sunset over mountains, dramatic lighting, 8k, highly detailed',
@@ -45,7 +45,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'KSampler',
         displayName: 'Settings',
         description: 'Fine-tune generation parameters',
-        icon: 'pi-sliders-h',
+        icon: 'sliders-h',
         exposedWidgets: ['seed', 'steps', 'cfg', 'sampler_name'],
         defaultValues: {
           seed: -1,
@@ -59,7 +59,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'EmptyLatentImage',
         displayName: 'Size',
         description: 'Set output dimensions',
-        icon: 'pi-arrows-alt',
+        icon: 'arrows-alt',
         exposedWidgets: ['width', 'height'],
         defaultValues: {
           width: 1024,
@@ -72,7 +72,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'SaveImage',
         displayName: 'Output',
         description: 'Save your creation',
-        icon: 'pi-download',
+        icon: 'download',
         exposedWidgets: ['filename_prefix'],
         defaultValues: {
           filename_prefix: 'linear_gen',
@@ -85,7 +85,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
     id: 'txt2img-portrait',
     name: 'Portrait Generator',
     description: 'Create stunning AI portraits with optimized settings',
-    icon: 'pi-user',
+    icon: 'user',
     category: 'text-to-image',
     tags: ['portrait', 'face', 'character'],
     featured: true,
@@ -96,7 +96,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'LoadCheckpoint',
         displayName: 'Model',
         description: 'Portrait-optimized model',
-        icon: 'pi-box',
+        icon: 'box',
         exposedWidgets: ['ckpt_name'],
         defaultValues: {
           ckpt_name: 'dreamshaper_8.safetensors',
@@ -107,7 +107,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'CLIPTextEncode',
         displayName: 'Describe Person',
         description: 'Describe the person you want to create',
-        icon: 'pi-pencil',
+        icon: 'pencil',
         exposedWidgets: ['text'],
         defaultValues: {
           text: 'Portrait of a person, professional photography, soft lighting, sharp focus, high detail',
@@ -118,7 +118,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'KSampler',
         displayName: 'Quality Settings',
         description: 'Adjust quality and creativity',
-        icon: 'pi-sliders-h',
+        icon: 'sliders-h',
         exposedWidgets: ['seed', 'steps', 'cfg'],
         defaultValues: {
           seed: -1,
@@ -132,7 +132,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'EmptyLatentImage',
         displayName: 'Format',
         description: 'Portrait dimensions',
-        icon: 'pi-arrows-alt',
+        icon: 'arrows-alt',
         exposedWidgets: ['width', 'height'],
         defaultValues: {
           width: 768,
@@ -145,7 +145,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'SaveImage',
         displayName: 'Save',
         description: 'Save portrait',
-        icon: 'pi-download',
+        icon: 'download',
         exposedWidgets: ['filename_prefix'],
         defaultValues: {
           filename_prefix: 'portrait',
@@ -158,7 +158,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
     id: 'txt2img-landscape',
     name: 'Landscape Creator',
     description: 'Generate breathtaking landscapes and environments',
-    icon: 'pi-sun',
+    icon: 'sun',
     category: 'text-to-image',
     tags: ['landscape', 'nature', 'environment'],
     featured: false,
@@ -168,7 +168,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         id: 'model',
         nodeType: 'LoadCheckpoint',
         displayName: 'Model',
-        icon: 'pi-box',
+        icon: 'box',
         exposedWidgets: ['ckpt_name'],
         defaultValues: {
           ckpt_name: 'sd_xl_base_1.0.safetensors',
@@ -179,7 +179,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'CLIPTextEncode',
         displayName: 'Scene Description',
         description: 'Describe your landscape',
-        icon: 'pi-pencil',
+        icon: 'pencil',
         exposedWidgets: ['text'],
         defaultValues: {
           text: 'Majestic mountain landscape at golden hour, dramatic clouds, photorealistic, 8k',
@@ -189,7 +189,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         id: 'settings',
         nodeType: 'KSampler',
         displayName: 'Settings',
-        icon: 'pi-sliders-h',
+        icon: 'sliders-h',
         exposedWidgets: ['seed', 'steps', 'cfg'],
         defaultValues: {
           seed: -1,
@@ -203,7 +203,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'EmptyLatentImage',
         displayName: 'Size',
         description: 'Wide format for landscapes',
-        icon: 'pi-arrows-alt',
+        icon: 'arrows-alt',
         exposedWidgets: ['width', 'height'],
         defaultValues: {
           width: 1344,
@@ -215,7 +215,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         id: 'output',
         nodeType: 'SaveImage',
         displayName: 'Save',
-        icon: 'pi-download',
+        icon: 'download',
         exposedWidgets: ['filename_prefix'],
         defaultValues: {
           filename_prefix: 'landscape',
@@ -229,7 +229,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
     id: 'img2img-basic',
     name: 'Image Variation',
     description: 'Create variations of an existing image',
-    icon: 'pi-images',
+    icon: 'images',
     category: 'image-to-image',
     tags: ['variation', 'transform'],
     featured: true,
@@ -239,7 +239,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         id: 'model',
         nodeType: 'LoadCheckpoint',
         displayName: 'Model',
-        icon: 'pi-box',
+        icon: 'box',
         exposedWidgets: ['ckpt_name'],
         defaultValues: {
           ckpt_name: 'sd_xl_base_1.0.safetensors',
@@ -250,7 +250,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'CLIPTextEncode',
         displayName: 'Style Guide',
         description: 'Describe the style transformation',
-        icon: 'pi-pencil',
+        icon: 'pencil',
         exposedWidgets: ['text'],
         defaultValues: {
           text: 'Same scene, oil painting style, artistic, masterpiece',
@@ -261,7 +261,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'KSampler',
         displayName: 'Transform Settings',
         description: 'Lower denoise = closer to original',
-        icon: 'pi-sliders-h',
+        icon: 'sliders-h',
         exposedWidgets: ['seed', 'steps', 'cfg', 'denoise'],
         defaultValues: {
           seed: -1,
@@ -275,7 +275,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         id: 'output',
         nodeType: 'SaveImage',
         displayName: 'Save',
-        icon: 'pi-download',
+        icon: 'download',
         exposedWidgets: ['filename_prefix'],
         defaultValues: {
           filename_prefix: 'variation',
@@ -289,7 +289,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
     id: 'upscale-basic',
     name: 'Image Upscaler',
     description: 'Upscale images to higher resolution with AI enhancement',
-    icon: 'pi-expand',
+    icon: 'expand',
     category: 'upscaling',
     tags: ['upscale', 'enhance', '4k'],
     featured: true,
@@ -299,7 +299,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         id: 'model',
         nodeType: 'LoadCheckpoint',
         displayName: 'Model',
-        icon: 'pi-box',
+        icon: 'box',
         exposedWidgets: ['ckpt_name'],
         defaultValues: {
           ckpt_name: 'sd_xl_base_1.0.safetensors',
@@ -310,7 +310,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'CLIPTextEncode',
         displayName: 'Enhancement Guide',
         description: 'Describe details to enhance',
-        icon: 'pi-pencil',
+        icon: 'pencil',
         exposedWidgets: ['text'],
         defaultValues: {
           text: 'High quality, sharp details, 4k, ultra detailed',
@@ -320,7 +320,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         id: 'settings',
         nodeType: 'KSampler',
         displayName: 'Upscale Settings',
-        icon: 'pi-sliders-h',
+        icon: 'sliders-h',
         exposedWidgets: ['seed', 'steps', 'denoise'],
         defaultValues: {
           seed: -1,
@@ -334,7 +334,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         id: 'output',
         nodeType: 'SaveImage',
         displayName: 'Save',
-        icon: 'pi-download',
+        icon: 'download',
         exposedWidgets: ['filename_prefix'],
         defaultValues: {
           filename_prefix: 'upscaled',
@@ -348,7 +348,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
     id: 'inpaint-basic',
     name: 'Inpaint / Edit',
     description: 'Edit parts of an image using AI',
-    icon: 'pi-pencil',
+    icon: 'pencil',
     category: 'inpainting',
     tags: ['inpaint', 'edit', 'fix'],
     featured: false,
@@ -358,7 +358,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         id: 'model',
         nodeType: 'LoadCheckpoint',
         displayName: 'Model',
-        icon: 'pi-box',
+        icon: 'box',
         exposedWidgets: ['ckpt_name'],
         defaultValues: {
           ckpt_name: 'sd_xl_base_1.0.safetensors',
@@ -369,7 +369,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         nodeType: 'CLIPTextEncode',
         displayName: 'What to Paint',
         description: 'Describe what to add in the masked area',
-        icon: 'pi-pencil',
+        icon: 'pencil',
         exposedWidgets: ['text'],
         defaultValues: {
           text: 'A beautiful flower, natural lighting, photorealistic',
@@ -379,7 +379,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         id: 'settings',
         nodeType: 'KSampler',
         displayName: 'Inpaint Settings',
-        icon: 'pi-sliders-h',
+        icon: 'sliders-h',
         exposedWidgets: ['seed', 'steps', 'cfg', 'denoise'],
         defaultValues: {
           seed: -1,
@@ -393,7 +393,7 @@ export const LINEAR_WORKFLOW_TEMPLATES: LinearWorkflowTemplate[] = [
         id: 'output',
         nodeType: 'SaveImage',
         displayName: 'Save',
-        icon: 'pi-download',
+        icon: 'download',
         exposedWidgets: ['filename_prefix'],
         defaultValues: {
           filename_prefix: 'inpainted',
@@ -423,11 +423,11 @@ export function getTemplatesByCategory(
  * Category display names and icons
  */
 export const TEMPLATE_CATEGORIES = [
-  { id: 'text-to-image', name: 'Text to Image', icon: 'pi-image' },
-  { id: 'image-to-image', name: 'Image to Image', icon: 'pi-images' },
-  { id: 'inpainting', name: 'Inpainting', icon: 'pi-pencil' },
-  { id: 'upscaling', name: 'Upscaling', icon: 'pi-expand' },
-  { id: 'video', name: 'Video', icon: 'pi-video' },
-  { id: 'audio', name: 'Audio', icon: 'pi-volume-up' },
-  { id: 'custom', name: 'Custom', icon: 'pi-cog' },
+  { id: 'text-to-image', name: 'Text to Image', icon: 'image' },
+  { id: 'image-to-image', name: 'Image to Image', icon: 'images' },
+  { id: 'inpainting', name: 'Inpainting', icon: 'pencil' },
+  { id: 'upscaling', name: 'Upscaling', icon: 'expand' },
+  { id: 'video', name: 'Video', icon: 'video' },
+  { id: 'audio', name: 'Audio', icon: 'volume-up' },
+  { id: 'custom', name: 'Custom', icon: 'cog' },
 ] as const

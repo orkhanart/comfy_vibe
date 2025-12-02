@@ -25,6 +25,6 @@ const emit = defineEmits<{
         {{ option.label }}
       </option>
     </select>
-    <i class="pi pi-chevron-down pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-zinc-400" />
+    <Icon name="chevron-down" size="xs" class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
   </div>
 </template>

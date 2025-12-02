@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/uiStore'
@@ -48,7 +49,7 @@ function toggleExperimentalUI(): void {
         @click="handleLogoClick"
       >
         <img src="/assets/images/comfy-logo-mono.svg" alt="Comfy" class="h-5 w-5" />
-        <i class="pi pi-chevron-down text-[10px] opacity-70" />
+        <Icon name="chevron-down" size="xs" class="opacity-70" />
       </button>
 
       <!-- Dropdown Menu -->
@@ -56,22 +57,22 @@ function toggleExperimentalUI(): void {
         <!-- File Section -->
         <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-zinc-500">File</div>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800">
-          <i class="pi pi-file w-4 text-sm text-zinc-500" />
+          <Icon name="file" size="sm" class="w-4 text-zinc-500" />
           <span class="flex-1">New Session</span>
           <span class="text-[11px] text-zinc-600">Ctrl+N</span>
         </button>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800">
-          <i class="pi pi-folder-open w-4 text-sm text-zinc-500" />
+          <Icon name="folder-open" size="sm" class="w-4 text-zinc-500" />
           <span class="flex-1">Open...</span>
           <span class="text-[11px] text-zinc-600">Ctrl+O</span>
         </button>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800">
-          <i class="pi pi-save w-4 text-sm text-zinc-500" />
+          <Icon name="save" size="sm" class="w-4 text-zinc-500" />
           <span class="flex-1">Save</span>
           <span class="text-[11px] text-zinc-600">Ctrl+S</span>
         </button>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800">
-          <i class="pi pi-download w-4 text-sm text-zinc-500" />
+          <Icon name="download" size="sm" class="w-4 text-zinc-500" />
           <span>Export...</span>
         </button>
 
@@ -80,11 +81,11 @@ function toggleExperimentalUI(): void {
         <!-- Workspace Section -->
         <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-zinc-500">Workspace</div>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="goToWorkspace">
-          <i class="pi pi-home w-4 text-sm text-zinc-500" />
+          <Icon name="home" size="sm" class="w-4 text-zinc-500" />
           <span>Dashboard</span>
         </button>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="goToProjects">
-          <i class="pi pi-folder w-4 text-sm text-zinc-500" />
+          <Icon name="folder" size="sm" class="w-4 text-zinc-500" />
           <span>Projects</span>
         </button>
 
@@ -93,11 +94,11 @@ function toggleExperimentalUI(): void {
         <!-- Account Section -->
         <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-zinc-500">Account</div>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="goToSettings">
-          <i class="pi pi-cog w-4 text-sm text-zinc-500" />
+          <Icon name="cog" size="sm" class="w-4 text-zinc-500" />
           <span>Settings</span>
         </button>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="toggleExperimentalUI">
-          <i class="pi pi-sparkles w-4 text-sm text-zinc-500" />
+          <Icon name="sparkles" size="sm" class="w-4 text-zinc-500" />
           <span class="flex-1">Experimental UI</span>
           <div
             class="h-5 w-9 rounded-full p-0.5 transition-colors"
@@ -113,7 +114,7 @@ function toggleExperimentalUI(): void {
         <div class="mx-2 my-1 h-px bg-zinc-800" />
 
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-red-400 transition-colors hover:bg-red-500/10" @click="signOut">
-          <i class="pi pi-sign-out w-4 text-sm text-red-400" />
+          <Icon name="sign-out" size="sm" class="w-4 text-red-400" />
           <span>Sign out</span>
         </button>
       </div>
@@ -131,7 +132,7 @@ function toggleExperimentalUI(): void {
       class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
       @click="goToWorkspace"
     >
-      <i class="pi pi-home text-base" />
+      <Icon name="home" size="md" />
     </button>
 
     <!-- Divider -->
@@ -142,7 +143,7 @@ function toggleExperimentalUI(): void {
       <div class="flex items-center gap-1">
         <span class="rounded-md bg-zinc-800 px-3 py-1.5 text-xs text-zinc-100">{{ sessionName }}</span>
         <button class="p-1 text-zinc-500 transition-colors hover:text-zinc-300">
-          <i class="pi pi-ellipsis-h text-xs" />
+          <Icon name="ellipsis-h" size="xs" />
         </button>
       </div>
     </div>
@@ -153,13 +154,13 @@ function toggleExperimentalUI(): void {
         v-tooltip.bottom="{ value: 'Help', showDelay: 50 }"
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
       >
-        <i class="pi pi-question-circle text-sm" />
+        <Icon name="question-circle" size="sm" />
       </button>
       <button
         v-tooltip.bottom="{ value: 'Open in new window', showDelay: 50 }"
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
       >
-        <i class="pi pi-external-link text-sm" />
+        <Icon name="external-link" size="sm" />
       </button>
       <span class="text-xs text-zinc-400">{{ credits.toLocaleString() }} credits</span>
       <button class="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-500">

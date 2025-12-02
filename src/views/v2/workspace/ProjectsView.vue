@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
@@ -114,7 +115,7 @@ const emptyStateDescription = computed(() =>
     <!-- Empty State -->
     <WorkspaceEmptyState
       v-if="filteredProjects.length === 0"
-      icon="pi pi-folder"
+      icon="folder"
       title="No projects found"
       :description="emptyStateDescription"
       :action-label="searchQuery ? undefined : 'New Project'"
@@ -132,10 +133,10 @@ const emptyStateDescription = computed(() =>
         :thumbnail="project.thumbnail"
         :title="project.name"
         :description="project.description"
-        icon="pi pi-folder"
+        icon="folder"
         :stats="[
-          { icon: 'pi pi-objects-column', value: project.canvasCount },
-          { icon: 'pi pi-box', value: project.modelCount }
+          { icon: 'objects-column', value: project.canvasCount },
+          { icon: 'box', value: project.modelCount }
         ]"
         @click="openProject(project.id)"
       />
@@ -151,7 +152,7 @@ const emptyStateDescription = computed(() =>
           @click="openProject(project.id)"
         >
           <div class="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
-            <i class="pi pi-folder text-zinc-500 dark:text-zinc-400" />
+            <Icon name="folder" size="md" class="text-zinc-500 dark:text-zinc-400" />
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ project.name }}</p>
@@ -159,11 +160,11 @@ const emptyStateDescription = computed(() =>
           </div>
           <div class="flex items-center gap-6 text-sm text-zinc-400 dark:text-zinc-500">
             <span class="flex items-center gap-1">
-              <i class="pi pi-objects-column text-xs" />
+              <Icon name="objects-column" size="xs" />
               {{ project.canvasCount }}
             </span>
             <span class="flex items-center gap-1">
-              <i class="pi pi-box text-xs" />
+              <Icon name="box" size="xs" />
               {{ project.modelCount }}
             </span>
             <span class="w-24 text-right">{{ project.updatedAt }}</span>
@@ -172,7 +173,7 @@ const emptyStateDescription = computed(() =>
             class="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-300"
             @click.stop
           >
-            <i class="pi pi-ellipsis-h text-sm" />
+            <Icon name="ellipsis-h" size="sm" />
           </button>
         </div>
       </div>

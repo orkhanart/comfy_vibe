@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import {
   WorkspaceViewHeader,
@@ -40,14 +41,14 @@ const filterOptions = [
 ]
 
 const recentItems = ref<RecentItem[]>([
-  { id: '1', name: 'Portrait Generation', type: 'canvas', icon: 'pi pi-objects-column', updatedAt: '2 minutes ago', thumbnail: '/thumbnails/canvas-1.jpg' },
-  { id: '2', name: 'SDXL Workflow', type: 'workflow', icon: 'pi pi-sitemap', updatedAt: '15 minutes ago', thumbnail: '/thumbnails/workflow-1.jpg' },
-  { id: '3', name: 'Product Shots', type: 'project', icon: 'pi pi-folder', updatedAt: '1 hour ago', thumbnail: '/thumbnails/project-1.jpg' },
-  { id: '4', name: 'reference_image.png', type: 'asset', icon: 'pi pi-image', updatedAt: '2 hours ago', thumbnail: '/thumbnails/asset-1.jpg' },
-  { id: '5', name: 'Inpainting Canvas', type: 'canvas', icon: 'pi pi-objects-column', updatedAt: '3 hours ago', thumbnail: '/thumbnails/canvas-2.jpg' },
-  { id: '6', name: 'ControlNet Pipeline', type: 'workflow', icon: 'pi pi-sitemap', updatedAt: '5 hours ago', thumbnail: '/thumbnails/workflow-2.jpg' },
-  { id: '7', name: 'Marketing Assets', type: 'project', icon: 'pi pi-folder', updatedAt: 'Yesterday', thumbnail: '/thumbnails/project-2.jpg' },
-  { id: '8', name: 'logo_v2.png', type: 'asset', icon: 'pi pi-image', updatedAt: 'Yesterday', thumbnail: '/thumbnails/asset-2.jpg' },
+  { id: '1', name: 'Portrait Generation', type: 'canvas', icon: 'objects-column', updatedAt: '2 minutes ago', thumbnail: '/thumbnails/canvas-1.jpg' },
+  { id: '2', name: 'SDXL Workflow', type: 'workflow', icon: 'sitemap', updatedAt: '15 minutes ago', thumbnail: '/thumbnails/workflow-1.jpg' },
+  { id: '3', name: 'Product Shots', type: 'project', icon: 'folder', updatedAt: '1 hour ago', thumbnail: '/thumbnails/project-1.jpg' },
+  { id: '4', name: 'reference_image.png', type: 'asset', icon: 'image', updatedAt: '2 hours ago', thumbnail: '/thumbnails/asset-1.jpg' },
+  { id: '5', name: 'Inpainting Canvas', type: 'canvas', icon: 'objects-column', updatedAt: '3 hours ago', thumbnail: '/thumbnails/canvas-2.jpg' },
+  { id: '6', name: 'ControlNet Pipeline', type: 'workflow', icon: 'sitemap', updatedAt: '5 hours ago', thumbnail: '/thumbnails/workflow-2.jpg' },
+  { id: '7', name: 'Marketing Assets', type: 'project', icon: 'folder', updatedAt: 'Yesterday', thumbnail: '/thumbnails/project-2.jpg' },
+  { id: '8', name: 'logo_v2.png', type: 'asset', icon: 'image', updatedAt: 'Yesterday', thumbnail: '/thumbnails/asset-2.jpg' },
 ])
 
 const filteredItems = computed(() => {
@@ -141,7 +142,7 @@ function getTypeColor(type: string): string {
           class="flex w-full cursor-pointer items-center gap-4 px-5 py-4 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
         >
           <div class="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
-            <i :class="['pi', item.icon, 'text-zinc-500 dark:text-zinc-400']" />
+            <Icon :name="item.icon" size="md" />
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ item.name }}</p>
@@ -156,7 +157,7 @@ function getTypeColor(type: string): string {
             class="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-300"
             @click.stop
           >
-            <i class="pi pi-ellipsis-h text-sm" />
+            <Icon name="ellipsis-h" size="sm" />
           </button>
         </div>
       </div>
@@ -164,7 +165,7 @@ function getTypeColor(type: string): string {
 
     <!-- Empty State -->
     <div v-if="filteredItems.length === 0" class="py-12 text-center">
-      <i class="pi pi-search mb-4 text-4xl text-zinc-300 dark:text-zinc-600" />
+      <Icon name="search" size="md" class="mb-4 text-4xl text-zinc-300 dark:text-zinc-600" />
       <p class="text-zinc-500 dark:text-zinc-400">No items found</p>
     </div>
   </div>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import CanvasLogoMenu from './CanvasLogoMenu.vue'
@@ -68,7 +69,7 @@ const activeWorkflowName = computed(() => {
         @click="handleLogoClick"
       >
         <img src="/assets/images/comfy-logo-mono.svg" alt="Comfy" class="h-5 w-5" />
-        <i class="pi pi-chevron-down text-[10px] opacity-70" />
+        <Icon name="chevron-down" size="xs" class="opacity-70" />
       </button>
 
       <CanvasLogoMenu :show="showMenu" @close="showMenu = false" />
@@ -83,7 +84,7 @@ const activeWorkflowName = computed(() => {
       class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
       @click="handleHomeClick"
     >
-      <i class="pi pi-home text-base" />
+      <Icon name="home" size="md" />
     </button>
 
     <!-- Divider -->
@@ -105,7 +106,7 @@ const activeWorkflowName = computed(() => {
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
         @click="showShareDialog = true"
       >
-        <i class="pi pi-share-alt text-sm" />
+        <Icon name="share-alt" size="sm" />
       </button>
     </div>
 

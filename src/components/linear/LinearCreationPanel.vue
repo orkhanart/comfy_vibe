@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useLinearModeStore } from '@/stores/linearModeStore'
 import { TEMPLATE_CATEGORIES } from '@/data/linearTemplates'
@@ -154,7 +155,7 @@ function randomizeSeed(): void {
         ]"
         @click="activeMode = 'image'"
       >
-        <i class="pi pi-image text-xs" />
+        <Icon name="image" size="xs" />
         Image
       </button>
       <button
@@ -166,7 +167,7 @@ function randomizeSeed(): void {
         ]"
         @click="activeMode = 'video'"
       >
-        <i class="pi pi-video text-xs" />
+        <Icon name="video" size="xs" />
         Video
       </button>
     </div>
@@ -178,7 +179,7 @@ function randomizeSeed(): void {
         <div
           class="flex h-48 flex-col items-center justify-center rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900/50 transition-colors hover:border-zinc-600 hover:bg-zinc-900"
         >
-          <i class="pi pi-cloud-upload mb-2 text-2xl text-zinc-500" />
+          <Icon name="cloud-upload" size="2xl" class="mb-2 text-zinc-500" />
           <p class="text-xs text-zinc-400">Drop an image or click to upload</p>
           <div class="mt-2 flex gap-2">
             <button class="rounded bg-zinc-800 px-2.5 py-1 text-[10px] font-medium text-zinc-300 transition-colors hover:bg-zinc-700">
@@ -215,17 +216,12 @@ function randomizeSeed(): void {
           @click="showWorkflowSelector = !showWorkflowSelector"
         >
           <div class="flex items-center gap-2">
-            <i class="pi pi-sitemap text-xs text-zinc-500" />
+            <Icon name="sitemap" size="xs" class="text-zinc-500" />
             <span class="text-xs font-medium text-zinc-300">
               {{ store.selectedTemplate?.name ?? 'Select Workflow' }}
             </span>
           </div>
-          <i
-            :class="[
-              'pi text-xs text-zinc-500 transition-transform',
-              showWorkflowSelector ? 'pi-chevron-up' : 'pi-chevron-down'
-            ]"
-          />
+          <Icon :name="showWorkflowSelector ? 'chevron-up' : 'chevron-down'" size="xs" class="text-zinc-500 transition-transform" />
         </button>
 
         <!-- Workflow Dropdown -->
@@ -236,7 +232,7 @@ function randomizeSeed(): void {
           <!-- Search -->
           <div class="border-b border-zinc-800 p-2">
             <div class="flex items-center rounded bg-zinc-800 px-2 py-1.5">
-              <i class="pi pi-search text-xs text-zinc-500" />
+              <Icon name="search" size="xs" class="text-zinc-500" />
               <input
                 v-model="searchQuery"
                 type="text"
@@ -295,7 +291,7 @@ function randomizeSeed(): void {
                     : 'bg-zinc-700 text-zinc-400'
                 ]"
               >
-                <i :class="['pi', template.icon, 'text-xs']" />
+                <Icon :name="template.icon" size="xs" />
               </div>
               <div class="min-w-0 flex-1">
                 <div class="truncate text-xs font-medium text-zinc-200">
@@ -316,26 +312,26 @@ function randomizeSeed(): void {
           <button
             class="flex items-center gap-1.5 rounded bg-zinc-900 px-2.5 py-1.5 text-[10px] font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
           >
-            <i class="pi pi-pencil text-[10px]" />
+            <Icon name="pencil" size="xs" />
             Prompt
           </button>
           <button
             class="flex items-center gap-1.5 rounded bg-zinc-900 px-2.5 py-1.5 text-[10px] font-medium text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
           >
-            <i class="pi pi-sparkles text-[10px]" />
+            <Icon name="sparkles" size="xs" />
             Act-Two
           </button>
           <div class="flex-1" />
           <button
             class="flex items-center gap-1 rounded bg-zinc-900 px-2 py-1.5 text-[10px] text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
           >
-            <i class="pi pi-desktop text-[10px]" />
+            <Icon name="desktop" size="xs" />
             16:9
           </button>
           <button
             class="flex h-7 w-7 items-center justify-center rounded bg-zinc-900 text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
           >
-            <i class="pi pi-sliders-h text-[10px]" />
+            <Icon name="sliders-h" size="xs" />
           </button>
         </div>
       </div>
@@ -347,7 +343,7 @@ function randomizeSeed(): void {
           @click="showAdvanced = !showAdvanced"
         >
           <div class="flex items-center gap-2">
-            <i class="pi pi-cog text-xs text-zinc-500" />
+            <Icon name="cog" size="xs" class="text-zinc-500" />
             <span class="text-xs font-medium text-zinc-300">Advanced Settings</span>
             <span
               v-if="advancedWidgets.length"
@@ -356,12 +352,7 @@ function randomizeSeed(): void {
               {{ advancedWidgets.length }}
             </span>
           </div>
-          <i
-            :class="[
-              'pi text-xs text-zinc-500 transition-transform',
-              showAdvanced ? 'pi-chevron-up' : 'pi-chevron-down'
-            ]"
-          />
+          <Icon :name="showAdvanced ? 'chevron-up' : 'chevron-down'" size="xs" class="text-zinc-500 transition-transform" />
         </button>
 
         <!-- Advanced Widgets -->
@@ -375,7 +366,7 @@ function randomizeSeed(): void {
               class="flex items-center gap-1.5 rounded bg-zinc-800 px-2 py-1 text-[10px] text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
               @click="randomizeSeed"
             >
-              <i class="pi pi-sync text-[10px]" />
+              <Icon name="sync" size="xs" />
               Random Seed
             </button>
           </div>
@@ -416,16 +407,16 @@ function randomizeSeed(): void {
       <!-- Model Selector -->
       <button class="flex items-center gap-2 rounded-lg bg-zinc-900 px-3 py-2 text-left transition-colors hover:bg-zinc-800">
         <div class="flex h-6 w-6 items-center justify-center rounded bg-blue-600">
-          <i class="pi pi-star text-[10px] text-white" />
+          <Icon name="star" size="xs" class="text-white" />
         </div>
         <span class="text-xs font-medium text-zinc-300">Gen-4 Turbo</span>
-        <i class="pi pi-chevron-down text-[10px] text-zinc-500" />
+        <Icon name="chevron-down" size="xs" class="text-zinc-500" />
       </button>
 
       <!-- Duration -->
       <button class="flex items-center gap-1 rounded-lg bg-zinc-900 px-3 py-2 text-xs text-zinc-400 transition-colors hover:bg-zinc-800">
         5s
-        <i class="pi pi-chevron-down text-[10px]" />
+        <Icon name="chevron-down" size="xs" />
       </button>
 
       <!-- Spacer -->
@@ -443,7 +434,7 @@ function randomizeSeed(): void {
         ]"
         @click="handleGenerate"
       >
-        <i class="pi pi-video text-xs" />
+        <Icon name="video" size="xs" />
         Generate
       </button>
       <button
@@ -451,7 +442,7 @@ function randomizeSeed(): void {
         class="flex items-center gap-2 rounded-lg bg-red-600/20 px-4 py-2 text-sm font-medium text-red-400 transition-colors hover:bg-red-600/30"
         @click="handleCancel"
       >
-        <i class="pi pi-times text-xs" />
+        <Icon name="times" size="xs" />
         Cancel
       </button>
     </div>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import type { NodeState, NodeBadge } from '@/types/node'
 
@@ -28,13 +29,13 @@ const editValue = ref('')
 const statusBadge = computed((): NodeBadge | null => {
   switch (props.state) {
     case 'muted':
-      return { text: 'Muted', icon: 'pi-ban', variant: 'default' }
+      return { text: 'Muted', icon: 'minus', variant: 'default' }
     case 'bypassed':
-      return { text: 'Bypassed', icon: 'pi-redo', variant: 'warning' }
+      return { text: 'Bypassed', icon: 'refresh', variant: 'warning' }
     case 'error':
-      return { text: 'Error', icon: 'pi-exclamation-triangle', variant: 'error' }
+      return { text: 'Error', icon: 'exclamation-triangle', variant: 'error' }
     case 'executing':
-      return { text: 'Running', icon: 'pi-spin pi-spinner', variant: 'default' }
+      return { text: 'Running', icon: 'spinner', variant: 'default', spin: true }
     default:
       return null
   }
@@ -99,11 +100,10 @@ function getBadgeClasses(variant?: string): string {
         @click="handleCollapseClick"
         @dblclick.stop
       >
-        <i
-          :class="[
-            'pi pi-chevron-down text-[10px] transition-transform duration-200',
-            collapsed && '-rotate-90',
-          ]"
+        <Icon
+          name="chevron-down"
+          size="xs"
+          :class="['transition-transform duration-200', collapsed && '-rotate-90']"
         />
       </button>
 
@@ -131,7 +131,7 @@ function getBadgeClasses(variant?: string): string {
             getBadgeClasses(badge.variant),
           ]"
         >
-          <i v-if="badge.icon" :class="['pi', badge.icon, 'text-[8px]']" />
+          <Icon v-if="badge.icon" :name="badge.icon" size="xs" />
           {{ badge.text }}
         </span>
 
@@ -142,11 +142,11 @@ function getBadgeClasses(variant?: string): string {
             getBadgeClasses(statusBadge.variant),
           ]"
         >
-          <i v-if="statusBadge.icon" :class="['pi', statusBadge.icon, 'text-[8px]']" />
+          <Icon v-if="statusBadge.icon" :name="statusBadge.icon" size="xs" :class="{ 'animate-spin': statusBadge.spin }" />
           {{ statusBadge.text }}
         </span>
 
-        <i v-if="pinned" class="pi pi-thumbtack text-[10px] text-zinc-500" />
+        <Icon v-if="pinned" name="thumbtack" size="xs" class="text-zinc-500" />
       </div>
     </div>
   </div>

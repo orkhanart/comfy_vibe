@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import type { SharedWorkflow } from '@/data/sidebarMockData'
 import { LibraryGridCard } from '@/components/common/sidebar'
 
@@ -21,11 +22,12 @@ const emit = defineEmits<{
       class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left transition-colors hover:bg-zinc-800"
       @click="emit('toggle')"
     >
-      <i
-        class="text-[10px] text-zinc-500 transition-transform"
-        :class="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+      <Icon
+        :name="expanded ? 'chevron-down' : 'chevron-right'"
+        size="xs"
+        class="text-zinc-500 transition-transform"
       />
-      <i class="pi pi-sitemap text-xs text-blue-400" />
+      <Icon name="sitemap" size="xs" class="text-blue-400" />
       <span class="flex-1 text-xs font-medium text-zinc-300">Shared Workflows</span>
       <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-500">
         {{ workflows.length }}
@@ -40,8 +42,8 @@ const emit = defineEmits<{
         class="group flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-zinc-800"
         draggable="true"
       >
-        <i class="pi pi-circle-fill text-[5px] text-zinc-600 group-hover:text-zinc-400" />
-        <i v-if="workflow.starred" class="pi pi-star-fill text-[10px] text-amber-400" />
+        <Icon name="circle-fill" size="md" class="text-[5px] text-zinc-600 group-hover:text-zinc-400" />
+        <Icon v-if="workflow.starred" name="star-fill" size="xs" class="text-amber-400" />
         <div class="min-w-0 flex-1">
           <div class="truncate text-xs text-zinc-400 group-hover:text-zinc-200">
             {{ workflow.name }}
@@ -51,7 +53,7 @@ const emit = defineEmits<{
             <span>{{ workflow.updatedAt }}</span>
           </div>
         </div>
-        <i class="pi pi-plus text-[10px] text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
+        <Icon name="plus" size="xs" class="text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
       </div>
     </div>
   </template>
@@ -60,7 +62,7 @@ const emit = defineEmits<{
   <template v-else>
     <div class="mb-2 flex items-center justify-between px-1">
       <div class="flex items-center gap-2">
-        <i class="pi pi-sitemap text-xs text-blue-400" />
+        <Icon name="sitemap" size="xs" class="text-blue-400" />
         <span class="text-[10px] font-medium uppercase tracking-wider text-zinc-500">Workflows</span>
       </div>
       <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[9px] text-zinc-500">
@@ -74,7 +76,7 @@ const emit = defineEmits<{
         :title="workflow.name"
         :subtitle="`${workflow.nodes} nodes · ${workflow.updatedAt}`"
         :thumbnail="workflow.thumbnail"
-        icon="pi pi-sitemap"
+        icon="sitemap"
         icon-class="text-blue-400"
         :badge="workflow.category"
         badge-class="bg-blue-500/30 text-blue-300"

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { computed } from 'vue'
 import type { LinearStep } from '@/types/linear'
 import type { WidgetDefinition } from '@/types/node'
@@ -59,7 +60,7 @@ function getWidgetComponent(type: WidgetDefinition['type']): unknown {
     <!-- Panel header -->
     <div class="panel-header">
       <div class="header-icon">
-        <i :class="['pi', step.icon ?? 'pi-cog']" />
+        <Icon :name="step.icon ?? 'cog'" size="md" />
       </div>
       <div class="header-content">
         <h3 class="panel-title">{{ step.displayName }}</h3>
@@ -104,7 +105,7 @@ function getWidgetComponent(type: WidgetDefinition['type']): unknown {
 
       <!-- Empty state -->
       <div v-if="!exposedWidgets.length" class="empty-state">
-        <i class="pi pi-cog text-zinc-600" />
+        <Icon name="cog" size="md" class="text-zinc-600" />
         <span>No parameters to configure</span>
       </div>
     </div>

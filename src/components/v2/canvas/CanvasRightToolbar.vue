@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 
 interface Props {
@@ -71,7 +72,7 @@ function toggleLinks(): void {
         :class="toolMode === 'select' ? 'bg-zinc-700 text-zinc-100' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'"
         @click="setToolMode('select')"
       >
-        <i class="pi pi-arrow-up-left text-base" />
+        <Icon name="arrow-up-left" size="md" />
       </button>
       <button
         v-tooltip:[tooltipPos]="{ value: 'Pan', showDelay: 300 }"
@@ -79,7 +80,7 @@ function toggleLinks(): void {
         :class="toolMode === 'pan' ? 'bg-zinc-700 text-zinc-100' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'"
         @click="setToolMode('pan')"
       >
-        <i class="pi pi-arrows-alt text-base" />
+        <Icon name="arrows-alt" size="md" />
       </button>
 
       <!-- Divider -->
@@ -91,7 +92,7 @@ function toggleLinks(): void {
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
         @click="handleFitView"
       >
-        <i class="pi pi-expand text-base" />
+        <Icon name="expand" size="md" />
       </button>
 
       <!-- Divider -->
@@ -103,7 +104,7 @@ function toggleLinks(): void {
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
         @click="handleZoomIn"
       >
-        <i class="pi pi-plus text-sm" />
+        <Icon name="plus" size="sm" />
       </button>
       <div
         v-tooltip:[tooltipPos]="{ value: 'Zoom Level', showDelay: 300 }"
@@ -116,7 +117,7 @@ function toggleLinks(): void {
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
         @click="handleZoomOut"
       >
-        <i class="pi pi-minus text-sm" />
+        <Icon name="minus" size="sm" />
       </button>
 
       <!-- Divider -->
@@ -129,7 +130,7 @@ function toggleLinks(): void {
         :class="showMinimap ? 'bg-zinc-700 text-zinc-100' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'"
         @click="toggleMinimap"
       >
-        <i class="pi pi-map text-base" />
+        <Icon name="map" size="md" />
       </button>
 
       <!-- Links Toggle -->
@@ -139,7 +140,7 @@ function toggleLinks(): void {
         :class="showLinks ? 'bg-zinc-700 text-zinc-100' : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'"
         @click="toggleLinks"
       >
-        <i class="pi pi-link text-base" />
+        <Icon name="link" size="md" />
       </button>
     </div>
   </div>

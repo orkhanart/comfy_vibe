@@ -4,7 +4,6 @@ import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
 import Icons from 'unplugin-icons/vite'
 import Components from 'unplugin-vue-components/vite'
-import { PrimeVueResolver } from '@primevue/auto-import-resolver'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
@@ -16,7 +15,6 @@ export default defineConfig({
       autoInstall: true
     }),
     Components({
-      resolvers: [PrimeVueResolver()],
       dts: 'src/components.d.ts'
     })
   ],

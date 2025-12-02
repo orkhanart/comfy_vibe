@@ -11,7 +11,7 @@ const emit = defineEmits<{
 
 <template>
   <div class="relative flex-1">
-    <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400" />
+    <Icon name="search" size="sm" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
     <input
       :value="modelValue"
       type="text"

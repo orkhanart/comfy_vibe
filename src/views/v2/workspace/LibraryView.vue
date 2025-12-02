@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import Popover from 'primevue/popover'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import {
   WorkspaceSearchInput,
   WorkspaceViewToggle,
@@ -23,22 +24,18 @@ interface Library {
 }
 
 const libraries = ref<Library[]>([
-  { id: 'netflix', name: 'Netflix', icon: 'pi pi-play', color: 'bg-red-600', itemCount: 248 },
-  { id: 'adobe', name: 'Adobe Creative', icon: 'pi pi-palette', color: 'bg-rose-600', itemCount: 156 },
-  { id: 'personal', name: 'My Library', icon: 'pi pi-user', color: 'bg-zinc-600', itemCount: 89 },
-  { id: 'community', name: 'Community Hub', icon: 'pi pi-users', color: 'bg-violet-600', itemCount: 1240 },
+  { id: 'netflix', name: 'Netflix', icon: 'play', color: 'bg-red-600', itemCount: 248 },
+  { id: 'adobe', name: 'Adobe Creative', icon: 'palette', color: 'bg-rose-600', itemCount: 156 },
+  { id: 'personal', name: 'My Library', icon: 'user', color: 'bg-zinc-600', itemCount: 89 },
+  { id: 'community', name: 'Community Hub', icon: 'users', color: 'bg-violet-600', itemCount: 1240 },
 ])
 
 const currentLibrary = ref<Library>(libraries.value[0])
-const libraryMenu = ref<InstanceType<typeof Popover> | null>(null)
-
-function toggleLibraryMenu(event: Event): void {
-  libraryMenu.value?.toggle(event)
-}
+const libraryMenuOpen = ref(false)
 
 function selectLibrary(library: Library): void {
   currentLibrary.value = library
-  libraryMenu.value?.hide()
+  libraryMenuOpen.value = false
 }
 
 // Category tabs
@@ -52,12 +49,12 @@ interface Category {
 }
 
 const categories = ref<Category[]>([
-  { id: 'all', label: 'All', icon: 'pi pi-th-large', count: 248 },
-  { id: 'workflows', label: 'Workflows', icon: 'pi pi-sitemap', count: 64 },
-  { id: 'models', label: 'Models', icon: 'pi pi-box', count: 38 },
-  { id: 'nodepacks', label: 'Nodepacks', icon: 'pi pi-th-large', count: 24 },
-  { id: 'assets', label: 'Assets', icon: 'pi pi-images', count: 89 },
-  { id: 'brand-kit', label: 'Brand Kit', icon: 'pi pi-palette', count: 33 },
+  { id: 'all', label: 'All', icon: 'th-large', count: 248 },
+  { id: 'workflows', label: 'Workflows', icon: 'sitemap', count: 64 },
+  { id: 'models', label: 'Models', icon: 'box', count: 38 },
+  { id: 'nodepacks', label: 'Nodepacks', icon: 'th-large', count: 24 },
+  { id: 'assets', label: 'Assets', icon: 'images', count: 89 },
+  { id: 'brand-kit', label: 'Brand Kit', icon: 'palette', count: 33 },
 ])
 
 const activeCategory = ref<CategoryId>('all')
@@ -100,18 +97,18 @@ interface LibraryItem {
 }
 
 const items = ref<LibraryItem[]>([
-  { id: '1', name: 'SDXL Base Pipeline', description: 'Standard text-to-image workflow with SDXL', type: 'workflows', thumbnail: '/assets/card_images/workflow_01.webp', icon: 'pi pi-sitemap', author: 'Netflix Design', updatedAt: '2 hours ago', updatedTimestamp: Date.now() - 2 * 60 * 60 * 1000, uses: 1250, isShared: true, isFavorited: true },
-  { id: '2', name: 'ControlNet Canny', description: 'Edge-guided image generation', type: 'workflows', thumbnail: '/assets/card_images/comfyui_workflow.jpg', icon: 'pi pi-sitemap', author: 'Team', updatedAt: '1 day ago', updatedTimestamp: Date.now() - 24 * 60 * 60 * 1000, uses: 890, isShared: true, isFavorited: false },
-  { id: '3', name: 'SDXL Lightning v1.0', description: '4-step fast generation checkpoint', type: 'models', thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp', icon: 'pi pi-box', author: 'ByteDance', updatedAt: '3 days ago', updatedTimestamp: Date.now() - 3 * 24 * 60 * 60 * 1000, uses: 3420, isShared: false, isFavorited: true },
-  { id: '4', name: 'Flux.1 Dev', description: 'High quality diffusion model', type: 'models', thumbnail: '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp', icon: 'pi pi-box', author: 'Black Forest', updatedAt: '1 week ago', updatedTimestamp: Date.now() - 7 * 24 * 60 * 60 * 1000, uses: 5670, isShared: false, isFavorited: false },
-  { id: '5', name: 'ComfyUI Manager', description: 'Install and manage custom nodes', type: 'nodepacks', thumbnail: '/assets/card_images/228616f4-12ad-426d-84fb-f20e488ba7ee.webp', icon: 'pi pi-th-large', author: 'Comfy Org', updatedAt: '2 weeks ago', updatedTimestamp: Date.now() - 14 * 24 * 60 * 60 * 1000, uses: 12400, isShared: false, isFavorited: true },
-  { id: '6', name: 'Impact Pack', description: 'Advanced sampling and detailing', type: 'nodepacks', thumbnail: '/assets/card_images/683255d3-1d10-43d9-a6ff-ef142061e88a.webp', icon: 'pi pi-th-large', author: 'Dr.Lt.Data', updatedAt: '5 days ago', updatedTimestamp: Date.now() - 5 * 24 * 60 * 60 * 1000, uses: 8900, isShared: false, isFavorited: false },
-  { id: '7', name: 'Brand Logo Pack', description: 'Netflix brand logos in various formats', type: 'brand-kit', thumbnail: '/assets/card_images/91f1f589-ddb4-4c4f-b3a7-ba30fc271987.webp', icon: 'pi pi-palette', author: 'Brand Team', updatedAt: '1 month ago', updatedTimestamp: Date.now() - 30 * 24 * 60 * 60 * 1000, uses: 450, isShared: true, isFavorited: false },
-  { id: '8', name: 'Color Guidelines', description: 'Official brand color palette', type: 'brand-kit', thumbnail: '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp', icon: 'pi pi-palette', author: 'Brand Team', updatedAt: '2 months ago', updatedTimestamp: Date.now() - 60 * 24 * 60 * 60 * 1000, uses: 890, isShared: true, isFavorited: true },
-  { id: '9', name: 'Hero Images Q4', description: 'Generated hero images for campaigns', type: 'assets', thumbnail: '/assets/card_images/dda28581-37c8-44da-8822-57d1ccc2118c_2130x1658.png', icon: 'pi pi-images', author: 'Creative Team', updatedAt: '3 days ago', updatedTimestamp: Date.now() - 3 * 24 * 60 * 60 * 1000, uses: 67, isShared: true, isFavorited: false },
-  { id: '10', name: 'Social Media Assets', description: 'Generated social media graphics', type: 'assets', thumbnail: '/assets/card_images/can-you-rate-my-comfyui-workflow-v0-o9clchhji39c1.webp', icon: 'pi pi-images', author: 'Marketing', updatedAt: '1 week ago', updatedTimestamp: Date.now() - 7 * 24 * 60 * 60 * 1000, uses: 234, isShared: true, isFavorited: false },
-  { id: '11', name: 'Video Upscale 4K', description: 'AI-powered video upscaling workflow', type: 'workflows', thumbnail: '/assets/card_images/workflow_01.webp', icon: 'pi pi-sitemap', author: 'Video Team', updatedAt: '4 days ago', updatedTimestamp: Date.now() - 4 * 24 * 60 * 60 * 1000, uses: 567, isShared: true, isFavorited: false },
-  { id: '12', name: 'Typography Set', description: 'Brand approved fonts and styles', type: 'brand-kit', thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp', icon: 'pi pi-palette', author: 'Brand Team', updatedAt: '2 weeks ago', updatedTimestamp: Date.now() - 14 * 24 * 60 * 60 * 1000, uses: 320, isShared: true, isFavorited: false },
+  { id: '1', name: 'SDXL Base Pipeline', description: 'Standard text-to-image workflow with SDXL', type: 'workflows', thumbnail: '/assets/card_images/workflow_01.webp', icon: 'sitemap', author: 'Netflix Design', updatedAt: '2 hours ago', updatedTimestamp: Date.now() - 2 * 60 * 60 * 1000, uses: 1250, isShared: true, isFavorited: true },
+  { id: '2', name: 'ControlNet Canny', description: 'Edge-guided image generation', type: 'workflows', thumbnail: '/assets/card_images/comfyui_workflow.jpg', icon: 'sitemap', author: 'Team', updatedAt: '1 day ago', updatedTimestamp: Date.now() - 24 * 60 * 60 * 1000, uses: 890, isShared: true, isFavorited: false },
+  { id: '3', name: 'SDXL Lightning v1.0', description: '4-step fast generation checkpoint', type: 'models', thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp', icon: 'box', author: 'ByteDance', updatedAt: '3 days ago', updatedTimestamp: Date.now() - 3 * 24 * 60 * 60 * 1000, uses: 3420, isShared: false, isFavorited: true },
+  { id: '4', name: 'Flux.1 Dev', description: 'High quality diffusion model', type: 'models', thumbnail: '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp', icon: 'box', author: 'Black Forest', updatedAt: '1 week ago', updatedTimestamp: Date.now() - 7 * 24 * 60 * 60 * 1000, uses: 5670, isShared: false, isFavorited: false },
+  { id: '5', name: 'ComfyUI Manager', description: 'Install and manage custom nodes', type: 'nodepacks', thumbnail: '/assets/card_images/228616f4-12ad-426d-84fb-f20e488ba7ee.webp', icon: 'th-large', author: 'Comfy Org', updatedAt: '2 weeks ago', updatedTimestamp: Date.now() - 14 * 24 * 60 * 60 * 1000, uses: 12400, isShared: false, isFavorited: true },
+  { id: '6', name: 'Impact Pack', description: 'Advanced sampling and detailing', type: 'nodepacks', thumbnail: '/assets/card_images/683255d3-1d10-43d9-a6ff-ef142061e88a.webp', icon: 'th-large', author: 'Dr.Lt.Data', updatedAt: '5 days ago', updatedTimestamp: Date.now() - 5 * 24 * 60 * 60 * 1000, uses: 8900, isShared: false, isFavorited: false },
+  { id: '7', name: 'Brand Logo Pack', description: 'Netflix brand logos in various formats', type: 'brand-kit', thumbnail: '/assets/card_images/91f1f589-ddb4-4c4f-b3a7-ba30fc271987.webp', icon: 'palette', author: 'Brand Team', updatedAt: '1 month ago', updatedTimestamp: Date.now() - 30 * 24 * 60 * 60 * 1000, uses: 450, isShared: true, isFavorited: false },
+  { id: '8', name: 'Color Guidelines', description: 'Official brand color palette', type: 'brand-kit', thumbnail: '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp', icon: 'palette', author: 'Brand Team', updatedAt: '2 months ago', updatedTimestamp: Date.now() - 60 * 24 * 60 * 60 * 1000, uses: 890, isShared: true, isFavorited: true },
+  { id: '9', name: 'Hero Images Q4', description: 'Generated hero images for campaigns', type: 'assets', thumbnail: '/assets/card_images/dda28581-37c8-44da-8822-57d1ccc2118c_2130x1658.png', icon: 'images', author: 'Creative Team', updatedAt: '3 days ago', updatedTimestamp: Date.now() - 3 * 24 * 60 * 60 * 1000, uses: 67, isShared: true, isFavorited: false },
+  { id: '10', name: 'Social Media Assets', description: 'Generated social media graphics', type: 'assets', thumbnail: '/assets/card_images/can-you-rate-my-comfyui-workflow-v0-o9clchhji39c1.webp', icon: 'images', author: 'Marketing', updatedAt: '1 week ago', updatedTimestamp: Date.now() - 7 * 24 * 60 * 60 * 1000, uses: 234, isShared: true, isFavorited: false },
+  { id: '11', name: 'Video Upscale 4K', description: 'AI-powered video upscaling workflow', type: 'workflows', thumbnail: '/assets/card_images/workflow_01.webp', icon: 'sitemap', author: 'Video Team', updatedAt: '4 days ago', updatedTimestamp: Date.now() - 4 * 24 * 60 * 60 * 1000, uses: 567, isShared: true, isFavorited: false },
+  { id: '12', name: 'Typography Set', description: 'Brand approved fonts and styles', type: 'brand-kit', thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp', icon: 'palette', author: 'Brand Team', updatedAt: '2 weeks ago', updatedTimestamp: Date.now() - 14 * 24 * 60 * 60 * 1000, uses: 320, isShared: true, isFavorited: false },
 ])
 
 // Filtered and sorted items
@@ -194,23 +191,22 @@ function formatUses(uses: number): string {
     <div class="mb-6 flex items-center justify-between">
       <div class="flex items-center gap-4">
         <!-- Library Switcher -->
-        <button
-          class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-2.5 transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
-          @click="toggleLibraryMenu"
-        >
-          <div :class="['flex h-8 w-8 items-center justify-center rounded-md text-white', currentLibrary.color]">
-            <i :class="[currentLibrary.icon, 'text-sm']" />
-          </div>
-          <div class="text-left">
-            <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ currentLibrary.name }}</p>
-            <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ currentLibrary.itemCount }} items</p>
-          </div>
-          <i class="pi pi-chevron-down text-xs text-zinc-400" />
-        </button>
-
-        <!-- Library Menu -->
-        <Popover ref="libraryMenu" append-to="self">
-          <div class="w-72 p-2">
+        <Popover v-model:open="libraryMenuOpen">
+          <PopoverTrigger as-child>
+            <button
+              class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-2.5 transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
+            >
+              <div :class="['flex h-8 w-8 items-center justify-center rounded-md text-white', currentLibrary.color]">
+                <Icon :name="currentLibrary.icon" size="sm" />
+              </div>
+              <div class="text-left">
+                <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ currentLibrary.name }}</p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ currentLibrary.itemCount }} items</p>
+              </div>
+              <Icon name="chevron-down" size="xs" class="text-zinc-400" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="start" class="w-72 p-2">
             <p class="px-2 py-1.5 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
               Switch Library
             </p>
@@ -227,16 +223,16 @@ function formatUses(uses: number): string {
                 @click="selectLibrary(lib)"
               >
                 <div :class="['flex h-8 w-8 items-center justify-center rounded-md text-white', lib.color]">
-                  <i :class="[lib.icon, 'text-sm']" />
+                  <Icon :name="lib.icon" size="sm" />
                 </div>
                 <div class="flex-1">
                   <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ lib.name }}</p>
                   <p class="text-xs text-zinc-500 dark:text-zinc-400">{{ lib.itemCount }} items</p>
                 </div>
-                <i v-if="currentLibrary.id === lib.id" class="pi pi-check text-sm text-blue-500" />
+                <Icon v-if="currentLibrary.id === lib.id" name="check" size="sm" class="text-blue-500" />
               </button>
             </div>
-          </div>
+          </PopoverContent>
         </Popover>
 
         <div>
@@ -254,20 +250,20 @@ function formatUses(uses: number): string {
           :to="`/${workspaceId}/create`"
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
-          <i class="pi pi-bolt text-xs" />
+          <Icon name="bolt" size="xs" />
           Linear
         </RouterLink>
         <RouterLink
           :to="`/${workspaceId}/canvas`"
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
-          <i class="pi pi-share-alt text-xs" />
+          <Icon name="share-alt" size="xs" />
           Node
         </RouterLink>
         <button
           class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
-          <i class="pi pi-plus text-xs" />
+          <Icon name="plus" size="xs" />
           Add to Library
         </button>
       </div>
@@ -286,7 +282,7 @@ function formatUses(uses: number): string {
         ]"
         @click="activeCategory = cat.id"
       >
-        <i :class="[cat.icon, 'text-sm']" />
+        <Icon :name="cat.icon" size="sm" />
         {{ cat.label }}
         <span
           :class="[
@@ -318,7 +314,7 @@ function formatUses(uses: number): string {
       class="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 py-16 dark:border-zinc-700"
     >
       <div class="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-        <i class="pi pi-inbox text-xl text-zinc-400" />
+        <Icon name="inbox" size="xl" class="text-zinc-400" />
       </div>
       <h3 class="mt-4 text-sm font-medium text-zinc-900 dark:text-zinc-100">No items found</h3>
       <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -341,8 +337,8 @@ function formatUses(uses: number): string {
         :badge="getTypeLabel(item.type)"
         :badge-class="getTypeColor(item.type)"
         :stats="[
-          { icon: 'pi pi-user', value: item.author },
-          { icon: 'pi pi-chart-bar', value: formatUses(item.uses) }
+          { icon: 'user', value: item.author },
+          { icon: 'chart-bar', value: formatUses(item.uses) }
         ]"
         :updated-at="item.updatedAt"
       />
@@ -375,8 +371,8 @@ function formatUses(uses: number): string {
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2">
               <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ item.name }}</p>
-              <i v-if="item.isFavorited" class="pi pi-star-fill text-xs text-amber-400" />
-              <i v-if="item.isShared" class="pi pi-share-alt text-xs text-zinc-400" />
+              <Icon v-if="item.isFavorited" name="star-fill" size="xs" class="text-amber-400" />
+              <Icon v-if="item.isShared" name="share-alt" size="xs" class="text-zinc-400" />
             </div>
             <p class="truncate text-sm text-zinc-500 dark:text-zinc-400">{{ item.description }}</p>
           </div>
@@ -399,7 +395,7 @@ function formatUses(uses: number): string {
               class="rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-300"
               @click.stop
             >
-              <i class="pi pi-ellipsis-h text-sm" />
+              <Icon name="ellipsis-h" size="sm" />
             </button>
           </div>
         </div>

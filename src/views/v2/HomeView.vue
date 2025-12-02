@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-
-import Button from 'primevue/button'
-import Card from 'primevue/card'
-
+import { ArrowRight, Link, Zap, Loader2 } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '@/components/ui/card'
 import { useComfyStore } from '@/stores/comfyStore'
 
 const comfyStore = useComfyStore()
@@ -22,13 +27,11 @@ async function connectToServer() {
 <template>
   <div class="flex min-h-screen flex-col items-center justify-center p-8">
     <Card class="w-full max-w-md">
-      <template #title>
-        <h1 class="text-2xl font-bold">ComfyUI Prototypes</h1>
-      </template>
-      <template #subtitle>
-        <p class="text-surface-500">Prototype new features for ComfyUI</p>
-      </template>
-      <template #content>
+      <CardHeader>
+        <CardTitle class="text-2xl">ComfyUI Prototypes</CardTitle>
+        <CardDescription>Prototype new features for ComfyUI</CardDescription>
+      </CardHeader>
+      <CardContent>
         <div class="flex flex-col gap-4">
           <div class="flex items-center gap-2">
             <span
@@ -47,27 +50,28 @@ async function connectToServer() {
           </div>
 
           <Button
-            :label="comfyStore.isConnected ? 'Open Canvas' : 'Connect'"
-            :loading="isConnecting"
-            :icon="comfyStore.isConnected ? 'pi pi-arrow-right' : 'pi pi-link'"
+            :disabled="isConnecting"
             @click="
               comfyStore.isConnected
                 ? $router.push('/nodemode/default/untitled')
                 : connectToServer()
             "
-          />
+          >
+            <Loader2 v-if="isConnecting" class="size-4 animate-spin" />
+            <ArrowRight v-else-if="comfyStore.isConnected" class="size-4" />
+            <Link v-else class="size-4" />
+            {{ comfyStore.isConnected ? 'Open Canvas' : 'Connect' }}
+          </Button>
 
-          <Button
-            label="Linear Mode"
-            severity="secondary"
-            icon="pi pi-bolt"
-            @click="$router.push('/create')"
-          />
-          <p class="text-center text-xs text-zinc-500">
+          <Button variant="secondary" @click="$router.push('/create')">
+            <Zap class="size-4" />
+            Linear Mode
+          </Button>
+          <p class="text-center text-xs text-muted-foreground">
             Simplified Runway/Midjourney-style interface
           </p>
         </div>
-      </template>
+      </CardContent>
     </Card>
   </div>
 </template>

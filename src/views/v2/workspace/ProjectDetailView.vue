@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -47,10 +48,10 @@ function createCanvas(): void {
 
 function getAssetIcon(type: string): string {
   switch (type) {
-    case 'image': return 'pi pi-image'
-    case 'video': return 'pi pi-video'
-    case 'audio': return 'pi pi-volume-up'
-    default: return 'pi pi-file'
+    case 'image': return 'image'
+    case 'video': return 'video'
+    case 'audio': return 'volume-up'
+    default: return 'file'
   }
 }
 </script>
@@ -66,13 +67,13 @@ function getAssetIcon(type: string): string {
         >
           Projects
         </button>
-        <i class="pi pi-chevron-right text-xs" />
+        <Icon name="chevron-right" size="xs" />
         <span class="text-zinc-700 dark:text-zinc-300">{{ project.name }}</span>
       </div>
       <div class="mt-2 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
-            <i class="pi pi-folder text-lg text-zinc-500 dark:text-zinc-400" />
+            <Icon name="folder" size="lg" class="text-zinc-500 dark:text-zinc-400" />
           </div>
           <div>
             <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
@@ -85,7 +86,7 @@ function getAssetIcon(type: string): string {
           class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
           @click="createCanvas"
         >
-          <i class="pi pi-plus text-xs" />
+          <Icon name="plus" size="xs" />
           New Canvas
         </button>
       </div>
@@ -133,7 +134,7 @@ function getAssetIcon(type: string): string {
           ]"
           @click="viewMode = 'grid'"
         >
-          <i class="pi pi-th-large" />
+          <Icon name="th-large" size="md" />
         </button>
         <button
           :class="[
@@ -144,7 +145,7 @@ function getAssetIcon(type: string): string {
           ]"
           @click="viewMode = 'list'"
         >
-          <i class="pi pi-list" />
+          <Icon name="list" size="md" />
         </button>
       </div>
     </div>
@@ -158,7 +159,7 @@ function getAssetIcon(type: string): string {
           class="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-300 text-zinc-500 transition-colors hover:border-zinc-400 hover:bg-zinc-50 hover:text-zinc-700 dark:border-zinc-700 dark:hover:border-zinc-600 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-300"
           @click="createCanvas"
         >
-          <i class="pi pi-plus text-2xl" />
+          <Icon name="plus" size="2xl" />
           <span class="text-sm font-medium">New Canvas</span>
         </button>
 
@@ -172,13 +173,13 @@ function getAssetIcon(type: string): string {
           <div class="flex h-full flex-col">
             <div class="flex items-start justify-between">
               <div class="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
-                <i class="pi pi-objects-column text-zinc-500 dark:text-zinc-400" />
+                <Icon name="objects-column" size="md" class="text-zinc-500 dark:text-zinc-400" />
               </div>
               <button
                 class="rounded p-1 text-zinc-400 opacity-0 transition-opacity hover:bg-zinc-100 hover:text-zinc-600 group-hover:opacity-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
                 @click.stop
               >
-                <i class="pi pi-ellipsis-h text-sm" />
+                <Icon name="ellipsis-h" size="sm" />
               </button>
             </div>
             <div class="mt-auto">
@@ -199,7 +200,7 @@ function getAssetIcon(type: string): string {
             @click="openCanvas(canvas.id)"
           >
             <div class="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
-              <i class="pi pi-objects-column text-zinc-500 dark:text-zinc-400" />
+              <Icon name="objects-column" size="md" class="text-zinc-500 dark:text-zinc-400" />
             </div>
             <div class="flex-1 min-w-0">
               <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ canvas.name }}</p>
@@ -209,7 +210,7 @@ function getAssetIcon(type: string): string {
               class="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-300"
               @click.stop
             >
-              <i class="pi pi-ellipsis-h text-sm" />
+              <Icon name="ellipsis-h" size="sm" />
             </button>
           </div>
         </div>
@@ -228,13 +229,13 @@ function getAssetIcon(type: string): string {
           <div class="flex h-full flex-col">
             <div class="flex items-start justify-between">
               <div class="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
-                <i :class="[getAssetIcon(asset.type), 'text-zinc-500 dark:text-zinc-400']" />
+                <Icon :name="getAssetIcon(asset.type)" size="md" />
               </div>
               <button
                 class="rounded p-1 text-zinc-400 opacity-0 transition-opacity hover:bg-zinc-100 hover:text-zinc-600 group-hover:opacity-100 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
                 @click.stop
               >
-                <i class="pi pi-ellipsis-h text-sm" />
+                <Icon name="ellipsis-h" size="sm" />
               </button>
             </div>
             <div class="mt-auto">
@@ -255,7 +256,7 @@ function getAssetIcon(type: string): string {
             class="flex items-center gap-4 px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
           >
             <div class="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
-              <i :class="[getAssetIcon(asset.type), 'text-zinc-500 dark:text-zinc-400']" />
+              <Icon :name="getAssetIcon(asset.type)" size="md" />
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-zinc-900 dark:text-zinc-100">{{ asset.name }}</p>
@@ -263,7 +264,7 @@ function getAssetIcon(type: string): string {
             </div>
             <span class="text-sm text-zinc-400 dark:text-zinc-500">{{ asset.size }}</span>
             <button class="rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-300">
-              <i class="pi pi-download text-sm" />
+              <Icon name="download" size="sm" />
             </button>
           </div>
         </div>

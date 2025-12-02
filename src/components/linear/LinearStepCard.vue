@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { computed } from 'vue'
 import type { LinearStep } from '@/types/linear'
 
@@ -17,11 +18,13 @@ const emit = defineEmits<{
 }>()
 
 const statusIcon = computed(() => {
-  if (props.step.state === 'completed') return 'pi-check'
-  if (props.step.state === 'executing') return 'pi-spin pi-spinner'
-  if (props.step.state === 'error') return 'pi-exclamation-triangle'
-  return props.step.icon ?? 'pi-circle'
+  if (props.step.state === 'completed') return 'check'
+  if (props.step.state === 'executing') return 'spinner'
+  if (props.step.state === 'error') return 'exclamation-triangle'
+  return props.step.icon ?? 'circle'
 })
+
+const isSpinning = computed(() => props.step.state === 'executing')
 
 const statusClass = computed(() => {
   if (props.step.state === 'completed') return 'status-completed'
@@ -40,7 +43,7 @@ const statusClass = computed(() => {
     <!-- Step number / status indicator -->
     <div class="step-indicator">
       <div class="indicator-circle">
-        <i :class="['pi', statusIcon]" />
+        <Icon :name="statusIcon" size="sm" :class="{ 'animate-spin': isSpinning }" />
       </div>
       <div v-if="stepIndex < 4" class="connector-line" />
     </div>
@@ -68,7 +71,7 @@ const statusClass = computed(() => {
     </div>
 
     <!-- Expand arrow -->
-    <i v-if="isActive" class="pi pi-chevron-right expand-icon" />
+    <Icon v-if="isActive" name="chevron-right" size="xs" class="expand-icon" />
   </button>
 </template>
 

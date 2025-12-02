@@ -1,14 +1,11 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
-import Popover from 'primevue/popover'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 
-const runMenu = ref<InstanceType<typeof Popover> | null>(null)
+const runMenuOpen = ref(false)
 const isRunning = ref(false)
 const queueCount = ref(0)
-
-function toggleRunMenu(event: Event): void {
-  runMenu.value?.toggle(event)
-}
 
 function runWorkflow(): void {
   isRunning.value = true
@@ -37,13 +34,13 @@ function clearQueue(): void {
       v-if="queueCount > 0"
       class="flex items-center gap-1.5 rounded-md bg-amber-500/20 px-2.5 py-1.5 text-xs font-medium text-amber-400"
     >
-      <i class="pi pi-list text-[10px]" />
+      <Icon name="list" size="xs" />
       <span>{{ queueCount }} in queue</span>
       <button
         class="ml-1 rounded p-0.5 transition-colors hover:bg-amber-500/20"
         @click="clearQueue"
       >
-        <i class="pi pi-times text-[10px]" />
+        <Icon name="times" size="xs" />
       </button>
     </div>
 
@@ -53,7 +50,7 @@ function clearQueue(): void {
       class="flex h-8 items-center gap-1.5 rounded-md bg-zinc-800/80 px-3 text-sm text-zinc-300 shadow-sm backdrop-blur transition-colors hover:bg-zinc-700 hover:text-white"
       @click="addToQueue"
     >
-      <i class="pi pi-plus text-xs" />
+      <Icon name="plus" size="xs" />
       <span>Queue</span>
     </button>
 
@@ -64,51 +61,53 @@ function clearQueue(): void {
         :disabled="isRunning"
         @click="runWorkflow"
       >
-        <i :class="['text-xs', isRunning ? 'pi pi-spin pi-spinner' : 'pi pi-play']" />
+        <Icon :name="isRunning ? 'spinner' : 'play'" size="xs" :class="isRunning ? 'animate-spin' : ''" />
         <span>{{ isRunning ? 'Running...' : 'Run' }}</span>
       </button>
-      <button
-        class="flex h-8 items-center rounded-r-md border-l border-blue-500 bg-blue-600 px-1.5 text-white shadow-sm transition-colors hover:bg-blue-500"
-        @click="toggleRunMenu"
-      >
-        <i class="pi pi-chevron-down text-[10px]" />
-      </button>
 
-      <!-- Run Menu Popover -->
-      <Popover ref="runMenu" append-to="self">
-        <div class="flex w-48 flex-col py-1">
+      <Popover v-model:open="runMenuOpen">
+        <PopoverTrigger as-child>
           <button
-            class="flex items-center gap-2 px-3 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            @click="runWorkflow(); runMenu?.hide()"
+            class="flex h-8 items-center rounded-r-md border-l border-blue-500 bg-blue-600 px-1.5 text-white shadow-sm transition-colors hover:bg-blue-500"
           >
-            <i class="pi pi-play text-xs text-blue-500" />
-            <span>Run Workflow</span>
-            <span class="ml-auto text-xs text-zinc-400">⌘↵</span>
+            <Icon name="chevron-down" size="xs" />
           </button>
-          <button
-            class="flex items-center gap-2 px-3 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            @click="runOnChange(); runMenu?.hide()"
-          >
-            <i class="pi pi-sync text-xs text-green-500" />
-            <span>Run on Change</span>
-          </button>
-          <div class="my-1 h-px bg-zinc-200 dark:bg-zinc-700" />
-          <button
-            class="flex items-center gap-2 px-3 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            @click="addToQueue(); runMenu?.hide()"
-          >
-            <i class="pi pi-plus text-xs text-amber-500" />
-            <span>Add to Queue</span>
-            <span class="ml-auto text-xs text-zinc-400">⌘⇧↵</span>
-          </button>
-          <button
-            class="flex items-center gap-2 px-3 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            @click="clearQueue(); runMenu?.hide()"
-          >
-            <i class="pi pi-trash text-xs text-red-500" />
-            <span>Clear Queue</span>
-          </button>
-        </div>
+        </PopoverTrigger>
+        <PopoverContent align="end" class="w-48 p-0">
+          <div class="flex flex-col py-1">
+            <button
+              class="flex items-center gap-2 px-3 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              @click="runWorkflow(); runMenuOpen = false"
+            >
+              <Icon name="play" size="xs" class="text-blue-500" />
+              <span>Run Workflow</span>
+              <span class="ml-auto text-xs text-zinc-400">⌘↵</span>
+            </button>
+            <button
+              class="flex items-center gap-2 px-3 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              @click="runOnChange(); runMenuOpen = false"
+            >
+              <Icon name="sync" size="xs" class="text-green-500" />
+              <span>Run on Change</span>
+            </button>
+            <div class="my-1 h-px bg-zinc-200 dark:bg-zinc-700" />
+            <button
+              class="flex items-center gap-2 px-3 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              @click="addToQueue(); runMenuOpen = false"
+            >
+              <Icon name="plus" size="xs" class="text-amber-500" />
+              <span>Add to Queue</span>
+              <span class="ml-auto text-xs text-zinc-400">⌘⇧↵</span>
+            </button>
+            <button
+              class="flex items-center gap-2 px-3 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              @click="clearQueue(); runMenuOpen = false"
+            >
+              <Icon name="trash" size="xs" class="text-red-500" />
+              <span>Clear Queue</span>
+            </button>
+          </div>
+        </PopoverContent>
       </Popover>
     </div>
   </div>

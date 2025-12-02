@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import AppCard, { type AppItem } from './apps/AppCard.vue'
 import AppForm, { type AppConfig } from './apps/AppForm.vue'
@@ -12,7 +13,7 @@ const appConfigs: Record<string, AppConfig> = {
   'gen-video': {
     id: 'gen-video',
     name: 'Generate Video',
-    icon: 'pi-video',
+    icon: 'video',
     description: 'Generate videos from text prompts using AI models.',
     inputs: [
       { id: 'prompt', type: 'textarea', label: 'Prompt', placeholder: 'Describe your video...', required: true },
@@ -33,7 +34,7 @@ const appConfigs: Record<string, AppConfig> = {
   'gen-image': {
     id: 'gen-image',
     name: 'Generate Image',
-    icon: 'pi-image',
+    icon: 'image',
     description: 'Generate images from text prompts using SDXL, Flux, and more.',
     inputs: [
       { id: 'prompt', type: 'textarea', label: 'Prompt', placeholder: 'Describe your image...', required: true },
@@ -55,7 +56,7 @@ const appConfigs: Record<string, AppConfig> = {
   'inpaint': {
     id: 'inpaint',
     name: 'Inpaint',
-    icon: 'pi-pencil',
+    icon: 'pencil',
     description: 'Edit specific parts of an image using a mask.',
     inputs: [
       { id: 'image', type: 'image', label: 'Input Image', required: true },
@@ -67,7 +68,7 @@ const appConfigs: Record<string, AppConfig> = {
   'upscale': {
     id: 'upscale',
     name: 'Upscale',
-    icon: 'pi-expand',
+    icon: 'expand',
     description: 'Upscale images to higher resolution with AI enhancement.',
     inputs: [
       { id: 'image', type: 'image', label: 'Input Image', required: true },
@@ -81,7 +82,7 @@ const appConfigs: Record<string, AppConfig> = {
   'remove-bg': {
     id: 'remove-bg',
     name: 'Remove Background',
-    icon: 'pi-eraser',
+    icon: 'trash',
     description: 'Remove background from images automatically.',
     inputs: [
       { id: 'image', type: 'image', label: 'Input Image', required: true },
@@ -91,7 +92,7 @@ const appConfigs: Record<string, AppConfig> = {
   'face-swap': {
     id: 'face-swap',
     name: 'Face Swap',
-    icon: 'pi-user',
+    icon: 'user',
     description: 'Swap faces between two images.',
     inputs: [
       { id: 'source', type: 'image', label: 'Source Face', required: true },
@@ -102,7 +103,7 @@ const appConfigs: Record<string, AppConfig> = {
   'style-transfer': {
     id: 'style-transfer',
     name: 'Style Transfer',
-    icon: 'pi-palette',
+    icon: 'palette',
     description: 'Apply artistic styles to your images.',
     inputs: [
       { id: 'image', type: 'image', label: 'Input Image', required: true },
@@ -119,7 +120,7 @@ const appConfigs: Record<string, AppConfig> = {
   'animate': {
     id: 'animate',
     name: 'Animate',
-    icon: 'pi-play',
+    icon: 'play',
     description: 'Animate a still image into a video.',
     inputs: [
       { id: 'image', type: 'image', label: 'Input Image', required: true },
@@ -140,24 +141,24 @@ const appConfigs: Record<string, AppConfig> = {
 
 // All Apps list
 const allApps: AppItem[] = [
-  { id: 'gen-video', name: 'Generate Video', icon: 'pi-video' },
-  { id: 'upscale-video', name: 'Upscale Video', icon: 'pi-expand' },
-  { id: 'animate', name: 'Animate', icon: 'pi-play' },
-  { id: 'interpolate', name: 'Interpolate', icon: 'pi-sort-alt' },
-  { id: 'gen-image', name: 'Generate Image', icon: 'pi-image' },
-  { id: 'inpaint', name: 'Inpaint', icon: 'pi-pencil' },
-  { id: 'upscale', name: 'Upscale', icon: 'pi-expand' },
-  { id: 'remove-bg', name: 'Remove BG', icon: 'pi-eraser' },
-  { id: 'face-swap', name: 'Face Swap', icon: 'pi-user' },
-  { id: 'style-transfer', name: 'Style Transfer', icon: 'pi-palette' },
-  { id: 'outpaint', name: 'Outpaint', icon: 'pi-arrows-alt' },
-  { id: 'colorize', name: 'Colorize', icon: 'pi-sun' },
-  { id: 'prompt-builder', name: 'Prompt Builder', icon: 'pi-pencil' },
-  { id: 'batch-process', name: 'Batch Process', icon: 'pi-list' },
-  { id: 'compare', name: 'Compare', icon: 'pi-arrows-h' },
-  { id: 'metadata', name: 'Metadata', icon: 'pi-info-circle' },
-  { id: 'gallery', name: 'Gallery', icon: 'pi-images' },
-  { id: 'history', name: 'History', icon: 'pi-history' },
+  { id: 'gen-video', name: 'Generate Video', icon: 'video' },
+  { id: 'upscale-video', name: 'Upscale Video', icon: 'expand' },
+  { id: 'animate', name: 'Animate', icon: 'play' },
+  { id: 'interpolate', name: 'Interpolate', icon: 'sort-alt' },
+  { id: 'gen-image', name: 'Generate Image', icon: 'image' },
+  { id: 'inpaint', name: 'Inpaint', icon: 'pencil' },
+  { id: 'upscale', name: 'Upscale', icon: 'expand' },
+  { id: 'remove-bg', name: 'Remove BG', icon: 'trash' },
+  { id: 'face-swap', name: 'Face Swap', icon: 'user' },
+  { id: 'style-transfer', name: 'Style Transfer', icon: 'palette' },
+  { id: 'outpaint', name: 'Outpaint', icon: 'arrows-alt' },
+  { id: 'colorize', name: 'Colorize', icon: 'sun' },
+  { id: 'prompt-builder', name: 'Prompt Builder', icon: 'pencil' },
+  { id: 'batch-process', name: 'Batch Process', icon: 'list' },
+  { id: 'compare', name: 'Compare', icon: 'arrow-left' },
+  { id: 'metadata', name: 'Metadata', icon: 'info-circle' },
+  { id: 'gallery', name: 'Gallery', icon: 'images' },
+  { id: 'history', name: 'History', icon: 'clock' },
 ]
 
 const filteredApps = computed(() => {
@@ -213,7 +214,7 @@ function handleRun(values: Record<string, unknown>, images: Record<string, strin
       <!-- Search + Actions -->
       <div class="flex items-center gap-2 border-b border-zinc-800 p-3">
         <div class="flex h-8 flex-1 items-center gap-2 rounded-lg bg-zinc-800 px-3">
-          <i class="pi pi-search text-xs text-zinc-500" />
+          <Icon name="search" size="xs" class="text-zinc-500" />
           <input
             v-model="searchQuery"
             type="text"
@@ -225,7 +226,7 @@ function handleRun(values: Record<string, unknown>, images: Record<string, strin
             class="text-zinc-500 hover:text-zinc-300"
             @click="searchQuery = ''"
           >
-            <i class="pi pi-times text-[10px]" />
+            <Icon name="times" size="xs" />
           </button>
         </div>
 
@@ -239,7 +240,7 @@ function handleRun(values: Record<string, unknown>, images: Record<string, strin
             ]"
             @click="viewMode = 'grid'"
           >
-            <i class="pi pi-th-large text-xs" />
+            <Icon name="th-large" size="xs" />
           </button>
           <button
             v-tooltip.bottom="'List'"
@@ -249,7 +250,7 @@ function handleRun(values: Record<string, unknown>, images: Record<string, strin
             ]"
             @click="viewMode = 'list'"
           >
-            <i class="pi pi-list text-xs" />
+            <Icon name="list" size="xs" />
           </button>
         </div>
 
@@ -258,7 +259,7 @@ function handleRun(values: Record<string, unknown>, images: Record<string, strin
           v-tooltip.bottom="'Filter'"
           class="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500 transition-colors hover:text-zinc-300"
         >
-          <i class="pi pi-filter text-xs" />
+          <Icon name="filter" size="xs" />
         </button>
       </div>
 
@@ -273,7 +274,7 @@ function handleRun(values: Record<string, unknown>, images: Record<string, strin
           />
         </div>
         <div v-if="filteredApps.length === 0" class="flex flex-col items-center py-8 text-zinc-500">
-          <i class="pi pi-search mb-2 text-2xl" />
+          <Icon name="search" size="2xl" class="mb-2" />
           <span class="text-xs">No apps found</span>
         </div>
       </div>

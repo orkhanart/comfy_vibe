@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { WORKFLOWS_DATA } from '@/data/sidebarMockData'
 
 defineProps<{
@@ -27,13 +28,13 @@ const mockWorkflows = WORKFLOWS_DATA
             'bg-gradient-to-br from-cyan-900/30 to-blue-900/30': workflow.thumbnail === 'inpaint',
           }"
         >
-          <i class="pi pi-sitemap text-2xl text-zinc-700" />
+          <Icon name="sitemap" size="2xl" class="text-zinc-700" />
         </div>
         <button
           v-tooltip.left="{ value: 'Share', showDelay: 50 }"
           class="absolute right-1.5 top-1.5 flex h-6 w-6 items-center justify-center rounded bg-zinc-800/90 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
         >
-          <i class="pi pi-share-alt text-[10px]" />
+          <Icon name="share-alt" size="xs" />
         </button>
         <div class="absolute bottom-1.5 left-1.5 rounded bg-zinc-900/80 px-1.5 py-0.5 text-[10px] text-zinc-400">
           {{ workflow.nodes }} nodes
@@ -49,7 +50,7 @@ const mockWorkflows = WORKFLOWS_DATA
           v-tooltip.left="{ value: 'Add to Canvas', showDelay: 50 }"
           class="ml-2 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-blue-600 text-white transition-all hover:bg-blue-500"
         >
-          <i class="pi pi-plus text-[10px]" />
+          <Icon name="plus" size="xs" />
         </button>
       </div>
     </div>

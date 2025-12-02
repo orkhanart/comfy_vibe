@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
+
 interface Props {
   icon?: string
   iconType?: 'dot' | 'icon'
@@ -12,7 +14,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   iconType: 'dot',
   draggable: false,
-  actionIcon: 'pi pi-plus',
+  actionIcon: 'plus',
 })
 
 const emit = defineEmits<{
@@ -28,13 +30,17 @@ const emit = defineEmits<{
     @click="emit('click')"
   >
     <!-- Dot or Icon -->
-    <i
+    <Icon
       v-if="props.iconType === 'dot'"
-      class="pi pi-circle-fill text-[5px] text-zinc-600 group-hover:text-zinc-400"
+      name="circle-fill"
+      size="xs"
+      class="text-zinc-600 group-hover:text-zinc-400"
     />
-    <i
+    <Icon
       v-else-if="props.icon"
-      :class="[props.icon, 'text-[10px] text-zinc-600 group-hover:text-zinc-400']"
+      :name="props.icon"
+      size="xs"
+      class="text-zinc-600 group-hover:text-zinc-400"
     />
 
     <!-- Content -->
@@ -56,8 +62,10 @@ const emit = defineEmits<{
     </span>
 
     <!-- Action Icon -->
-    <i
-      :class="[props.actionIcon, 'text-[10px] text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100']"
+    <Icon
+      :name="props.actionIcon"
+      size="xs"
+      class="text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100"
       @click.stop="emit('action')"
     />
   </div>

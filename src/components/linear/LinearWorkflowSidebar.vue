@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useLinearModeStore } from '@/stores/linearModeStore'
 import { TEMPLATE_CATEGORIES } from '@/data/linearTemplates'
@@ -49,7 +50,7 @@ function isSelected(template: LinearWorkflowTemplate): boolean {
     <!-- Search -->
     <div class="border-b border-zinc-800 p-2">
       <div class="flex items-center rounded bg-zinc-800 px-2 py-1.5">
-        <i class="pi pi-search text-xs text-zinc-500" />
+        <Icon name="search" size="xs" class="text-zinc-500" />
         <input
           v-model="searchQuery"
           type="text"
@@ -110,7 +111,7 @@ function isSelected(template: LinearWorkflowTemplate): boolean {
                 : 'bg-zinc-800 text-zinc-400 group-hover:bg-zinc-700 group-hover:text-zinc-300'
             ]"
           >
-            <i :class="['pi', template.icon, 'text-sm']" />
+            <Icon :name="template.icon" size="sm" />
           </div>
 
           <!-- Info -->
@@ -142,7 +143,7 @@ function isSelected(template: LinearWorkflowTemplate): boolean {
           v-if="!filteredTemplates.length"
           class="flex flex-col items-center justify-center py-8 text-zinc-500"
         >
-          <i class="pi pi-inbox mb-2 text-2xl" />
+          <Icon name="inbox" size="2xl" class="mb-2" />
           <span class="text-xs">No workflows found</span>
         </div>
       </div>

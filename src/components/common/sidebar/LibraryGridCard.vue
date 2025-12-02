@@ -45,7 +45,7 @@ const emit = defineEmits<{
         v-else
         class="flex h-full w-full items-center justify-center"
       >
-        <i :class="[props.icon || 'pi pi-file', 'text-2xl text-zinc-600']" />
+        <Icon :name="props.icon || 'file'" size="2xl" />
       </div>
 
       <!-- Gradient overlay -->
@@ -56,7 +56,7 @@ const emit = defineEmits<{
         v-if="props.starred"
         class="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded bg-amber-500/20 backdrop-blur-sm"
       >
-        <i class="pi pi-star-fill text-[10px] text-amber-400" />
+        <Icon name="star-fill" size="xs" class="text-amber-400" />
       </div>
 
       <!-- Badge (top-right) -->
@@ -74,7 +74,7 @@ const emit = defineEmits<{
         v-if="props.icon"
         class="absolute bottom-1.5 left-1.5 flex h-6 w-6 items-center justify-center rounded bg-black/40 backdrop-blur-sm"
       >
-        <i :class="[props.icon, 'text-xs', props.iconClass]" />
+        <Icon :name="props.icon" size="xs" :class="props.iconClass" />
       </div>
 
       <!-- Add button (bottom-right, on hover) -->
@@ -82,7 +82,7 @@ const emit = defineEmits<{
         class="absolute bottom-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded bg-white/90 text-zinc-800 opacity-0 transition-all hover:bg-white group-hover:opacity-100"
         @click.stop
       >
-        <i class="pi pi-plus text-xs" />
+        <Icon name="plus" size="xs" />
       </button>
     </div>
 

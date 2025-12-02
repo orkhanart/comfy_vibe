@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 
 type ToolId = 'select' | 'group' | 'ungroup' | 'section' | 'note' | 'annotation' | 'text' | 'pen' | 'highlighter'
@@ -6,15 +7,15 @@ type ToolId = 'select' | 'group' | 'ungroup' | 'section' | 'note' | 'annotation'
 const activeTool = ref<ToolId>('select')
 
 const tools: Array<{ id: ToolId; icon: string; label: string; dividerAfter?: boolean }> = [
-  { id: 'select', icon: 'pi-arrow-up-left', label: 'Select' },
-  { id: 'group', icon: 'pi-objects-column', label: 'Group', dividerAfter: false },
-  { id: 'ungroup', icon: 'pi-table', label: 'Ungroup', dividerAfter: true },
-  { id: 'section', icon: 'pi-stop', label: 'Section' },
-  { id: 'note', icon: 'pi-bookmark', label: 'Sticky Note' },
-  { id: 'annotation', icon: 'pi-comment', label: 'Annotation', dividerAfter: true },
-  { id: 'text', icon: 'pi-at', label: 'Text' },
-  { id: 'pen', icon: 'pi-pencil', label: 'Pen' },
-  { id: 'highlighter', icon: 'pi-eraser', label: 'Highlighter' },
+  { id: 'select', icon: 'arrow-up', label: 'Select' },
+  { id: 'group', icon: 'objects-column', label: 'Group', dividerAfter: false },
+  { id: 'ungroup', icon: 'grid', label: 'Ungroup', dividerAfter: true },
+  { id: 'section', icon: 'square', label: 'Section' },
+  { id: 'note', icon: 'bookmark', label: 'Sticky Note' },
+  { id: 'annotation', icon: 'comment', label: 'Annotation', dividerAfter: true },
+  { id: 'text', icon: 'type', label: 'Text' },
+  { id: 'pen', icon: 'pencil', label: 'Pen' },
+  { id: 'highlighter', icon: 'edit', label: 'Highlighter' },
 ]
 
 const emit = defineEmits<{
@@ -41,7 +42,7 @@ function selectTool(tool: ToolId): void {
           ]"
           @click="selectTool(tool.id)"
         >
-          <i :class="['pi', tool.icon, 'text-sm']" />
+          <Icon :name="tool.icon" size="sm" />
         </button>
         <div v-if="tool.dividerAfter" class="mx-1 h-5 w-px bg-zinc-700" />
       </template>

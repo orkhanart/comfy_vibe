@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
-import Button from 'primevue/button'
+import { Maximize2, X } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
 import { SidebarSearchBox, SidebarViewToggle, LibraryGridCard } from '@/components/common/sidebar'
 import { TEMPLATE_CATEGORIES_DATA } from '@/data/sidebarMockData'
 
@@ -33,11 +35,11 @@ const sortOptions = [
 ]
 
 const filterOptions = [
-  { label: 'Official', value: 'official', icon: 'pi pi-verified', color: 'text-blue-400' },
-  { label: 'SDXL', value: 'sdxl', icon: 'pi pi-star', color: 'text-purple-400' },
-  { label: 'ControlNet', value: 'controlnet', icon: 'pi pi-sliders-v', color: 'text-amber-400' },
-  { label: 'Video', value: 'video', icon: 'pi pi-video', color: 'text-green-400' },
-  { label: 'Community', value: 'community', icon: 'pi pi-users', color: 'text-cyan-400' },
+  { label: 'Official', value: 'official', icon: 'verified', color: 'text-blue-400' },
+  { label: 'SDXL', value: 'sdxl', icon: 'star', color: 'text-purple-400' },
+  { label: 'ControlNet', value: 'controlnet', icon: 'sliders-v', color: 'text-amber-400' },
+  { label: 'Video', value: 'video', icon: 'video', color: 'text-green-400' },
+  { label: 'Community', value: 'community', icon: 'users', color: 'text-cyan-400' },
 ]
 
 function setSort(value: string): void {
@@ -136,22 +138,12 @@ const filteredTemplates = computed(() => {
         TEMPLATES
       </span>
       <div class="flex items-center gap-1">
-        <Button
-          icon="pi pi-window-maximize"
-          text
-          severity="secondary"
-          size="small"
-          class="!h-6 !w-6"
-          v-tooltip.top="'Expand'"
-        />
-        <Button
-          icon="pi pi-times"
-          text
-          severity="secondary"
-          size="small"
-          class="!h-6 !w-6"
-          @click="emit('close')"
-        />
+        <Button variant="ghost" size="icon" class="h-6 w-6">
+          <Maximize2 class="size-3" />
+        </Button>
+        <Button variant="ghost" size="icon" class="h-6 w-6" @click="emit('close')">
+          <X class="size-3" />
+        </Button>
       </div>
     </div>
 
@@ -162,7 +154,7 @@ const filteredTemplates = computed(() => {
         placeholder="Search templates..."
         :show-action="true"
         action-tooltip="Browse Templates"
-        action-icon="pi pi-external-link"
+        action-icon="external-link"
       />
 
       <!-- View Controls -->
@@ -182,9 +174,9 @@ const filteredTemplates = computed(() => {
               ]"
               @click="showFilterMenu = !showFilterMenu"
             >
-              <i class="pi pi-filter text-[10px]" />
+              <Icon name="filter" size="xs" />
               <span>{{ filterLabel }}</span>
-              <i class="pi pi-chevron-down text-[8px]" />
+              <Icon name="chevron-down" size="md" class="text-[8px]" />
             </button>
             <div
               v-if="showFilterMenu"
@@ -196,7 +188,7 @@ const filteredTemplates = computed(() => {
                 class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
                 @click="clearFilters"
               >
-                <i class="pi pi-times text-[10px]" />
+                <Icon name="times" size="xs" />
                 Clear all
               </button>
               <div v-if="activeFilters.size > 0" class="mx-2 my-1 h-px bg-zinc-800" />
@@ -215,9 +207,9 @@ const filteredTemplates = computed(() => {
                       : 'border-zinc-600 bg-transparent'
                   ]"
                 >
-                  <i v-if="activeFilters.has(option.value)" class="pi pi-check text-[8px] text-white" />
+                  <Icon v-if="activeFilters.has(option.value)" name="check" size="xs" class="text-white" />
                 </div>
-                <i :class="[option.icon, 'text-[10px]', option.color]" />
+                <Icon :name="option.icon" size="xs" :class="option.color" />
                 <span :class="activeFilters.has(option.value) ? 'text-zinc-200' : 'text-zinc-400'">
                   {{ option.label }}
                 </span>
@@ -231,9 +223,9 @@ const filteredTemplates = computed(() => {
               class="flex h-6 items-center gap-1 rounded bg-zinc-800 px-2 text-[10px] text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
               @click="showSortMenu = !showSortMenu"
             >
-              <i class="pi pi-sort-alt text-[10px]" />
+              <Icon name="sort-alt" size="xs" />
               <span>{{ sortOptions.find(o => o.value === sortBy)?.label }}</span>
-              <i class="pi pi-chevron-down text-[8px]" />
+              <Icon name="chevron-down" size="md" class="text-[8px]" />
             </button>
             <div
               v-if="showSortMenu"
@@ -261,7 +253,7 @@ const filteredTemplates = computed(() => {
         v-if="filteredTemplates.length === 0"
         class="flex flex-col items-center justify-center py-8 text-center"
       >
-        <i class="pi pi-copy mb-2 text-2xl text-zinc-600" />
+        <Icon name="copy" size="2xl" class="mb-2 text-zinc-600" />
         <p class="text-xs text-zinc-500">No templates found</p>
       </div>
 
@@ -273,7 +265,7 @@ const filteredTemplates = computed(() => {
           class="group flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-zinc-800"
           draggable="true"
         >
-          <i :class="[template.categoryIcon, 'text-xs text-zinc-500']" />
+          <Icon :name="template.categoryIcon" size="xs" />
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-1.5">
               <span class="truncate text-xs text-zinc-300 group-hover:text-zinc-100">{{ template.name }}</span>
@@ -285,7 +277,7 @@ const filteredTemplates = computed(() => {
               <span>{{ template.nodes }} nodes</span>
             </div>
           </div>
-          <i class="pi pi-plus text-[10px] text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
+          <Icon name="plus" size="xs" class="text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
         </div>
       </div>
 

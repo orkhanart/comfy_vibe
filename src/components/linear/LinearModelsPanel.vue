@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 
 type MediaType = 'image' | 'video'
@@ -103,7 +104,7 @@ function handleRun(): void {
             ]"
             @click="mediaType = 'image'; generationType = 'text-to-image'"
           >
-            <i class="pi pi-image text-xs" />
+            <Icon name="image" size="xs" />
             Image
           </button>
           <button
@@ -113,7 +114,7 @@ function handleRun(): void {
             ]"
             @click="mediaType = 'video'; generationType = 'text-to-video'"
           >
-            <i class="pi pi-video text-xs" />
+            <Icon name="video" size="xs" />
             Video
           </button>
         </div>
@@ -124,17 +125,17 @@ function handleRun(): void {
         <label class="mb-1.5 block text-[10px] font-medium uppercase tracking-wide text-zinc-500">Type</label>
         <div class="relative flex items-center gap-2">
           <button class="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500 hover:text-zinc-300">
-            <i class="pi pi-cog text-xs" />
+            <Icon name="cog" size="xs" />
           </button>
           <button
             class="flex h-8 flex-1 items-center justify-between rounded-lg bg-zinc-800 px-3 text-xs text-zinc-300 hover:bg-zinc-700"
             @click="showTypeDropdown = !showTypeDropdown"
           >
             <div class="flex items-center gap-2">
-              <i class="pi pi-image text-xs text-zinc-500" />
+              <Icon name="image" size="xs" class="text-zinc-500" />
               {{ generationTypes.find(t => t.value === generationType)?.label }}
             </div>
-            <i class="pi pi-chevron-down text-[10px] text-zinc-500" />
+            <Icon name="chevron-down" size="xs" class="text-zinc-500" />
           </button>
           <!-- Dropdown -->
           <div
@@ -147,7 +148,7 @@ function handleRun(): void {
               class="flex w-full items-center gap-2 px-3 py-2 text-xs text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
               @click="selectGenerationType(type.value)"
             >
-              <i class="pi pi-image text-xs text-zinc-500" />
+              <Icon name="image" size="xs" class="text-zinc-500" />
               {{ type.label }}
             </button>
           </div>
@@ -160,10 +161,10 @@ function handleRun(): void {
           <label class="text-[10px] font-medium uppercase tracking-wide text-zinc-500">Model Selection</label>
           <div class="flex items-center gap-1">
             <button class="flex h-6 w-6 items-center justify-center rounded text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300">
-              <i class="pi pi-th-large text-[10px]" />
+              <Icon name="th-large" size="xs" />
             </button>
             <button class="relative flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-1 text-[10px] text-zinc-400 hover:text-zinc-200">
-              <i class="pi pi-th-large text-[10px]" />
+              <Icon name="th-large" size="xs" />
               Explore Sets
               <span class="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 rounded-full bg-orange-500" />
             </button>
@@ -190,7 +191,7 @@ function handleRun(): void {
           >
             <div class="flex items-center gap-2">
               <div class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-zinc-700/50 bg-zinc-800">
-                <i class="pi pi-image text-xs text-zinc-400" />
+                <Icon name="image" size="xs" class="text-zinc-400" />
               </div>
               <span class="text-[11px] text-zinc-500">
                 {{ model.provider }}/<span class="text-zinc-300">{{ model.name }}</span>
@@ -200,14 +201,14 @@ function handleRun(): void {
               class="text-zinc-600 hover:text-zinc-400"
               @click="removeModel(model.id)"
             >
-              <i class="pi pi-times text-[10px]" />
+              <Icon name="times" size="xs" />
             </button>
           </div>
         </div>
 
         <!-- Add Model Search -->
         <div class="flex h-8 items-center gap-2 rounded-lg bg-zinc-800 px-3">
-          <i class="pi pi-search text-xs text-zinc-500" />
+          <Icon name="search" size="xs" class="text-zinc-500" />
           <input
             type="text"
             placeholder="Add another model"
@@ -223,7 +224,7 @@ function handleRun(): void {
             Prompt<span class="text-zinc-400">*</span>
           </label>
           <button class="flex items-center gap-1 text-[10px] text-zinc-500 hover:text-zinc-300">
-            <i class="pi pi-sparkles text-[10px]" />
+            <Icon name="sparkles" size="xs" />
             Enhance Prompt
           </button>
         </div>
@@ -294,7 +295,7 @@ function handleRun(): void {
             <option :value="4">4x</option>
             <option :value="8">8x</option>
           </select>
-          <i class="pi pi-chevron-down pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-zinc-500" />
+          <Icon name="chevron-down" size="xs" class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-zinc-500" />
         </div>
         <button
           class="flex h-8 flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-200 text-xs font-medium text-zinc-900 transition-colors hover:bg-white"
@@ -303,10 +304,10 @@ function handleRun(): void {
           Run
         </button>
         <button class="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500 hover:text-zinc-300">
-          <i class="pi pi-cog text-xs" />
+          <Icon name="cog" size="xs" />
         </button>
         <button class="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-zinc-500 hover:text-zinc-300">
-          <i class="pi pi-arrows-h text-xs" />
+          <Icon name="arrows-h" size="xs" />
         </button>
       </div>
     </div>

@@ -21,7 +21,7 @@ const emit = defineEmits<{
       ]"
       @click="emit('update:modelValue', 'grid')"
     >
-      <i class="pi pi-th-large" />
+      <Icon name="th-large" size="md" />
     </button>
     <button
       :class="[
@@ -32,7 +32,7 @@ const emit = defineEmits<{
       ]"
       @click="emit('update:modelValue', 'list')"
     >
-      <i class="pi pi-list" />
+      <Icon name="list" size="md" />
     </button>
   </div>
 </template>

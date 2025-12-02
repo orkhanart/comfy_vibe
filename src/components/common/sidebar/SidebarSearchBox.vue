@@ -8,7 +8,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   placeholder: 'Search...',
-  actionIcon: 'pi pi-plus',
+  actionIcon: 'plus',
   actionTooltip: 'Add',
   showAction: false,
 })
@@ -23,7 +23,7 @@ const emit = defineEmits<{
 <template>
   <div class="flex items-center gap-2">
     <div class="flex flex-1 items-center rounded bg-zinc-800 px-2 py-1.5">
-      <i class="pi pi-search text-xs text-zinc-500" />
+      <Icon name="search" size="xs" class="text-zinc-500" />
       <input
         v-model="model"
         type="text"
@@ -37,7 +37,7 @@ const emit = defineEmits<{
       class="flex h-7 w-7 shrink-0 items-center justify-center rounded bg-zinc-800 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
       @click="emit('action')"
     >
-      <i :class="[props.actionIcon, 'text-xs']" />
+      <Icon :name="props.actionIcon" size="xs" />
     </button>
   </div>
 </template>

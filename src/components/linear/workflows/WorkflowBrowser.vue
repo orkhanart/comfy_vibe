@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 
 export type WorkflowSource = 'templates' | 'my-workflows' | 'shared' | 'libraries'
@@ -108,7 +109,7 @@ function handleItemClick(item: WorkflowItem): void {
     <div class="border-b border-zinc-800 p-3">
       <div class="flex items-center gap-2">
         <div class="flex h-8 flex-1 items-center gap-2 rounded-lg bg-zinc-800 px-3">
-          <i class="pi pi-search text-xs text-zinc-500" />
+          <Icon name="search" size="xs" class="text-zinc-500" />
           <input
             v-model="searchQuery"
             type="text"
@@ -120,7 +121,7 @@ function handleItemClick(item: WorkflowItem): void {
             class="text-zinc-500 hover:text-zinc-300"
             @click="searchQuery = ''"
           >
-            <i class="pi pi-times text-[10px]" />
+            <Icon name="times" size="xs" />
           </button>
         </div>
         <button
@@ -128,7 +129,7 @@ function handleItemClick(item: WorkflowItem): void {
           class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-800 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
           @click="emit('import')"
         >
-          <i class="pi pi-plus text-sm" />
+          <Icon name="plus" size="sm" />
         </button>
       </div>
     </div>
@@ -142,10 +143,10 @@ function handleItemClick(item: WorkflowItem): void {
         class="flex items-center gap-1 text-[10px] text-zinc-400 hover:text-zinc-200"
         @click="emit('navigate-folder', null)"
       >
-        <i class="pi pi-home text-[10px]" />
+        <Icon name="home" size="xs" />
         <span>My Workflows</span>
       </button>
-      <i class="pi pi-chevron-right text-[8px] text-zinc-600" />
+      <Icon name="chevron-right" size="md" class="text-[8px] text-zinc-600" />
       <span class="text-[10px] text-zinc-300">Current Folder</span>
     </div>
 
@@ -178,7 +179,7 @@ function handleItemClick(item: WorkflowItem): void {
             ]"
             @click="viewMode = 'grid'"
           >
-            <i class="pi pi-th-large text-[10px]" />
+            <Icon name="th-large" size="xs" />
           </button>
           <button
             v-tooltip.bottom="'List'"
@@ -188,7 +189,7 @@ function handleItemClick(item: WorkflowItem): void {
             ]"
             @click="viewMode = 'list'"
           >
-            <i class="pi pi-list text-[10px]" />
+            <Icon name="list" size="xs" />
           </button>
         </div>
       </div>
@@ -200,7 +201,7 @@ function handleItemClick(item: WorkflowItem): void {
       class="mx-3 mt-3 flex items-center gap-2 rounded-lg border border-dashed border-zinc-700 px-3 py-2 text-xs text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-400"
       @click="emit('create-folder')"
     >
-      <i class="pi pi-folder-plus text-sm" />
+      <Icon name="folder-plus" size="sm" />
       <span>New Folder</span>
     </button>
 
@@ -217,7 +218,7 @@ function handleItemClick(item: WorkflowItem): void {
           <!-- Folder -->
           <template v-if="wf.isFolder">
             <div class="flex aspect-square w-full items-center justify-center bg-zinc-800/50">
-              <i class="pi pi-folder text-4xl text-zinc-500" />
+              <Icon name="folder" size="md" class="text-4xl text-zinc-500" />
             </div>
             <div class="p-2">
               <p class="text-xs font-medium text-zinc-200">{{ wf.name }}</p>
@@ -241,7 +242,7 @@ function handleItemClick(item: WorkflowItem): void {
                   {{ wf.sharedBy ? `Shared by ${wf.sharedBy}` : wf.author }}
                 </span>
                 <span v-if="wf.downloads" class="text-[9px] text-zinc-600">
-                  <i class="pi pi-download mr-0.5 text-[8px]" />
+                  <Icon name="download" size="md" class="mr-0.5 text-[8px]" />
                   {{ formatDownloads(wf.downloads) }}
                 </span>
               </div>
@@ -263,7 +264,7 @@ function handleItemClick(item: WorkflowItem): void {
             v-if="wf.isFolder"
             class="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-zinc-800"
           >
-            <i class="pi pi-folder text-xl text-zinc-500" />
+            <Icon name="folder" size="xl" class="text-zinc-500" />
           </div>
           <!-- Workflow Thumbnail -->
           <div v-else class="h-12 w-12 shrink-0 overflow-hidden rounded bg-zinc-800">
@@ -278,19 +279,19 @@ function handleItemClick(item: WorkflowItem): void {
               <template v-if="wf.downloads">
                 <span class="text-zinc-700">•</span>
                 <span class="text-[9px] text-zinc-600">
-                  <i class="pi pi-download mr-0.5 text-[8px]" />
+                  <Icon name="download" size="md" class="mr-0.5 text-[8px]" />
                   {{ formatDownloads(wf.downloads) }}
                 </span>
               </template>
             </div>
           </div>
-          <i class="pi pi-chevron-right self-center text-[10px] text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
+          <Icon name="chevron-right" size="xs" class="self-center text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
         </button>
       </div>
 
       <!-- Empty State -->
       <div v-if="filteredWorkflows.length === 0" class="flex flex-col items-center py-8 text-zinc-500">
-        <i class="pi pi-search mb-2 text-2xl" />
+        <Icon name="search" size="2xl" class="mb-2" />
         <span class="text-xs">No workflows found</span>
       </div>
     </div>

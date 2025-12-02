@@ -51,7 +51,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
     id: 'loaders',
     label: 'Loaders',
     shortLabel: 'LOAD',
-    icon: 'pi pi-download',
+    icon: 'download',
     color: '#B39DDB', // Purple
     subcategories: [
       { id: 'checkpoints', label: 'Checkpoints', nodes: ['CheckpointLoader', 'CheckpointLoaderSimple', 'unCLIPCheckpointLoader'] },
@@ -68,7 +68,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
     id: 'conditioning',
     label: 'Conditioning',
     shortLabel: 'COND',
-    icon: 'pi pi-comment',
+    icon: 'comment',
     color: '#FFAB40', // Orange
     subcategories: [
       { id: 'text-encode', label: 'Text Encoding', nodes: ['CLIPTextEncode', 'CLIPTextEncodeSDXL', 'CLIPTextEncodeSD3'] },
@@ -84,7 +84,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
     id: 'sampling',
     label: 'Sampling',
     shortLabel: 'SMPL',
-    icon: 'pi pi-play',
+    icon: 'play',
     color: '#64B5F6', // Blue
     subcategories: [
       { id: 'basic', label: 'Basic', nodes: ['KSampler', 'KSamplerAdvanced'] },
@@ -99,7 +99,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
     id: 'latent',
     label: 'Latent',
     shortLabel: 'LAT',
-    icon: 'pi pi-th-large',
+    icon: 'th-large',
     color: '#FF80AB', // Pink
     subcategories: [
       { id: 'create', label: 'Create', nodes: ['EmptyLatentImage', 'EmptySD3LatentImage'] },
@@ -114,7 +114,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
     id: 'image',
     label: 'Image',
     shortLabel: 'IMG',
-    icon: 'pi pi-image',
+    icon: 'image',
     color: '#4DD0E1', // Cyan
     subcategories: [
       { id: 'io', label: 'Load & Save', nodes: ['LoadImage', 'SaveImage', 'PreviewImage'] },
@@ -129,7 +129,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
     id: 'mask',
     label: 'Mask',
     shortLabel: 'MASK',
-    icon: 'pi pi-circle',
+    icon: 'circle',
     color: '#FFD54F', // Yellow
     subcategories: [
       { id: 'create', label: 'Create', nodes: ['SolidMask', 'EmptyMask', 'ImageToMask', 'MaskFromColor'] },
@@ -142,7 +142,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
     id: 'audio',
     label: 'Audio',
     shortLabel: 'AUD',
-    icon: 'pi pi-volume-up',
+    icon: 'volume-up',
     color: '#81C784', // Green
     subcategories: [
       { id: 'io', label: 'Load & Save', nodes: ['LoadAudio', 'SaveAudio', 'SaveAudioMP3', 'SaveAudioOpus', 'PreviewAudio', 'RecordAudio'] },
@@ -155,7 +155,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
     id: 'video',
     label: 'Video',
     shortLabel: 'VID',
-    icon: 'pi pi-video',
+    icon: 'video',
     color: '#26A69A', // Teal
     subcategories: [
       { id: 'generation', label: 'Generation', nodes: ['SVD_img2vid_Conditioning', 'VideoLinearCFGGuidance'] },
@@ -170,7 +170,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
     id: '3d',
     label: '3D',
     shortLabel: '3D',
-    icon: 'pi pi-box',
+    icon: 'box',
     color: '#EF5350', // Red
     subcategories: [
       { id: 'hunyuan3d', label: 'Hunyuan3D', nodes: ['Hunyuan3Dv2Conditioning', 'Hunyuan3Dv2ConditioningMultiView'] },
@@ -182,7 +182,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
     id: 'advanced',
     label: 'Advanced',
     shortLabel: 'ADV',
-    icon: 'pi pi-cog',
+    icon: 'cog',
     color: '#78909C', // Gray
     subcategories: [
       { id: 'model-merging', label: 'Model Merging', nodes: ['ModelMergeSimple', 'ModelMergeBlocks', 'ModelMergeSD1', 'ModelMergeSDXL'] },
@@ -196,7 +196,7 @@ export const NODE_CATEGORIES: NodeCategory[] = [
     id: 'api',
     label: 'API',
     shortLabel: 'API',
-    icon: 'pi pi-cloud',
+    icon: 'cloud',
     color: '#7E57C2', // Dark Purple
     subcategories: [
       { id: 'image-gen', label: 'Image Generation', nodes: ['OpenAI DALL-E', 'Stability AI', 'Recraft', 'Ideogram', 'BFL Flux'] },
@@ -209,21 +209,21 @@ export const NODE_CATEGORIES: NodeCategory[] = [
 
 // Legacy sidebar tabs (for workspace navigation, not nodes)
 export const SIDEBAR_TABS: SidebarTab[] = [
-  { id: 'nodes', label: 'Nodes', icon: 'pi pi-sitemap', tooltip: 'Node Library' },
-  { id: 'models', label: 'Models', icon: 'pi pi-box', tooltip: 'Model Library' },
-  { id: 'workflows', label: 'Workflows', icon: 'pi pi-folder-open', tooltip: 'Workflows' },
-  { id: 'assets', label: 'Assets', icon: 'pi pi-images', tooltip: 'Assets' },
-  { id: 'templates', label: 'Templates', icon: 'pi pi-clone', tooltip: 'Templates' },
-  { id: 'library', label: 'Library', icon: 'pi pi-bookmark', tooltip: 'Library' },
+  { id: 'nodes', label: 'Nodes', icon: 'sitemap', tooltip: 'Node Library' },
+  { id: 'models', label: 'Models', icon: 'box', tooltip: 'Model Library' },
+  { id: 'workflows', label: 'Workflows', icon: 'folder-open', tooltip: 'Workflows' },
+  { id: 'assets', label: 'Assets', icon: 'images', tooltip: 'Assets' },
+  { id: 'templates', label: 'Templates', icon: 'clone', tooltip: 'Templates' },
+  { id: 'library', label: 'Library', icon: 'bookmark', tooltip: 'Library' },
 ]
 
 // V2 bottom bar tabs
 export const BOTTOM_BAR_TABS: SidebarTab[] = [
-  { id: 'workflows', label: 'Workflows', icon: 'pi pi-sitemap', tooltip: 'Canvas Workflows' },
-  { id: 'assets', label: 'Assets', icon: 'pi pi-images', tooltip: 'Assets (Generated, Imported)' },
-  { id: 'models', label: 'Models', icon: 'pi pi-box', tooltip: 'Model Library' },
-  { id: 'packages', label: 'Packages', icon: 'pi pi-th-large', tooltip: 'Node Packages' },
-  { id: 'templates', label: 'Templates', icon: 'pi pi-clone', tooltip: 'Templates' },
+  { id: 'workflows', label: 'Workflows', icon: 'sitemap', tooltip: 'Canvas Workflows' },
+  { id: 'assets', label: 'Assets', icon: 'images', tooltip: 'Assets (Generated, Imported)' },
+  { id: 'models', label: 'Models', icon: 'box', tooltip: 'Model Library' },
+  { id: 'packages', label: 'Packages', icon: 'th-large', tooltip: 'Node Packages' },
+  { id: 'templates', label: 'Templates', icon: 'clone', tooltip: 'Templates' },
 ]
 
 export const useUiStore = defineStore('ui', () => {

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 
 const steps = ref(30)
@@ -64,7 +65,7 @@ function randomizeSeed(): void {
           class="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-800 text-xs text-zinc-500 transition-colors hover:bg-zinc-700 hover:text-zinc-300"
           @click="randomizeSeed"
         >
-          <i class="pi pi-refresh text-xs" />
+          <Icon name="refresh" size="xs" />
         </button>
       </div>
     </div>

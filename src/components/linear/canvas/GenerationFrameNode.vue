@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { computed, ref } from 'vue'
 import type { GenerationFrameData } from '@/types/linearCanvas'
 
@@ -264,7 +265,7 @@ function handleSectionDrop(event: DragEvent): void {
             class="flex h-5 w-5 items-center justify-center rounded text-white/70 transition-colors hover:bg-white/20 hover:text-white"
             @click.stop="emit('rerun', id)"
           >
-            <i class="pi pi-refresh text-[9px]" />
+            <Icon name="refresh" size="md" class="text-[9px]" />
           </button>
           <button
             v-if="data.images.length > 0"
@@ -272,14 +273,14 @@ function handleSectionDrop(event: DragEvent): void {
             class="flex h-5 w-5 items-center justify-center rounded text-white/70 transition-colors hover:bg-white/20 hover:text-white"
             @click.stop="emit('download', id)"
           >
-            <i class="pi pi-download text-[9px]" />
+            <Icon name="download" size="md" class="text-[9px]" />
           </button>
           <button
             v-tooltip.top="'Delete'"
             class="flex h-5 w-5 items-center justify-center rounded text-white/70 transition-colors hover:bg-white/20 hover:text-red-300"
             @click.stop="emit('delete', id)"
           >
-            <i class="pi pi-trash text-[9px]" />
+            <Icon name="trash" size="md" class="text-[9px]" />
           </button>
         </div>
       </div>
@@ -335,21 +336,21 @@ function handleSectionDrop(event: DragEvent): void {
                 class="flex h-6 w-6 items-center justify-center rounded bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
                 @click.stop="emit('preview', img)"
               >
-                <i class="pi pi-expand text-[10px]" />
+                <Icon name="expand" size="xs" />
               </button>
               <button
                 v-tooltip.top="'Download'"
                 class="flex h-6 w-6 items-center justify-center rounded bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
                 @click.stop="emit('download', id)"
               >
-                <i class="pi pi-download text-[10px]" />
+                <Icon name="download" size="xs" />
               </button>
               <button
                 v-tooltip.top="'Extract'"
                 class="flex h-6 w-6 items-center justify-center rounded bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
                 @click.stop="emit('extractImage', id, idx, img)"
               >
-                <i class="pi pi-external-link text-[10px]" />
+                <Icon name="external-link" size="xs" />
               </button>
             </div>
           </div>
@@ -364,7 +365,7 @@ function handleSectionDrop(event: DragEvent): void {
             :style="{ width: `${imageSize}px`, height: `${imageSize}px` }"
           >
             <div class="flex flex-col items-center">
-              <i class="pi pi-spin pi-spinner text-xl text-blue-400" />
+              <Icon name="spinner" size="xl" class="animate-spin text-blue-400" />
               <span class="mt-1.5 text-xs text-zinc-500">{{ data.progress ?? 0 }}%</span>
             </div>
           </div>
@@ -378,7 +379,7 @@ function handleSectionDrop(event: DragEvent): void {
             class="flex items-center justify-center rounded bg-zinc-800/50"
             :style="{ width: `${imageSize}px`, height: `${imageSize}px` }"
           >
-            <i class="pi pi-clock text-xl text-zinc-600" />
+            <Icon name="clock" size="xl" class="text-zinc-600" />
           </div>
         </template>
       </div>
@@ -399,7 +400,7 @@ function handleSectionDrop(event: DragEvent): void {
         class="pointer-events-none absolute inset-0 flex items-center justify-center rounded-b bg-blue-500/10"
       >
         <div class="flex items-center gap-2 rounded-lg bg-blue-500/90 px-3 py-1.5 text-white shadow-lg">
-          <i class="pi pi-plus text-xs" />
+          <Icon name="plus" size="xs" />
           <span class="text-xs font-medium">Drop to add</span>
         </div>
       </div>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import WorkflowBrowser, { type WorkflowSource, type WorkflowItem } from './workflows/WorkflowBrowser.vue'
 import WorkflowForm, { type WorkflowTemplate, type ExposedInput } from './workflows/WorkflowForm.vue'
@@ -7,10 +8,10 @@ import WorkflowForm, { type WorkflowTemplate, type ExposedInput } from './workfl
 type SourceTab = { id: WorkflowSource; label: string; icon: string }
 
 const sourceTabs: SourceTab[] = [
-  { id: 'templates', label: 'Templates', icon: 'pi-box' },
-  { id: 'my-workflows', label: 'My Workflows', icon: 'pi-folder' },
-  { id: 'shared', label: 'Shared', icon: 'pi-users' },
-  { id: 'libraries', label: 'Libraries', icon: 'pi-database' },
+  { id: 'templates', label: 'Templates', icon: 'box' },
+  { id: 'my-workflows', label: 'My Workflows', icon: 'folder' },
+  { id: 'shared', label: 'Shared', icon: 'users' },
+  { id: 'libraries', label: 'Libraries', icon: 'layers' },
 ]
 
 const activeSource = ref<WorkflowSource>('templates')
@@ -276,7 +277,7 @@ function handleRunWorkflow(values: Record<string, unknown>, images: Record<strin
           ]"
           @click="activeSource = tab.id; currentFolderId = null"
         >
-          <i :class="['pi', tab.icon, 'text-xs']" />
+          <Icon :name="tab.icon" size="xs" />
           <span class="hidden sm:inline">{{ tab.label }}</span>
         </button>
       </div>

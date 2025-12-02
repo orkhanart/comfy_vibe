@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, nextTick, watch } from 'vue'
 
 export interface ChatMessage {
@@ -57,7 +58,7 @@ defineExpose({ scrollToBottom })
             : 'bg-zinc-800 text-zinc-400'
         ]"
       >
-        <i :class="message.role === 'user' ? 'pi pi-user' : 'pi pi-sparkles'" />
+        <Icon :name="message.role === 'user' ? 'user' : 'sparkles'" size="xs" />
       </div>
 
       <!-- Content -->

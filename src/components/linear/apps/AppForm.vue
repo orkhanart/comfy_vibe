@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 
 export interface AppInput {
@@ -101,11 +102,11 @@ async function runApp(): Promise<void> {
         class="flex h-6 w-6 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
         @click="emit('back')"
       >
-        <i class="pi pi-arrow-left text-xs" />
+        <Icon name="arrow-left" size="xs" />
       </button>
       <div class="flex items-center gap-2">
         <div class="flex h-6 w-6 items-center justify-center rounded-md border border-zinc-700/50 bg-zinc-800">
-          <i :class="['pi', app.icon, 'text-xs text-zinc-400']" />
+          <Icon :name="app.icon" size="xs" />
         </div>
         <span class="text-sm font-medium text-zinc-200">{{ app.name }}</span>
       </div>
@@ -137,7 +138,7 @@ async function runApp(): Promise<void> {
               />
               <div class="flex aspect-video items-center justify-center rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-400">
                 <div class="flex flex-col items-center">
-                  <i class="pi pi-image text-2xl" />
+                  <Icon name="image" size="2xl" />
                   <span class="mt-1 text-[10px]">Click or drop image</span>
                 </div>
               </div>
@@ -148,7 +149,7 @@ async function runApp(): Promise<void> {
                 class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-red-600"
                 @click="removeImage(input.id)"
               >
-                <i class="pi pi-times text-[10px]" />
+                <Icon name="times" size="xs" />
               </button>
             </div>
           </div>
@@ -195,7 +196,7 @@ async function runApp(): Promise<void> {
               class="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
               @click="randomizeSeed(input.id)"
             >
-              <i class="pi pi-refresh text-xs" />
+              <Icon name="refresh" size="xs" />
             </button>
           </div>
 
@@ -257,8 +258,8 @@ async function runApp(): Promise<void> {
         ]"
         @click="runApp"
       >
-        <i v-if="isRunning" class="pi pi-spin pi-spinner text-sm" />
-        <i v-else class="pi pi-play text-sm" />
+        <Icon v-if="isRunning" name="spinner" size="sm" class="animate-spin" />
+        <Icon v-else name="play" size="sm" />
         <span>{{ isRunning ? 'Running...' : 'Run' }}</span>
       </button>
     </div>

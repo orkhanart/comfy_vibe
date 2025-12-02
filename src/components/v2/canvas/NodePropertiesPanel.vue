@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import type { Node } from '@vue-flow/core'
 import type { FlowNodeData, NodeState } from '@/types/node'
 
@@ -22,7 +23,7 @@ const emit = defineEmits<{
         class="rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
         @click="emit('close')"
       >
-        <i class="pi pi-times text-xs" />
+        <Icon name="times" size="xs" />
       </button>
     </div>
 

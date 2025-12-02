@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed, onMounted, markRaw } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
@@ -589,7 +590,7 @@ function handleAddImageToSection(targetGenerationId: string, imageUrl: string): 
         class="flex items-center gap-2 rounded-lg border border-zinc-700 bg-zinc-800/90 px-3 py-2 text-sm text-zinc-300 backdrop-blur transition-colors hover:bg-zinc-700 hover:text-white"
         @click="addSection"
       >
-        <i class="pi pi-plus text-xs" />
+        <Icon name="plus" size="xs" />
         Add Section
       </button>
     </div>
@@ -601,7 +602,7 @@ function handleAddImageToSection(targetGenerationId: string, imageUrl: string): 
         class="flex h-7 w-7 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
         @click="handleZoomOut"
       >
-        <i class="pi pi-minus text-xs" />
+        <Icon name="minus" size="xs" />
       </button>
       <span class="w-12 text-center text-[11px] text-zinc-500">{{ zoomLevel }}%</span>
       <button
@@ -609,7 +610,7 @@ function handleAddImageToSection(targetGenerationId: string, imageUrl: string): 
         class="flex h-7 w-7 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
         @click="handleZoomIn"
       >
-        <i class="pi pi-plus text-xs" />
+        <Icon name="plus" size="xs" />
       </button>
       <div class="mx-1 h-4 w-px bg-zinc-700" />
       <button
@@ -617,7 +618,7 @@ function handleAddImageToSection(targetGenerationId: string, imageUrl: string): 
         class="flex h-7 w-7 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
         @click="handleFitView"
       >
-        <i class="pi pi-expand text-xs" />
+        <Icon name="expand" size="xs" />
       </button>
     </div>
 
@@ -626,7 +627,7 @@ function handleAddImageToSection(targetGenerationId: string, imageUrl: string): 
       v-if="generations.length === 0"
       class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-zinc-500"
     >
-      <i class="pi pi-th-large mb-2 text-4xl opacity-50" />
+      <Icon name="th-large" size="md" class="mb-2 text-4xl opacity-50" />
       <span class="text-sm">No generations yet</span>
       <p class="mt-1 text-xs text-zinc-600">
         Start generating to see your creations here

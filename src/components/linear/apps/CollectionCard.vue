@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import type { AppItem } from './AppCard.vue'
 
 export interface CollectionItem {
@@ -58,7 +59,7 @@ const emit = defineEmits<{
         <div
           class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-zinc-700/50 bg-zinc-800"
         >
-          <i :class="['pi', app.icon, 'text-xs text-zinc-400']" />
+          <Icon :name="app.icon" size="xs" class="text-zinc-400" />
         </div>
         <span class="truncate text-[11px] text-zinc-400">{{ app.name }}</span>
       </button>

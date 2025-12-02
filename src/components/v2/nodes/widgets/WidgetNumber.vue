@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { computed, ref, watch } from 'vue'
 import type { WidgetDefinition } from '@/types/node'
 
@@ -71,7 +72,7 @@ function decrement(): void {
       :disabled="disabled || (min !== undefined && localValue <= min)"
       @click="decrement"
     >
-      <i class="pi pi-minus text-[10px]" />
+      <Icon name="minus" size="xs" />
     </button>
     <input
       type="number"
@@ -89,7 +90,7 @@ function decrement(): void {
       :disabled="disabled || (max !== undefined && localValue >= max)"
       @click="increment"
     >
-      <i class="pi pi-plus text-[10px]" />
+      <Icon name="plus" size="xs" />
     </button>
   </div>
 </template>

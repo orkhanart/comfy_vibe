@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
+
 export interface ModelItem {
   id: string
   name: string
@@ -16,12 +18,12 @@ const emit = defineEmits<{
 }>()
 
 const typeIcons: Record<string, string> = {
-  'Image': 'pi-image',
-  'Video': 'pi-video',
-  'Video + Audio': 'pi-video',
-  'Audio': 'pi-volume-up',
-  'Text': 'pi-align-left',
-  '3D': 'pi-box',
+  'Image': 'image',
+  'Video': 'video',
+  'Video + Audio': 'video',
+  'Audio': 'volume-up',
+  'Text': 'type',
+  '3D': 'box',
 }
 </script>
 
@@ -33,13 +35,17 @@ const typeIcons: Record<string, string> = {
     <div
       class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-zinc-700/50 bg-zinc-800"
     >
-      <i
+      <Icon
         v-if="model.icon"
-        :class="['pi', model.icon, 'text-xs text-zinc-400']"
+        :name="model.icon"
+        size="xs"
+        class="text-zinc-400"
       />
-      <i
+      <Icon
         v-else
-        :class="['pi', typeIcons[model.type] ?? 'pi-star', 'text-xs text-zinc-400']"
+        :name="typeIcons[model.type] ?? 'star'"
+        size="xs"
+        class="text-zinc-400"
       />
     </div>
     <span class="truncate text-[11px] text-zinc-400">{{ model.name }}</span>

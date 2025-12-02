@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
-import Button from 'primevue/button'
+import { Maximize2, X } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
 import { SidebarSearchBox, SidebarViewToggle, LibraryGridCard } from '@/components/common/sidebar'
 import {
   TEAM_MEMBERS_DATA,
@@ -47,10 +49,10 @@ const sortOptions = [
 ]
 
 const filterOptions = [
-  { label: 'Workflows', value: 'workflow', icon: 'pi pi-sitemap', color: 'text-blue-400' },
-  { label: 'Models', value: 'model', icon: 'pi pi-box', color: 'text-green-400' },
-  { label: 'Nodepacks', value: 'nodepack', icon: 'pi pi-code', color: 'text-purple-400' },
-  { label: 'Brand Kit', value: 'brand', icon: 'pi pi-palette', color: 'text-amber-400' },
+  { label: 'Workflows', value: 'workflow', icon: 'sitemap', color: 'text-blue-400' },
+  { label: 'Models', value: 'model', icon: 'box', color: 'text-green-400' },
+  { label: 'Nodepacks', value: 'nodepack', icon: 'code', color: 'text-purple-400' },
+  { label: 'Brand Kit', value: 'brand', icon: 'palette', color: 'text-amber-400' },
 ]
 
 function setSort(value: string): void {
@@ -94,7 +96,7 @@ const allItems = computed<LibraryItem[]>(() => {
       description: w.description,
       type: 'workflow',
       thumbnail: w.thumbnail,
-      icon: 'pi pi-sitemap',
+      icon: 'sitemap',
       iconClass: 'text-blue-400',
       badge: `${w.nodes} nodes`,
       badgeClass: 'bg-blue-500/30 text-blue-300',
@@ -125,7 +127,7 @@ const allItems = computed<LibraryItem[]>(() => {
       type: 'model',
       subtype: m.type,
       thumbnail: m.thumbnail,
-      icon: 'pi pi-box',
+      icon: 'box',
       iconClass: 'text-green-400',
       badge: typeLabels[m.type] || m.type,
       badgeClass: typeColors[m.type] || 'bg-zinc-700 text-zinc-400',
@@ -141,7 +143,7 @@ const allItems = computed<LibraryItem[]>(() => {
       description: p.description,
       type: 'nodepack',
       thumbnail: p.thumbnail,
-      icon: 'pi pi-code',
+      icon: 'code',
       iconClass: 'text-purple-400',
       badge: p.installed ? 'Installed' : `${p.nodes} nodes`,
       badgeClass: p.installed ? 'bg-green-500/30 text-green-300' : 'bg-zinc-700 text-zinc-400',
@@ -163,7 +165,7 @@ const allItems = computed<LibraryItem[]>(() => {
       description: a.description,
       type: 'brand',
       subtype: a.type,
-      icon: a.type === 'logo' ? 'pi pi-image' : a.type === 'font' ? 'pi pi-align-left' : a.type === 'template' ? 'pi pi-clone' : 'pi pi-book',
+      icon: a.type === 'logo' ? 'image' : a.type === 'font' ? 'type' : a.type === 'template' ? 'clone' : 'book',
       iconClass: 'text-amber-400',
       badge: typeLabels[a.type] || a.type,
       badgeClass: 'bg-amber-500/30 text-amber-300',
@@ -208,22 +210,12 @@ const filteredItems = computed(() => {
         TEAM LIBRARY
       </span>
       <div class="flex items-center gap-1">
-        <Button
-          icon="pi pi-window-maximize"
-          text
-          severity="secondary"
-          size="small"
-          class="!h-6 !w-6"
-          v-tooltip.top="'Expand'"
-        />
-        <Button
-          icon="pi pi-times"
-          text
-          severity="secondary"
-          size="small"
-          class="!h-6 !w-6"
-          @click="emit('close')"
-        />
+        <Button variant="ghost" size="icon" class="h-6 w-6">
+          <Maximize2 class="size-3" />
+        </Button>
+        <Button variant="ghost" size="icon" class="h-6 w-6" @click="emit('close')">
+          <X class="size-3" />
+        </Button>
       </div>
     </div>
 
@@ -234,7 +226,7 @@ const filteredItems = computed(() => {
         placeholder="Search library..."
         :show-action="true"
         action-tooltip="Manage Library"
-        action-icon="pi pi-cog"
+        action-icon="cog"
       />
 
       <!-- View Controls -->
@@ -254,9 +246,9 @@ const filteredItems = computed(() => {
               ]"
               @click="showFilterMenu = !showFilterMenu"
             >
-              <i class="pi pi-filter text-[10px]" />
+              <Icon name="filter" size="xs" />
               <span>{{ filterLabel }}</span>
-              <i class="pi pi-chevron-down text-[8px]" />
+              <Icon name="chevron-down" size="md" class="text-[8px]" />
             </button>
             <div
               v-if="showFilterMenu"
@@ -268,7 +260,7 @@ const filteredItems = computed(() => {
                 class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
                 @click="clearFilters"
               >
-                <i class="pi pi-times text-[10px]" />
+                <Icon name="times" size="xs" />
                 Clear all
               </button>
               <div v-if="activeFilters.size > 0" class="mx-2 my-1 h-px bg-zinc-800" />
@@ -287,9 +279,9 @@ const filteredItems = computed(() => {
                       : 'border-zinc-600 bg-transparent'
                   ]"
                 >
-                  <i v-if="activeFilters.has(option.value)" class="pi pi-check text-[8px] text-white" />
+                  <Icon v-if="activeFilters.has(option.value)" name="check" size="xs" class="text-white" />
                 </div>
-                <i :class="[option.icon, 'text-[10px]', option.color]" />
+                <Icon :name="option.icon" size="xs" :class="option.color" />
                 <span :class="activeFilters.has(option.value) ? 'text-zinc-200' : 'text-zinc-400'">
                   {{ option.label }}
                 </span>
@@ -303,9 +295,9 @@ const filteredItems = computed(() => {
               class="flex h-6 items-center gap-1 rounded bg-zinc-800 px-2 text-[10px] text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
               @click="showSortMenu = !showSortMenu"
             >
-              <i class="pi pi-sort-alt text-[10px]" />
+              <Icon name="sort-alt" size="xs" />
               <span>{{ sortOptions.find(o => o.value === sortBy)?.label }}</span>
-              <i class="pi pi-chevron-down text-[8px]" />
+              <Icon name="chevron-down" size="md" class="text-[8px]" />
             </button>
             <div
               v-if="showSortMenu"
@@ -333,7 +325,7 @@ const filteredItems = computed(() => {
         v-if="filteredItems.length === 0"
         class="flex flex-col items-center justify-center py-8 text-center"
       >
-        <i class="pi pi-inbox mb-2 text-2xl text-zinc-600" />
+        <Icon name="inbox" size="2xl" class="mb-2 text-zinc-600" />
         <p class="text-xs text-zinc-500">No items found</p>
       </div>
 
@@ -345,11 +337,11 @@ const filteredItems = computed(() => {
           class="group flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-zinc-800"
           draggable="true"
         >
-          <i :class="[item.icon, 'text-xs', item.iconClass]" />
+          <Icon :name="item.icon" size="xs" :class="item.iconClass" />
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-1.5">
               <span class="truncate text-xs text-zinc-300 group-hover:text-zinc-100">{{ item.name }}</span>
-              <i v-if="item.starred" class="pi pi-star-fill text-[8px] text-amber-400" />
+              <Icon v-if="item.starred" name="star-fill" size="xs" class="text-amber-400" />
             </div>
             <div class="flex items-center gap-2 text-[10px] text-zinc-600">
               <span v-if="item.badge" :class="['rounded px-1 py-0.5 text-[9px]', item.badgeClass]">
@@ -358,7 +350,7 @@ const filteredItems = computed(() => {
               <span v-if="item.meta">{{ item.meta }}</span>
             </div>
           </div>
-          <i class="pi pi-plus text-[10px] text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
+          <Icon name="plus" size="xs" class="text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
         </div>
       </div>
 

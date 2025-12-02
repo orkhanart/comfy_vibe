@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
+
 interface Props {
   icon: string
   iconColor?: string
@@ -22,11 +24,12 @@ const emit = defineEmits<{
     class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left transition-colors hover:bg-zinc-800"
     @click="emit('toggle')"
   >
-    <i
-      class="text-[10px] text-zinc-500 transition-transform"
-      :class="props.expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+    <Icon
+      :name="props.expanded ? 'chevron-down' : 'chevron-right'"
+      size="xs"
+      class="text-zinc-500 transition-transform"
     />
-    <i :class="[props.icon, 'text-xs', props.iconColor]" />
+    <Icon :name="props.icon" size="xs" :class="props.iconColor" />
     <span class="flex-1 text-xs font-medium text-zinc-300">
       {{ props.label }}
     </span>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { WorkspaceCard } from '@/components/v2/workspace'
@@ -77,20 +78,20 @@ const filteredWorkflows = computed(() => {
           :to="`/${workspaceId}/create`"
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
-          <i class="pi pi-bolt text-xs" />
+          <Icon name="bolt" size="xs" />
           Linear
         </RouterLink>
         <RouterLink
           :to="`/${workspaceId}/canvas`"
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
-          <i class="pi pi-share-alt text-xs" />
+          <Icon name="share-alt" size="xs" />
           Node
         </RouterLink>
         <button
           class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
-          <i class="pi pi-upload text-xs" />
+          <Icon name="upload" size="xs" />
           Import Workflow
         </button>
       </div>
@@ -99,7 +100,7 @@ const filteredWorkflows = computed(() => {
     <!-- Search, Sort & View Toggle -->
     <div class="mb-6 flex items-center gap-3">
       <div class="relative flex-1">
-        <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-400" />
+        <Icon name="search" size="sm" class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
         <input
           v-model="searchQuery"
           type="text"
@@ -118,7 +119,7 @@ const filteredWorkflows = computed(() => {
             {{ option.label }}
           </option>
         </select>
-        <i class="pi pi-chevron-down pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-zinc-400" />
+        <Icon name="chevron-down" size="xs" class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
       </div>
 
       <!-- View Toggle -->
@@ -132,7 +133,7 @@ const filteredWorkflows = computed(() => {
           ]"
           @click="viewMode = 'grid'"
         >
-          <i class="pi pi-th-large" />
+          <Icon name="th-large" size="md" />
         </button>
         <button
           :class="[
@@ -143,7 +144,7 @@ const filteredWorkflows = computed(() => {
           ]"
           @click="viewMode = 'list'"
         >
-          <i class="pi pi-list" />
+          <Icon name="list" size="md" />
         </button>
       </div>
     </div>
@@ -154,7 +155,7 @@ const filteredWorkflows = computed(() => {
       class="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 py-16 dark:border-zinc-700"
     >
       <div class="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-        <i class="pi pi-sitemap text-xl text-zinc-400" />
+        <Icon name="sitemap" size="xl" class="text-zinc-400" />
       </div>
       <h3 class="mt-4 text-sm font-medium text-zinc-900 dark:text-zinc-100">No workflows found</h3>
       <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -173,8 +174,8 @@ const filteredWorkflows = computed(() => {
         :thumbnail="workflow.thumbnail"
         :title="workflow.name"
         :description="workflow.description"
-        icon="pi pi-sitemap"
-        :stats="[{ icon: 'pi pi-stop', value: workflow.nodeCount }]"
+        icon="sitemap"
+        :stats="[{ icon: 'stop', value: workflow.nodeCount }]"
         :updated-at="workflow.updatedAt"
       />
     </div>
@@ -188,7 +189,7 @@ const filteredWorkflows = computed(() => {
           class="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
         >
           <div class="flex h-10 w-10 items-center justify-center rounded-md bg-zinc-100 dark:bg-zinc-800">
-            <i class="pi pi-sitemap text-zinc-500 dark:text-zinc-400" />
+            <Icon name="sitemap" size="md" class="text-zinc-500 dark:text-zinc-400" />
           </div>
           <div class="flex-1 min-w-0">
             <p class="font-medium text-zinc-900 dark:text-zinc-100">{{ workflow.name }}</p>
@@ -196,7 +197,7 @@ const filteredWorkflows = computed(() => {
           </div>
           <div class="flex items-center gap-6 text-sm text-zinc-400 dark:text-zinc-500">
             <span class="flex items-center gap-1">
-              <i class="pi pi-stop text-xs" />
+              <Icon name="stop" size="xs" />
               {{ workflow.nodeCount }}
             </span>
             <span class="w-24 text-right">{{ workflow.updatedAt }}</span>

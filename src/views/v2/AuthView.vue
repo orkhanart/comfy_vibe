@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-
 import { useRouter } from 'vue-router'
-
-import Button from 'primevue/button'
-import InputText from 'primevue/inputtext'
+import { User, Users } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 const router = useRouter()
 
@@ -49,7 +48,7 @@ function signIn(accountType: AccountType): void {
 
     <!-- Right Side - Auth Form -->
     <div
-      class="flex w-full flex-col items-center justify-center bg-base-background p-8 lg:w-1/2"
+      class="flex w-full flex-col items-center justify-center bg-base-background text-base-foreground p-8 lg:w-1/2"
     >
       <div class="w-full max-w-md">
         <!-- Mobile Logo -->
@@ -74,7 +73,7 @@ function signIn(accountType: AccountType): void {
           <!-- Username Input -->
           <div class="flex flex-col gap-2">
             <label for="username" class="font-medium text-base-foreground">Username</label>
-            <InputText
+            <Input
               id="username"
               v-model="username"
               placeholder="Enter your username"
@@ -89,20 +88,22 @@ function signIn(accountType: AccountType): void {
 
             <div class="grid grid-cols-2 gap-4">
               <Button
-                label="User"
-                icon="pi pi-user"
                 :disabled="!username.trim()"
                 class="w-full"
                 @click="signIn('user')"
-              />
+              >
+                <User class="size-4" />
+                User
+              </Button>
               <Button
-                label="Teams"
-                icon="pi pi-users"
-                severity="secondary"
+                variant="secondary"
                 :disabled="!username.trim()"
                 class="w-full"
                 @click="signIn('teams')"
-              />
+              >
+                <Users class="size-4" />
+                Teams
+              </Button>
             </div>
           </div>
         </div>

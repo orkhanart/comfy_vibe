@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
-import Button from 'primevue/button'
+import { X } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
 import { useUiStore, BOTTOM_BAR_TABS, type SidebarTabId } from '@/stores/uiStore'
 
 const uiStore = useUiStore()
@@ -41,41 +43,41 @@ const sidebarCategories = computed(() => {
   switch (activeBottomTab.value) {
     case 'models':
       return [
-        { id: 'checkpoints', label: 'Checkpoints', icon: 'pi-box', count: 12 },
-        { id: 'lora', label: 'LoRA', icon: 'pi-bolt', count: 24 },
-        { id: 'vae', label: 'VAE', icon: 'pi-sliders-h', count: 3 },
-        { id: 'embeddings', label: 'Embeddings', icon: 'pi-tag', count: 8 },
-        { id: 'controlnet', label: 'ControlNet', icon: 'pi-sitemap', count: 6 },
-        { id: 'upscalers', label: 'Upscalers', icon: 'pi-arrow-up-right', count: 4 },
+        { id: 'checkpoints', label: 'Checkpoints', icon: 'box', count: 12 },
+        { id: 'lora', label: 'LoRA', icon: 'bolt', count: 24 },
+        { id: 'vae', label: 'VAE', icon: 'sliders-h', count: 3 },
+        { id: 'embeddings', label: 'Embeddings', icon: 'type', count: 8 },
+        { id: 'controlnet', label: 'ControlNet', icon: 'sitemap', count: 6 },
+        { id: 'upscalers', label: 'Upscalers', icon: 'arrow-up', count: 4 },
       ]
     case 'workflows':
       return [
-        { id: 'recent', label: 'Recent', icon: 'pi-clock', count: 8 },
-        { id: 'favorites', label: 'Favorites', icon: 'pi-star', count: 5 },
-        { id: 'shared', label: 'Shared with me', icon: 'pi-users', count: 3 },
-        { id: 'templates', label: 'From Templates', icon: 'pi-copy', count: 12 },
+        { id: 'recent', label: 'Recent', icon: 'clock', count: 8 },
+        { id: 'favorites', label: 'Favorites', icon: 'star', count: 5 },
+        { id: 'shared', label: 'Shared with me', icon: 'users', count: 3 },
+        { id: 'templates', label: 'From Templates', icon: 'copy', count: 12 },
       ]
     case 'assets':
       return [
-        { id: 'images', label: 'Images', icon: 'pi-image', count: 45 },
-        { id: 'masks', label: 'Masks', icon: 'pi-circle', count: 8 },
-        { id: 'videos', label: 'Videos', icon: 'pi-video', count: 3 },
-        { id: 'audio', label: 'Audio', icon: 'pi-volume-up', count: 2 },
+        { id: 'images', label: 'Images', icon: 'image', count: 45 },
+        { id: 'masks', label: 'Masks', icon: 'circle', count: 8 },
+        { id: 'videos', label: 'Videos', icon: 'video', count: 3 },
+        { id: 'audio', label: 'Audio', icon: 'volume-up', count: 2 },
       ]
     case 'templates':
       return [
-        { id: 'official', label: 'Official', icon: 'pi-verified', count: 15 },
-        { id: 'sdxl', label: 'SDXL', icon: 'pi-star', count: 8 },
-        { id: 'controlnet', label: 'ControlNet', icon: 'pi-sitemap', count: 12 },
-        { id: 'video', label: 'Video', icon: 'pi-video', count: 6 },
-        { id: 'community', label: 'Community', icon: 'pi-users', count: 42 },
+        { id: 'official', label: 'Official', icon: 'check-circle', count: 15 },
+        { id: 'sdxl', label: 'SDXL', icon: 'star', count: 8 },
+        { id: 'controlnet', label: 'ControlNet', icon: 'sitemap', count: 12 },
+        { id: 'video', label: 'Video', icon: 'video', count: 6 },
+        { id: 'community', label: 'Community', icon: 'users', count: 42 },
       ]
     case 'packages':
       return [
-        { id: 'installed', label: 'Installed', icon: 'pi-check-circle', count: 8 },
-        { id: 'updates', label: 'Updates', icon: 'pi-refresh', count: 2 },
-        { id: 'popular', label: 'Popular', icon: 'pi-chart-line', count: 50 },
-        { id: 'new', label: 'New', icon: 'pi-sparkles', count: 12 },
+        { id: 'installed', label: 'Installed', icon: 'check-circle', count: 8 },
+        { id: 'updates', label: 'Updates', icon: 'refresh', count: 2 },
+        { id: 'popular', label: 'Popular', icon: 'star', count: 50 },
+        { id: 'new', label: 'New', icon: 'sparkles', count: 12 },
       ]
     default:
       return []
@@ -135,9 +137,9 @@ const mockPackages = [
 ]
 
 const mockRecents = [
-  { name: 'Upscale 4x', type: 'action', icon: 'pi-arrow-up-right' },
-  { name: 'SDXL Base', type: 'model', icon: 'pi-box' },
-  { name: 'Basic txt2img', type: 'workflow', icon: 'pi-share-alt' },
+  { name: 'Upscale 4x', type: 'action', icon: 'arrow-up' },
+  { name: 'SDXL Base', type: 'model', icon: 'box' },
+  { name: 'Basic txt2img', type: 'workflow', icon: 'share-alt' },
 ]
 </script>
 
@@ -170,7 +172,7 @@ const mockRecents = [
             :class="activeFilter === cat.id ? 'bg-zinc-800 text-zinc-100' : 'text-zinc-400'"
             @click="activeFilter = cat.id"
           >
-            <i :class="['pi', cat.icon, 'text-[11px]']" />
+            <Icon :name="cat.icon" size="md" />
             <span class="flex-1 truncate">{{ cat.label }}</span>
             <span class="rounded bg-zinc-700/50 px-1.5 py-0.5 text-[10px] text-zinc-500">{{ cat.count }}</span>
           </button>
@@ -189,7 +191,7 @@ const mockRecents = [
               v-tooltip.top="showSidebar ? 'Hide sidebar' : 'Show sidebar'"
               @click="showSidebar = !showSidebar"
             >
-              <i class="pi pi-bars text-xs" />
+              <Icon name="bars" size="xs" />
             </button>
             <div class="h-4 w-px bg-zinc-700" />
             <span class="text-sm font-medium text-zinc-200">
@@ -200,7 +202,7 @@ const mockRecents = [
               v-if="activeBottomTab === 'models' || activeBottomTab === 'packages'"
               class="flex items-center gap-1.5 rounded-md bg-zinc-800 px-2 py-1 text-[11px] text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
             >
-              <i class="pi pi-sync text-[10px]" />
+              <Icon name="sync" size="xs" />
               Scan
             </button>
           </div>
@@ -210,13 +212,13 @@ const mockRecents = [
               class="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
               v-tooltip.top="'Grid view'"
             >
-              <i class="pi pi-th-large text-xs" />
+              <Icon name="th-large" size="xs" />
             </button>
             <button
               class="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
               v-tooltip.top="'List view'"
             >
-              <i class="pi pi-list text-xs" />
+              <Icon name="list" size="xs" />
             </button>
             <div class="mx-1 h-4 w-px bg-zinc-700" />
             <button
@@ -225,16 +227,16 @@ const mockRecents = [
               v-tooltip.top="isExtended ? 'Collapse' : 'Expand'"
               @click="isExtended = !isExtended"
             >
-              <i :class="['pi text-xs', isExtended ? 'pi-window-minimize' : 'pi-window-maximize']" />
+              <Icon :name="isExtended ? 'minus' : 'maximize'" size="xs" />
             </button>
             <Button
-              icon="pi pi-times"
-              text
-              severity="secondary"
-              size="small"
-              class="!h-7 !w-7"
+              variant="ghost"
+              size="icon"
+              class="h-7 w-7"
               @click="uiStore.closeBottomPanel()"
-            />
+            >
+              <X class="size-4" />
+            </Button>
           </div>
         </div>
 
@@ -242,7 +244,7 @@ const mockRecents = [
         <div class="flex items-center gap-3 border-b border-zinc-800 px-4 py-2.5">
           <!-- Search -->
           <div class="flex flex-1 items-center rounded-lg bg-zinc-800 px-3 py-2">
-            <i class="pi pi-search text-sm text-zinc-500" />
+            <Icon name="search" size="sm" class="text-zinc-500" />
             <input
               v-model="searchQuery"
               type="text"
@@ -257,7 +259,7 @@ const mockRecents = [
             <span class="text-[11px] text-zinc-500">Sort:</span>
             <button class="flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-1.5 text-[11px] text-zinc-300 transition-colors hover:bg-zinc-700">
               Recent
-              <i class="pi pi-chevron-down text-[10px] text-zinc-500" />
+              <Icon name="chevron-down" size="xs" class="text-zinc-500" />
             </button>
           </div>
         </div>
@@ -288,7 +290,7 @@ const mockRecents = [
               :key="recent.name"
               class="flex items-center gap-2 rounded-lg bg-zinc-800/50 px-3 py-1.5 text-xs text-zinc-300 transition-colors hover:bg-zinc-800"
             >
-              <i :class="['pi', recent.icon, 'text-[10px] text-zinc-500']" />
+              <Icon :name="recent.icon" size="xs" />
               {{ recent.name }}
             </button>
           </div>
@@ -313,9 +315,9 @@ const mockRecents = [
                 class="card-item group"
               >
                 <div class="card-preview">
-                  <i class="pi pi-box text-2xl text-zinc-500" />
+                  <Icon name="box" size="2xl" class="text-zinc-500" />
                   <button class="card-menu">
-                    <i class="pi pi-ellipsis-v text-[10px]" />
+                    <Icon name="ellipsis-v" size="xs" />
                   </button>
                   <span class="card-badge">{{ model.type }}</span>
                 </div>
@@ -334,9 +336,9 @@ const mockRecents = [
                 class="card-item group"
               >
                 <div class="card-preview">
-                  <i class="pi pi-share-alt text-2xl text-zinc-500" />
+                  <Icon name="share-alt" size="2xl" class="text-zinc-500" />
                   <button class="card-menu">
-                    <i class="pi pi-ellipsis-v text-[10px]" />
+                    <Icon name="ellipsis-v" size="xs" />
                   </button>
                   <span class="card-badge">{{ workflow.nodes }} nodes</span>
                 </div>
@@ -355,9 +357,9 @@ const mockRecents = [
                 class="card-item group"
               >
                 <div class="card-preview">
-                  <i class="pi pi-image text-2xl text-zinc-500" />
+                  <Icon name="image" size="2xl" class="text-zinc-500" />
                   <button class="card-menu">
-                    <i class="pi pi-ellipsis-v text-[10px]" />
+                    <Icon name="ellipsis-v" size="xs" />
                   </button>
                 </div>
                 <div class="card-info">
@@ -375,9 +377,9 @@ const mockRecents = [
                 class="card-item group"
               >
                 <div class="card-preview">
-                  <i class="pi pi-copy text-2xl text-zinc-500" />
+                  <Icon name="copy" size="2xl" class="text-zinc-500" />
                   <button class="card-menu">
-                    <i class="pi pi-ellipsis-v text-[10px]" />
+                    <Icon name="ellipsis-v" size="xs" />
                   </button>
                   <span
                     class="card-badge"
@@ -401,9 +403,9 @@ const mockRecents = [
                 class="card-item group"
               >
                 <div class="card-preview">
-                  <i class="pi pi-th-large text-2xl text-zinc-500" />
+                  <Icon name="th-large" size="2xl" class="text-zinc-500" />
                   <button class="card-menu">
-                    <i class="pi pi-ellipsis-v text-[10px]" />
+                    <Icon name="ellipsis-v" size="xs" />
                   </button>
                   <span
                     v-if="pkg.installed"
@@ -422,7 +424,7 @@ const mockRecents = [
 
           <!-- Library Tab - Empty State -->
           <div v-else class="flex flex-col items-center justify-center py-12 text-zinc-500">
-            <i class="pi pi-bookmark mb-3 text-4xl" />
+            <Icon name="bookmark" size="md" class="mb-3 text-4xl" />
             <span class="text-sm font-medium">No bookmarks yet</span>
             <span class="mt-1 text-xs text-zinc-600">Bookmarked items will appear here</span>
           </div>
@@ -445,7 +447,7 @@ const mockRecents = [
         ]"
         @click="handleTabClick(tab.id)"
       >
-        <i :class="[tab.icon, 'text-base']" />
+        <Icon :name="tab.icon" size="md" />
       </button>
 
       <!-- Divider -->
@@ -456,13 +458,13 @@ const mockRecents = [
         v-tooltip.top="{ value: 'Keyboard Shortcuts', showDelay: 300 }"
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
       >
-        <i class="pi pi-bolt text-base" />
+        <Icon name="bolt" size="md" />
       </button>
       <button
         v-tooltip.top="{ value: 'Settings', showDelay: 300 }"
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
       >
-        <i class="pi pi-cog text-base" />
+        <Icon name="cog" size="md" />
       </button>
     </div>
   </div>

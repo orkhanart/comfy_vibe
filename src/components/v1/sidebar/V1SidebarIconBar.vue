@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { computed } from 'vue'
 import { useUiStore, SIDEBAR_TABS, type SidebarTabId } from '@/stores/uiStore'
 
@@ -26,7 +27,7 @@ function handleTabClick(tabId: Exclude<SidebarTabId, null>): void {
         ]"
         @click="handleTabClick(tab.id)"
       >
-        <i :class="[tab.icon, 'text-sm']" />
+        <Icon :name="tab.icon" size="sm" />
       </button>
     </div>
 
@@ -36,19 +37,19 @@ function handleTabClick(tabId: Exclude<SidebarTabId, null>): void {
         v-tooltip.right="{ value: 'Console', showDelay: 50 }"
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
       >
-        <i class="pi pi-code text-sm" />
+        <Icon name="code" size="sm" />
       </button>
       <button
         v-tooltip.right="{ value: 'Settings', showDelay: 50 }"
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
       >
-        <i class="pi pi-cog text-sm" />
+        <Icon name="cog" size="sm" />
       </button>
       <button
         v-tooltip.right="{ value: 'Help', showDelay: 50 }"
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
       >
-        <i class="pi pi-question-circle text-sm" />
+        <Icon name="question-circle" size="sm" />
       </button>
     </div>
   </nav>

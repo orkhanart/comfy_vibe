@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import WorkspaceViewHeader from '@/components/v2/workspace/WorkspaceViewHeader.vue'
 
@@ -12,10 +13,10 @@ interface TrashItem {
 }
 
 const trashItems = ref<TrashItem[]>([
-  { id: '1', name: 'Old Canvas Draft', type: 'canvas', icon: 'pi-objects-column', deletedAt: '2 days ago', expiresIn: '28 days' },
-  { id: '2', name: 'Test Workflow', type: 'workflow', icon: 'pi-sitemap', deletedAt: '5 days ago', expiresIn: '25 days' },
-  { id: '3', name: 'unused_asset.png', type: 'asset', icon: 'pi-image', deletedAt: '1 week ago', expiresIn: '23 days' },
-  { id: '4', name: 'Archived Project', type: 'project', icon: 'pi-folder', deletedAt: '2 weeks ago', expiresIn: '16 days' },
+  { id: '1', name: 'Old Canvas Draft', type: 'canvas', icon: 'objects-column', deletedAt: '2 days ago', expiresIn: '28 days' },
+  { id: '2', name: 'Test Workflow', type: 'workflow', icon: 'sitemap', deletedAt: '5 days ago', expiresIn: '25 days' },
+  { id: '3', name: 'unused_asset.png', type: 'asset', icon: 'image', deletedAt: '1 week ago', expiresIn: '23 days' },
+  { id: '4', name: 'Archived Project', type: 'project', icon: 'folder', deletedAt: '2 weeks ago', expiresIn: '16 days' },
 ])
 
 const selectedItems = ref<Set<string>>(new Set())
@@ -89,14 +90,14 @@ function getTypeLabel(type: string): string {
             class="flex items-center gap-1.5 rounded-md bg-zinc-200 px-2 py-1 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-600"
             @click="restoreSelected"
           >
-            <i class="pi pi-refresh text-[10px]" />
+            <Icon name="refresh" size="xs" />
             Restore
           </button>
           <button
             class="flex items-center gap-1.5 rounded-md bg-red-500/10 px-2 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-500/20"
             @click="deleteSelected"
           >
-            <i class="pi pi-trash text-[10px]" />
+            <Icon name="trash" size="xs" />
             Delete forever
           </button>
         </template>
@@ -105,7 +106,7 @@ function getTypeLabel(type: string): string {
         class="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-500/10"
         @click="emptyTrash"
       >
-        <i class="pi pi-trash text-[10px]" />
+        <Icon name="trash" size="xs" />
         Empty trash
       </button>
     </div>
@@ -129,7 +130,7 @@ function getTypeLabel(type: string): string {
           @change="toggleSelect(item.id)"
         />
         <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
-          <i :class="['pi', item.icon, 'text-lg text-zinc-400']" />
+          <Icon :name="item.icon" size="lg" />
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-2">
@@ -147,13 +148,13 @@ function getTypeLabel(type: string): string {
             class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
             title="Restore"
           >
-            <i class="pi pi-refresh text-sm" />
+            <Icon name="refresh" size="sm" />
           </button>
           <button
             class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10"
             title="Delete forever"
           >
-            <i class="pi pi-trash text-sm" />
+            <Icon name="trash" size="sm" />
           </button>
         </div>
       </div>
@@ -162,7 +163,7 @@ function getTypeLabel(type: string): string {
     <!-- Empty State -->
     <div v-else class="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 py-16 dark:border-zinc-700">
       <div class="flex h-16 w-16 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-        <i class="pi pi-trash text-2xl text-zinc-400" />
+        <Icon name="trash" size="2xl" class="text-zinc-400" />
       </div>
       <h3 class="mt-4 text-lg font-medium text-zinc-900 dark:text-zinc-100">Trash is empty</h3>
       <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Deleted items will appear here</p>

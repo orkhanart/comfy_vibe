@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed, watch } from 'vue'
 
 export type InputType = 'text' | 'textarea' | 'image' | 'number' | 'slider' | 'select' | 'toggle' | 'color' | 'seed'
@@ -126,7 +127,7 @@ async function runWorkflow(): Promise<void> {
         class="flex h-6 w-6 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
         @click="emit('back')"
       >
-        <i class="pi pi-arrow-left text-xs" />
+        <Icon name="arrow-left" size="xs" />
       </button>
       <div class="flex-1">
         <p class="text-sm font-medium text-zinc-200">{{ workflow.name }}</p>
@@ -158,7 +159,7 @@ async function runWorkflow(): Promise<void> {
                 />
                 <div class="flex aspect-video items-center justify-center rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900 text-zinc-500 transition-colors hover:border-zinc-600 hover:text-zinc-400">
                   <div class="flex flex-col items-center">
-                    <i class="pi pi-image text-2xl" />
+                    <Icon name="image" size="2xl" />
                     <span class="mt-1 text-[10px]">Click or drop image</span>
                   </div>
                 </div>
@@ -169,7 +170,7 @@ async function runWorkflow(): Promise<void> {
                   class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-red-600"
                   @click="removeImage(input.id)"
                 >
-                  <i class="pi pi-times text-[10px]" />
+                  <Icon name="times" size="xs" />
                 </button>
               </div>
             </div>
@@ -216,7 +217,7 @@ async function runWorkflow(): Promise<void> {
                 class="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
                 @click="randomizeSeed(input.id)"
               >
-                <i class="pi pi-refresh text-xs" />
+                <Icon name="refresh" size="xs" />
               </button>
             </div>
 
@@ -279,8 +280,8 @@ async function runWorkflow(): Promise<void> {
         ]"
         @click="runWorkflow"
       >
-        <i v-if="isRunning" class="pi pi-spin pi-spinner text-sm" />
-        <i v-else class="pi pi-play text-sm" />
+        <Icon v-if="isRunning" name="spinner" size="sm" class="animate-spin" />
+        <Icon v-else name="play" size="sm" />
         <span>{{ isRunning ? 'Running...' : 'Run Workflow' }}</span>
       </button>
     </div>

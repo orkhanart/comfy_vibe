@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
-import Button from 'primevue/button'
-import InputText from 'primevue/inputtext'
+import { X } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { useUiStore, NODE_CATEGORIES, type NodeCategoryId } from '@/stores/uiStore'
 
 const uiStore = useUiStore()
@@ -63,7 +65,7 @@ function handleNodeLeave(): void {
         v-tooltip.right="{ value: 'Help', showDelay: 50 }"
         class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
       >
-        <i class="pi pi-question-circle text-xs" />
+        <Icon name="question-circle" size="xs" />
       </button>
     </div>
   </nav>
@@ -89,24 +91,19 @@ function handleNodeLeave(): void {
             {{ activeNodeCategoryData.label }}
           </span>
         </div>
-        <Button
-          icon="pi pi-times"
-          text
-          severity="secondary"
-          size="small"
-          class="!h-6 !w-6"
-          @click="uiStore.closeNodePanel()"
-        />
+        <Button variant="ghost" size="icon" class="h-6 w-6" @click="uiStore.closeNodePanel()">
+          <X class="size-3" />
+        </Button>
       </div>
 
       <!-- Search Box -->
       <div class="border-b border-zinc-800/50 p-2">
         <div class="relative">
-          <i class="pi pi-search absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-zinc-500" />
-          <InputText
+          <Icon name="search" size="xs" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-500" />
+          <Input
             v-model="searchQuery"
             :placeholder="`Search ${activeNodeCategoryData.label.toLowerCase()}...`"
-            class="!h-8 w-full !rounded !border-zinc-700 !bg-zinc-800/50 !pl-8 !text-xs"
+            class="h-8 w-full rounded border-zinc-700 bg-zinc-800/50 pl-8 text-xs"
           />
         </div>
       </div>
@@ -136,7 +133,7 @@ function handleNodeLeave(): void {
                 <span class="flex-1 truncate text-xs text-zinc-400 group-hover:text-zinc-200">
                   {{ nodeName }}
                 </span>
-                <i class="pi pi-plus text-[10px] text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
+                <Icon name="plus" size="xs" class="text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
               </div>
             </div>
           </div>

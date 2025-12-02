@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
-import Button from 'primevue/button'
+import { Maximize2, X } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
 import { SidebarSearchBox, SidebarViewToggle, LibraryGridCard } from '@/components/common/sidebar'
 
 interface AssetItem {
@@ -35,11 +37,11 @@ const sortOptions = [
 ]
 
 const filterOptions = [
-  { label: 'Images', value: 'image', icon: 'pi pi-image', color: 'text-blue-400' },
-  { label: 'Videos', value: 'video', icon: 'pi pi-video', color: 'text-purple-400' },
-  { label: 'Audio', value: 'audio', icon: 'pi pi-volume-up', color: 'text-green-400' },
-  { label: 'Masks', value: 'mask', icon: 'pi pi-circle', color: 'text-amber-400' },
-  { label: '3D', value: '3d', icon: 'pi pi-box', color: 'text-cyan-400' },
+  { label: 'Images', value: 'image', icon: 'image', color: 'text-blue-400' },
+  { label: 'Videos', value: 'video', icon: 'video', color: 'text-purple-400' },
+  { label: 'Audio', value: 'audio', icon: 'volume-up', color: 'text-green-400' },
+  { label: 'Masks', value: 'mask', icon: 'circle', color: 'text-amber-400' },
+  { label: '3D', value: '3d', icon: 'box', color: 'text-cyan-400' },
 ]
 
 function setSort(value: string): void {
@@ -72,16 +74,16 @@ const filterLabel = computed(() => {
 
 // Mock assets data
 const allAssets = computed<AssetItem[]>(() => [
-  { id: '1', name: 'reference_portrait.png', type: 'image', size: '2.4 MB', dimensions: '1024x1024', thumbnail: '/assets/card_images/workflow_01.webp', icon: 'pi pi-image', iconClass: 'text-blue-400', badge: 'PNG', badgeClass: 'bg-blue-500/30 text-blue-300', updatedAt: '2 hours ago' },
-  { id: '2', name: 'depth_map_01.png', type: 'mask', size: '512 KB', dimensions: '512x512', thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp', icon: 'pi pi-circle', iconClass: 'text-amber-400', badge: 'Mask', badgeClass: 'bg-amber-500/30 text-amber-300', updatedAt: '1 day ago' },
-  { id: '3', name: 'hero_background.jpg', type: 'image', size: '3.8 MB', dimensions: '1920x1080', thumbnail: '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp', icon: 'pi pi-image', iconClass: 'text-blue-400', badge: 'JPG', badgeClass: 'bg-blue-500/30 text-blue-300', updatedAt: '3 days ago' },
-  { id: '4', name: 'animation_loop.mp4', type: 'video', size: '12.5 MB', dimensions: '1080x1920', thumbnail: '/assets/card_images/228616f4-12ad-426d-84fb-f20e488ba7ee.webp', icon: 'pi pi-video', iconClass: 'text-purple-400', badge: 'MP4', badgeClass: 'bg-purple-500/30 text-purple-300', updatedAt: '1 week ago' },
-  { id: '5', name: 'controlnet_pose.png', type: 'mask', size: '890 KB', dimensions: '768x1024', thumbnail: '/assets/card_images/683255d3-1d10-43d9-a6ff-ef142061e88a.webp', icon: 'pi pi-circle', iconClass: 'text-amber-400', badge: 'Pose', badgeClass: 'bg-amber-500/30 text-amber-300', updatedAt: '2 days ago' },
-  { id: '6', name: 'product_shot.png', type: 'image', size: '1.8 MB', dimensions: '2048x2048', thumbnail: '/assets/card_images/91f1f589-ddb4-4c4f-b3a7-ba30fc271987.webp', icon: 'pi pi-image', iconClass: 'text-blue-400', badge: 'PNG', badgeClass: 'bg-blue-500/30 text-blue-300', updatedAt: '5 days ago' },
-  { id: '7', name: 'ambient_audio.wav', type: 'audio', size: '4.2 MB', icon: 'pi pi-volume-up', iconClass: 'text-green-400', badge: 'WAV', badgeClass: 'bg-green-500/30 text-green-300', updatedAt: '1 week ago' },
-  { id: '8', name: 'canny_edges.png', type: 'mask', size: '320 KB', dimensions: '1024x1024', thumbnail: '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp', icon: 'pi pi-circle', iconClass: 'text-amber-400', badge: 'Canny', badgeClass: 'bg-amber-500/30 text-amber-300', updatedAt: '4 days ago' },
-  { id: '9', name: 'style_reference.webp', type: 'image', size: '680 KB', dimensions: '512x768', thumbnail: '/assets/card_images/comfyui_workflow.jpg', icon: 'pi pi-image', iconClass: 'text-blue-400', badge: 'WEBP', badgeClass: 'bg-blue-500/30 text-blue-300', updatedAt: '6 days ago' },
-  { id: '10', name: 'promo_video.mp4', type: 'video', size: '28.4 MB', dimensions: '1920x1080', thumbnail: '/assets/card_images/dda28581-37c8-44da-8822-57d1ccc2118c_2130x1658.png', icon: 'pi pi-video', iconClass: 'text-purple-400', badge: 'MP4', badgeClass: 'bg-purple-500/30 text-purple-300', updatedAt: '2 weeks ago' },
+  { id: '1', name: 'reference_portrait.png', type: 'image', size: '2.4 MB', dimensions: '1024x1024', thumbnail: '/assets/card_images/workflow_01.webp', icon: 'image', iconClass: 'text-blue-400', badge: 'PNG', badgeClass: 'bg-blue-500/30 text-blue-300', updatedAt: '2 hours ago' },
+  { id: '2', name: 'depth_map_01.png', type: 'mask', size: '512 KB', dimensions: '512x512', thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp', icon: 'circle', iconClass: 'text-amber-400', badge: 'Mask', badgeClass: 'bg-amber-500/30 text-amber-300', updatedAt: '1 day ago' },
+  { id: '3', name: 'hero_background.jpg', type: 'image', size: '3.8 MB', dimensions: '1920x1080', thumbnail: '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp', icon: 'image', iconClass: 'text-blue-400', badge: 'JPG', badgeClass: 'bg-blue-500/30 text-blue-300', updatedAt: '3 days ago' },
+  { id: '4', name: 'animation_loop.mp4', type: 'video', size: '12.5 MB', dimensions: '1080x1920', thumbnail: '/assets/card_images/228616f4-12ad-426d-84fb-f20e488ba7ee.webp', icon: 'video', iconClass: 'text-purple-400', badge: 'MP4', badgeClass: 'bg-purple-500/30 text-purple-300', updatedAt: '1 week ago' },
+  { id: '5', name: 'controlnet_pose.png', type: 'mask', size: '890 KB', dimensions: '768x1024', thumbnail: '/assets/card_images/683255d3-1d10-43d9-a6ff-ef142061e88a.webp', icon: 'circle', iconClass: 'text-amber-400', badge: 'Pose', badgeClass: 'bg-amber-500/30 text-amber-300', updatedAt: '2 days ago' },
+  { id: '6', name: 'product_shot.png', type: 'image', size: '1.8 MB', dimensions: '2048x2048', thumbnail: '/assets/card_images/91f1f589-ddb4-4c4f-b3a7-ba30fc271987.webp', icon: 'image', iconClass: 'text-blue-400', badge: 'PNG', badgeClass: 'bg-blue-500/30 text-blue-300', updatedAt: '5 days ago' },
+  { id: '7', name: 'ambient_audio.wav', type: 'audio', size: '4.2 MB', icon: 'volume-up', iconClass: 'text-green-400', badge: 'WAV', badgeClass: 'bg-green-500/30 text-green-300', updatedAt: '1 week ago' },
+  { id: '8', name: 'canny_edges.png', type: 'mask', size: '320 KB', dimensions: '1024x1024', thumbnail: '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp', icon: 'circle', iconClass: 'text-amber-400', badge: 'Canny', badgeClass: 'bg-amber-500/30 text-amber-300', updatedAt: '4 days ago' },
+  { id: '9', name: 'style_reference.webp', type: 'image', size: '680 KB', dimensions: '512x768', thumbnail: '/assets/card_images/comfyui_workflow.jpg', icon: 'image', iconClass: 'text-blue-400', badge: 'WEBP', badgeClass: 'bg-blue-500/30 text-blue-300', updatedAt: '6 days ago' },
+  { id: '10', name: 'promo_video.mp4', type: 'video', size: '28.4 MB', dimensions: '1920x1080', thumbnail: '/assets/card_images/dda28581-37c8-44da-8822-57d1ccc2118c_2130x1658.png', icon: 'video', iconClass: 'text-purple-400', badge: 'MP4', badgeClass: 'bg-purple-500/30 text-purple-300', updatedAt: '2 weeks ago' },
 ])
 
 // Filter and search
@@ -122,22 +124,12 @@ const filteredAssets = computed(() => {
         ASSETS
       </span>
       <div class="flex items-center gap-1">
-        <Button
-          icon="pi pi-window-maximize"
-          text
-          severity="secondary"
-          size="small"
-          class="!h-6 !w-6"
-          v-tooltip.top="'Expand'"
-        />
-        <Button
-          icon="pi pi-times"
-          text
-          severity="secondary"
-          size="small"
-          class="!h-6 !w-6"
-          @click="emit('close')"
-        />
+        <Button variant="ghost" size="icon" class="h-6 w-6">
+          <Maximize2 class="size-3" />
+        </Button>
+        <Button variant="ghost" size="icon" class="h-6 w-6" @click="emit('close')">
+          <X class="size-3" />
+        </Button>
       </div>
     </div>
 
@@ -148,7 +140,7 @@ const filteredAssets = computed(() => {
         placeholder="Search assets..."
         :show-action="true"
         action-tooltip="Upload Asset"
-        action-icon="pi pi-upload"
+        action-icon="upload"
       />
 
       <!-- View Controls -->
@@ -168,9 +160,9 @@ const filteredAssets = computed(() => {
               ]"
               @click="showFilterMenu = !showFilterMenu"
             >
-              <i class="pi pi-filter text-[10px]" />
+              <Icon name="filter" size="xs" />
               <span>{{ filterLabel }}</span>
-              <i class="pi pi-chevron-down text-[8px]" />
+              <Icon name="chevron-down" size="md" class="text-[8px]" />
             </button>
             <div
               v-if="showFilterMenu"
@@ -182,7 +174,7 @@ const filteredAssets = computed(() => {
                 class="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
                 @click="clearFilters"
               >
-                <i class="pi pi-times text-[10px]" />
+                <Icon name="times" size="xs" />
                 Clear all
               </button>
               <div v-if="activeFilters.size > 0" class="mx-2 my-1 h-px bg-zinc-800" />
@@ -201,9 +193,9 @@ const filteredAssets = computed(() => {
                       : 'border-zinc-600 bg-transparent'
                   ]"
                 >
-                  <i v-if="activeFilters.has(option.value)" class="pi pi-check text-[8px] text-white" />
+                  <Icon v-if="activeFilters.has(option.value)" name="check" size="xs" class="text-white" />
                 </div>
-                <i :class="[option.icon, 'text-[10px]', option.color]" />
+                <Icon :name="option.icon" size="xs" :class="option.color" />
                 <span :class="activeFilters.has(option.value) ? 'text-zinc-200' : 'text-zinc-400'">
                   {{ option.label }}
                 </span>
@@ -217,9 +209,9 @@ const filteredAssets = computed(() => {
               class="flex h-6 items-center gap-1 rounded bg-zinc-800 px-2 text-[10px] text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
               @click="showSortMenu = !showSortMenu"
             >
-              <i class="pi pi-sort-alt text-[10px]" />
+              <Icon name="sort-alt" size="xs" />
               <span>{{ sortOptions.find(o => o.value === sortBy)?.label }}</span>
-              <i class="pi pi-chevron-down text-[8px]" />
+              <Icon name="chevron-down" size="md" class="text-[8px]" />
             </button>
             <div
               v-if="showSortMenu"
@@ -247,7 +239,7 @@ const filteredAssets = computed(() => {
         v-if="filteredAssets.length === 0"
         class="flex flex-col items-center justify-center py-8 text-center"
       >
-        <i class="pi pi-images mb-2 text-2xl text-zinc-600" />
+        <Icon name="images" size="2xl" class="mb-2 text-zinc-600" />
         <p class="text-xs text-zinc-500">No assets found</p>
       </div>
 
@@ -272,7 +264,7 @@ const filteredAssets = computed(() => {
               <span v-if="asset.dimensions">{{ asset.dimensions }}</span>
             </div>
           </div>
-          <i class="pi pi-plus text-[10px] text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
+          <Icon name="plus" size="xs" class="text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
         </div>
       </div>
 

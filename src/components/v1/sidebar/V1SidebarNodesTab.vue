@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import { SidebarTreeCategory, SidebarTreeItem, SidebarGridCard } from '@/components/common/sidebar'
 import { NODE_CATEGORIES_DATA, type NodeCategory } from '@/data/sidebarMockData'
@@ -60,10 +61,10 @@ function toggleCategory(categoryId: string): void {
         :draggable="true"
       >
         <template #header-left>
-          <i :class="[category.icon, 'text-xs text-zinc-500']" />
+          <Icon :name="category.icon" size="xs" />
         </template>
         <template #header-right>
-          <i class="pi pi-plus text-[10px] text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
+          <Icon name="plus" size="xs" class="text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
         </template>
       </SidebarGridCard>
     </template>

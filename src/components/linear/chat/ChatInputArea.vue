@@ -36,19 +36,19 @@ function handleKeydown(e: KeyboardEvent): void {
           v-tooltip.top="'Upload image'"
           class="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
         >
-          <i class="pi pi-image text-xs" />
+          <Icon name="image" size="xs" />
         </button>
         <button
           v-tooltip.top="'Attach file'"
           class="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
         >
-          <i class="pi pi-paperclip text-xs" />
+          <Icon name="paperclip" size="xs" />
         </button>
         <button
           v-tooltip.top="'Voice input'"
           class="flex h-7 w-7 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-300"
         >
-          <i class="pi pi-microphone text-xs" />
+          <Icon name="microphone" size="xs" />
         </button>
       </div>
       <div class="flex items-center gap-1.5">
@@ -57,7 +57,7 @@ function handleKeydown(e: KeyboardEvent): void {
           class="flex h-7 items-center gap-1.5 rounded-md bg-zinc-700 px-2.5 text-xs text-zinc-300 transition-colors hover:bg-zinc-600"
           @click="emit('stop')"
         >
-          <i class="pi pi-stop text-[10px]" />
+          <Icon name="stop" size="xs" />
           <span class="font-medium">Stop</span>
         </button>
         <button
@@ -72,7 +72,7 @@ function handleKeydown(e: KeyboardEvent): void {
           @click="emit('send')"
         >
           Generate
-          <i class="pi pi-arrow-right text-[10px]" />
+          <Icon name="arrow-right" size="xs" />
         </button>
       </div>
     </div>

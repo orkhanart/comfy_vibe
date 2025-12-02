@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import { SidebarTreeCategory, SidebarGridCard } from '@/components/common/sidebar'
 import { MODEL_CATEGORIES_DATA, type ModelCategory } from '@/data/sidebarMockData'
@@ -45,7 +46,7 @@ function toggleCategory(categoryId: string): void {
           class="group flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 transition-colors hover:bg-zinc-800"
           draggable="true"
         >
-          <i class="pi pi-file text-[10px] text-zinc-600 group-hover:text-zinc-400" />
+          <Icon name="file" size="xs" class="text-zinc-600 group-hover:text-zinc-400" />
           <div class="min-w-0 flex-1">
             <div class="truncate text-xs text-zinc-400 group-hover:text-zinc-200">
               {{ model.display }}
@@ -68,7 +69,7 @@ function toggleCategory(categoryId: string): void {
         :draggable="true"
       >
         <template #header-left>
-          <i :class="[category.icon, 'text-xs text-zinc-500']" />
+          <Icon :name="category.icon" size="xs" />
         </template>
         <template #header-right>
           <span class="rounded bg-zinc-800 px-1 py-0.5 text-[9px] text-zinc-600">

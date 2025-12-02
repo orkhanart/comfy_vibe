@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
-import Toast from 'primevue/toast'
-import ConfirmDialog from 'primevue/confirmdialog'
+import { Toaster } from 'vue-sonner'
 
 import { useUiStore } from '@/stores/uiStore'
 
@@ -32,10 +31,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-surface-ground text-surface-900">
+  <div class="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
     <!-- Global components -->
-    <Toast />
-    <ConfirmDialog />
+    <Toaster richColors position="bottom-right" />
 
     <!-- Main content -->
     <RouterView />

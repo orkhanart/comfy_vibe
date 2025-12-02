@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useLinearModeStore } from '@/stores/linearModeStore'
 import LinearStepCard from './LinearStepCard.vue'
@@ -72,16 +73,16 @@ function randomizeSeed(): void {
     <header class="workspace-header">
       <div class="header-left">
         <button class="back-btn" @click="handleBack">
-          <i class="pi pi-arrow-left" />
+          <Icon name="arrow-left" size="md" />
         </button>
         <div class="workflow-info">
           <h1 class="workflow-name">{{ workflowName }}</h1>
           <span v-if="store.isGenerating" class="status-badge generating">
-            <i class="pi pi-spin pi-spinner" />
+            <Icon name="spinner" size="md" class="animate-spin" />
             Generating...
           </span>
           <span v-else-if="store.currentWorkflow?.executionState === 'completed'" class="status-badge completed">
-            <i class="pi pi-check" />
+            <Icon name="check" size="md" />
             Completed
           </span>
         </div>
@@ -93,7 +94,7 @@ function randomizeSeed(): void {
           class="action-btn secondary"
           @click="handleReset"
         >
-          <i class="pi pi-refresh" />
+          <Icon name="refresh" size="md" />
           Reset
         </button>
 
@@ -102,7 +103,7 @@ function randomizeSeed(): void {
           class="action-btn danger"
           @click="handleCancel"
         >
-          <i class="pi pi-times" />
+          <Icon name="times" size="md" />
           Cancel
         </button>
 
@@ -112,7 +113,7 @@ function randomizeSeed(): void {
           :disabled="!store.canGenerate"
           @click="handleGenerate"
         >
-          <i class="pi pi-play" />
+          <Icon name="play" size="md" />
           Generate
         </button>
       </div>
@@ -161,7 +162,7 @@ function randomizeSeed(): void {
           <!-- Quick actions for this step -->
           <div v-if="activeStep.exposedWidgets.includes('seed')" class="quick-actions">
             <button class="quick-btn" @click="randomizeSeed">
-              <i class="pi pi-sync" />
+              <Icon name="sync" size="md" />
               Random Seed
             </button>
           </div>
@@ -173,7 +174,7 @@ function randomizeSeed(): void {
         </div>
 
         <div v-else class="empty-parameters">
-          <i class="pi pi-arrow-left text-4xl text-zinc-700" />
+          <Icon name="arrow-left" size="md" class="text-4xl text-zinc-700" />
           <p>Select a step to configure its parameters</p>
         </div>
       </main>

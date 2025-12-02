@@ -12,7 +12,7 @@ const model = defineModel<ViewMode>({ required: true })
       :class="model === 'list' ? 'bg-zinc-700 text-zinc-200' : 'text-zinc-500 hover:text-zinc-300'"
       @click="model = 'list'"
     >
-      <i class="pi pi-list text-[10px]" />
+      <Icon name="list" size="xs" />
     </button>
     <button
       v-tooltip.bottom="{ value: 'Grid View', showDelay: 50 }"
@@ -20,7 +20,7 @@ const model = defineModel<ViewMode>({ required: true })
       :class="model === 'grid' ? 'bg-zinc-700 text-zinc-200' : 'text-zinc-500 hover:text-zinc-300'"
       @click="model = 'grid'"
     >
-      <i class="pi pi-th-large text-[10px]" />
+      <Icon name="th-large" size="xs" />
     </button>
   </div>
 </template>
