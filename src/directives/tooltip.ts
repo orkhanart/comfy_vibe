@@ -51,9 +51,9 @@ function createTooltip(el: TooltipElement, binding: DirectiveBinding): void {
     padding: 6px 10px;
     font-size: 12px;
     font-weight: 500;
-    color: hsl(var(--popover-foreground));
-    background: hsl(var(--popover));
-    border: 1px solid hsl(var(--border));
+    color: var(--popover-foreground);
+    background: var(--popover);
+    border: 1px solid var(--border);
     border-radius: 6px;
     pointer-events: none;
     opacity: 0;
@@ -69,6 +69,8 @@ function createTooltip(el: TooltipElement, binding: DirectiveBinding): void {
     clearTimeout(el._hideTimeout)
     el._showTimeout = setTimeout(() => {
       const rect = el.getBoundingClientRect()
+      // Force browser reflow to ensure dimensions are computed
+      void tooltip.offsetWidth
       const tooltipRect = tooltip.getBoundingClientRect()
 
       let top = 0

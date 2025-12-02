@@ -106,7 +106,7 @@ const routes: RouteRecordRaw[] = [
     name: 'linear',
     component: () => import('./views/linear/LinearView.vue'),
     props: true
-  }
+  },
 ]
 
 const router = createRouter({

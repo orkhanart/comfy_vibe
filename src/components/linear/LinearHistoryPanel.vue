@@ -156,7 +156,7 @@ function handleRerun(gen: GenerationItem): void {
   <main class="flex h-full flex-1 flex-col bg-background">
     <!-- Header -->
     <div class="flex items-center justify-between border-b border-border px-4 py-2">
-      <span class="text-sm font-medium text-foreground">Outputs</span>
+      <span class="text-sm font-medium text-foreground">Queue</span>
       <div class="flex items-center gap-2">
         <button
           v-tooltip.bottom="'Clear all'"

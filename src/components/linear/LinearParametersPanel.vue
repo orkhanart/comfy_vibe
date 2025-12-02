@@ -1,118 +1,126 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
-import { ref, computed, watch } from 'vue'
-
-export type InputType = 'text' | 'textarea' | 'image' | 'number' | 'slider' | 'select' | 'toggle' | 'color' | 'seed'
-
-export interface ExposedInput {
-  id: string
-  nodeId: string
-  inputName: string
-  type: InputType
-  label: string
-  description?: string
-  placeholder?: string
-  options?: Array<{ value: string; label: string }>
-  min?: number
-  max?: number
-  step?: number
-  default?: string | number | boolean
-  required?: boolean
-  group?: string
-}
-
-export interface WorkflowTemplate {
-  id: string
-  name: string
-  description: string
-  exposedInputs: ExposedInput[]
-}
-
-const props = defineProps<{
-  workflow: WorkflowTemplate | null
-}>()
+import { Switch } from '@/components/ui/switch'
+import { Textarea } from '@/components/ui/textarea'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { ref, computed } from 'vue'
 
 const emit = defineEmits<{
-  run: [values: Record<string, unknown>, images: Record<string, string>]
+  run: [params: RunParams]
 }>()
 
-const formValues = ref<Record<string, string | number | boolean | null>>({})
-const uploadedImages = ref<Record<string, string>>({})
+export interface RunParams {
+  prompt: string
+  steps: number
+  seed: number
+  randomizeSeed: boolean
+  cfg: number
+  sampler: string
+  scheduler: string
+  generations: number
+  image?: string
+}
+
+// Form state
+const uploadedImage = ref<string | null>(null)
+const prompt = ref('beautiful scenery nature glass bottle landscape, purple galaxy bottle,')
+const steps = ref(20)
+const seed = ref(1809000312992)
+const randomizeSeed = ref(true)
+const cfg = ref(1.0)
+const sampler = ref('euler')
+const scheduler = ref('normal')
+const generations = ref(99)
+
+const advancedOpen = ref(true)
 const isRunning = ref(false)
+const isDragging = ref(false)
 
-// Initialize form values when workflow changes
-watch(
-  () => props.workflow,
-  (workflow) => {
-    formValues.value = {}
-    uploadedImages.value = {}
+const samplers = ['euler', 'euler_ancestral', 'heun', 'dpm_2', 'dpm_2_ancestral', 'lms', 'ddim', 'uni_pc']
+const schedulers = ['normal', 'karras', 'exponential', 'sgm_uniform', 'simple', 'ddim_uniform']
 
-    if (!workflow) return
+const canRun = computed(() => prompt.value.trim().length > 0)
 
-    for (const input of workflow.exposedInputs) {
-      if (input.default !== undefined) {
-        formValues.value[input.id] = input.default
-      } else if (input.type === 'seed') {
-        formValues.value[input.id] = -1
-      } else {
-        formValues.value[input.id] = ''
-      }
-    }
-  },
-  { immediate: true }
-)
-
-const groupedInputs = computed(() => {
-  if (!props.workflow) return {}
-  const groups: Record<string, ExposedInput[]> = {}
-  for (const input of props.workflow.exposedInputs) {
-    const group = input.group ?? 'General'
-    if (!groups[group]) groups[group] = []
-    groups[group].push(input)
+function increment(ref: { value: number }, step = 1, max?: number) {
+  if (max === undefined || ref.value + step <= max) {
+    ref.value += step
   }
-  return groups
-})
+}
 
-const canRun = computed(() => {
-  if (!props.workflow) return false
-  for (const input of props.workflow.exposedInputs) {
-    if (input.required) {
-      if (input.type === 'image') {
-        if (!uploadedImages.value[input.id]) return false
-      } else {
-        const value = formValues.value[input.id]
-        if (value === '' || value === null || value === undefined) return false
-      }
-    }
+function decrement(ref: { value: number }, step = 1, min = 0) {
+  if (ref.value - step >= min) {
+    ref.value -= step
   }
-  return true
-})
+}
 
-function handleImageUpload(inputId: string, event: Event): void {
+function handleDragOver(event: DragEvent) {
+  event.preventDefault()
+  isDragging.value = true
+}
+
+function handleDragLeave() {
+  isDragging.value = false
+}
+
+function handleDrop(event: DragEvent) {
+  event.preventDefault()
+  isDragging.value = false
+  const file = event.dataTransfer?.files[0]
+  if (file && file.type.startsWith('image/')) {
+    readImageFile(file)
+  }
+}
+
+function handleFileSelect(event: Event) {
   const input = event.target as HTMLInputElement
   const file = input.files?.[0]
   if (file) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      uploadedImages.value[inputId] = e.target?.result as string
-    }
-    reader.readAsDataURL(file)
+    readImageFile(file)
   }
 }
 
-function removeImage(inputId: string): void {
-  delete uploadedImages.value[inputId]
+function readImageFile(file: File) {
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    uploadedImage.value = e.target?.result as string
+  }
+  reader.readAsDataURL(file)
 }
 
-function randomizeSeed(inputId: string): void {
-  formValues.value[inputId] = Math.floor(Math.random() * 2147483647)
+function removeImage() {
+  uploadedImage.value = null
 }
 
-async function runWorkflow(): Promise<void> {
+function generateRandomSeed() {
+  seed.value = Math.floor(Math.random() * 9999999999999)
+}
+
+async function runWorkflow() {
+  if (!canRun.value) return
+
   isRunning.value = true
-  emit('run', { ...formValues.value }, { ...uploadedImages.value })
 
-  // Simulate run
+  const params: RunParams = {
+    prompt: prompt.value,
+    steps: steps.value,
+    seed: randomizeSeed.value ? Math.floor(Math.random() * 9999999999999) : seed.value,
+    randomizeSeed: randomizeSeed.value,
+    cfg: cfg.value,
+    sampler: sampler.value,
+    scheduler: scheduler.value,
+    generations: generations.value,
+    image: uploadedImage.value || undefined
+  }
+
+  emit('run', params)
+
+  // Simulate running for now
   await new Promise(resolve => setTimeout(resolve, 2000))
   isRunning.value = false
 }
@@ -121,169 +129,214 @@ async function runWorkflow(): Promise<void> {
 <template>
   <div class="flex h-full w-80 flex-col border-l border-border bg-background">
     <!-- Header -->
-    <div class="flex items-center justify-between border-b border-border px-3 py-2">
-      <span class="text-sm font-medium text-foreground">Parameters</span>
+    <div class="flex h-10 items-center border-b border-border px-3">
+      <span class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Info</span>
     </div>
 
-    <!-- Empty State -->
-    <div v-if="!workflow" class="flex flex-1 flex-col items-center justify-center p-4 text-center">
-      <Icon name="sliders-h" size="2xl" class="mb-2 text-muted-foreground/50" />
-      <p class="text-sm text-muted-foreground">No workflow loaded</p>
-      <p class="mt-1 text-xs text-muted-foreground/70">Load a workflow to see its parameters</p>
-    </div>
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto">
+      <div class="flex flex-col gap-5 p-4">
+        <!-- Image Upload -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm text-foreground">Image upload</label>
+          <div
+            v-if="!uploadedImage"
+            class="relative flex h-28 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed transition-colors"
+            :class="isDragging ? 'border-primary bg-primary/5' : 'border-border'"
+            @dragover="handleDragOver"
+            @dragleave="handleDragLeave"
+            @drop="handleDrop"
+          >
+            <span class="text-sm text-muted-foreground">Drag an image or</span>
+            <label class="cursor-pointer rounded-md bg-accent px-3 py-1.5 text-sm text-foreground hover:bg-accent/80">
+              Browse
+              <Icon name="image" size="sm" class="ml-1 inline" />
+              <input type="file" accept="image/*" class="hidden" @change="handleFileSelect" />
+            </label>
+          </div>
+          <div v-else class="relative">
+            <img :src="uploadedImage" alt="Uploaded" class="h-28 w-full rounded-lg object-cover" />
+            <button
+              class="absolute right-2 top-2 flex size-6 items-center justify-center rounded-full bg-background/80 text-foreground hover:bg-background"
+              @click="removeImage"
+            >
+              <Icon name="times" size="xs" />
+            </button>
+          </div>
+        </div>
 
-    <!-- Dynamic Form -->
-    <template v-else>
-      <div class="flex-1 overflow-y-auto p-3">
-        <div v-for="(inputs, groupName) in groupedInputs" :key="groupName" class="mb-4">
-          <p class="mb-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">{{ groupName }}</p>
+        <!-- Prompt -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm text-foreground">Prompt</label>
+          <Textarea
+            v-model="prompt"
+            placeholder="Enter your prompt..."
+            class="min-h-[100px] resize-none border-border bg-transparent text-sm"
+          />
+        </div>
 
-          <div class="flex flex-col gap-3">
-            <div v-for="input in inputs" :key="input.id">
-              <label class="mb-1 flex items-center gap-1 text-xs font-medium text-foreground">
-                {{ input.label }}
-                <span v-if="input.required" class="text-red-400">*</span>
-              </label>
-              <p v-if="input.description" class="mb-1 text-[10px] text-muted-foreground">{{ input.description }}</p>
+        <!-- Steps -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm text-foreground">Steps</label>
+          <div class="flex h-10 items-center rounded-md border border-border">
+            <button
+              class="flex h-full w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+              @click="decrement(steps, 1, 1)"
+            >
+              <Icon name="minus" size="sm" />
+            </button>
+            <input
+              v-model.number="steps"
+              type="number"
+              class="h-full flex-1 bg-transparent text-center text-sm text-foreground outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
+            <button
+              class="flex h-full w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+              @click="increment(steps)"
+            >
+              <Icon name="plus" size="sm" />
+            </button>
+          </div>
+        </div>
 
-              <!-- Image Upload -->
-              <div v-if="input.type === 'image'">
-                <div v-if="!uploadedImages[input.id]" class="relative">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    class="absolute inset-0 cursor-pointer opacity-0"
-                    @change="handleImageUpload(input.id, $event)"
-                  />
-                  <div class="flex aspect-video items-center justify-center rounded-lg border-2 border-dashed border-border bg-card text-muted-foreground transition-colors hover:border-accent hover:text-muted-foreground">
-                    <div class="flex flex-col items-center">
-                      <Icon name="image" size="2xl" />
-                      <span class="mt-1 text-[10px]">Click or drop image</span>
-                    </div>
-                  </div>
-                </div>
-                <div v-else class="relative">
-                  <img :src="uploadedImages[input.id]" class="aspect-video w-full rounded-lg object-cover" />
-                  <button
-                    class="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-popover/60 text-white transition-colors hover:bg-red-600"
-                    @click="removeImage(input.id)"
-                  >
-                    <Icon name="times" size="xs" />
-                  </button>
-                </div>
-              </div>
+        <!-- Seed -->
+        <div class="flex flex-col gap-2">
+          <label class="text-sm text-foreground">Seed</label>
+          <div class="flex h-10 items-center rounded-md border border-border">
+            <button
+              class="flex h-full w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+              @click="decrement(seed)"
+            >
+              <Icon name="minus" size="sm" />
+            </button>
+            <input
+              v-model.number="seed"
+              type="number"
+              class="h-full flex-1 bg-transparent text-center text-sm text-foreground outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            />
+            <button
+              class="flex h-full w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+              @click="increment(seed)"
+            >
+              <Icon name="plus" size="sm" />
+            </button>
+          </div>
+        </div>
 
-              <!-- Textarea -->
-              <textarea
-                v-else-if="input.type === 'textarea'"
-                v-model="formValues[input.id]"
-                :placeholder="input.placeholder"
-                rows="3"
-                class="w-full resize-none rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground outline-none placeholder:text-muted-foreground focus:border-primary"
-              />
+        <!-- Randomize Seed Toggle -->
+        <div class="flex items-center justify-between">
+          <label class="text-sm text-foreground">Randomize seed every generation</label>
+          <Switch v-model:checked="randomizeSeed" />
+        </div>
 
-              <!-- Text Input -->
-              <input
-                v-else-if="input.type === 'text'"
-                v-model="formValues[input.id]"
-                type="text"
-                :placeholder="input.placeholder"
-                class="w-full rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground outline-none placeholder:text-muted-foreground focus:border-primary"
-              />
+        <!-- Advanced Section -->
+        <div class="flex flex-col">
+          <button
+            class="flex items-center justify-between py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground"
+            @click="advancedOpen = !advancedOpen"
+          >
+            <span>Advanced</span>
+            <Icon :name="advancedOpen ? 'chevron-up' : 'chevron-down'" size="sm" />
+          </button>
 
-              <!-- Number Input -->
-              <input
-                v-else-if="input.type === 'number'"
-                v-model.number="formValues[input.id]"
-                type="number"
-                :min="input.min"
-                :max="input.max"
-                :step="input.step"
-                class="w-full rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground outline-none focus:border-primary"
-              />
-
-              <!-- Seed Input -->
-              <div v-else-if="input.type === 'seed'" class="flex gap-2">
+          <div v-show="advancedOpen" class="flex flex-col gap-5 pt-2">
+            <!-- CFG -->
+            <div class="flex flex-col gap-2">
+              <label class="text-sm text-foreground">CFG</label>
+              <div class="flex h-10 items-center rounded-md border border-border">
+                <button
+                  class="flex h-full w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+                  @click="decrement(cfg, 0.1, 0)"
+                >
+                  <Icon name="minus" size="sm" />
+                </button>
                 <input
-                  v-model.number="formValues[input.id]"
+                  v-model.number="cfg"
                   type="number"
-                  placeholder="-1 for random"
-                  class="flex-1 rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground outline-none focus:border-primary"
+                  step="0.1"
+                  class="h-full flex-1 bg-transparent text-center text-sm text-foreground outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                 />
                 <button
-                  v-tooltip.top="'Random'"
-                  class="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                  @click="randomizeSeed(input.id)"
+                  class="flex h-full w-10 items-center justify-center text-muted-foreground hover:text-foreground"
+                  @click="increment(cfg, 0.1)"
                 >
-                  <Icon name="refresh" size="xs" />
+                  <Icon name="plus" size="sm" />
                 </button>
               </div>
+            </div>
 
-              <!-- Select -->
-              <select
-                v-else-if="input.type === 'select'"
-                v-model="formValues[input.id]"
-                class="w-full rounded-lg border border-border bg-muted px-3 py-2 text-xs text-foreground outline-none focus:border-primary"
-              >
-                <option v-for="opt in input.options" :key="opt.value" :value="opt.value">
-                  {{ opt.label }}
-                </option>
-              </select>
+            <!-- Sampler -->
+            <div class="flex flex-col gap-2">
+              <label class="text-sm text-foreground">Sampler</label>
+              <Select v-model="sampler">
+                <SelectTrigger class="h-10 border-border bg-transparent">
+                  <SelectValue :placeholder="sampler" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="s in samplers" :key="s" :value="s">
+                    {{ s }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-              <!-- Slider -->
-              <div v-else-if="input.type === 'slider'" class="flex items-center gap-3">
-                <input
-                  v-model.number="formValues[input.id]"
-                  type="range"
-                  :min="input.min"
-                  :max="input.max"
-                  :step="input.step"
-                  class="flex-1"
-                />
-                <span class="w-12 text-right text-xs tabular-nums text-muted-foreground">
-                  {{ typeof formValues[input.id] === 'number' ? formValues[input.id].toFixed(2) : formValues[input.id] }}
-                </span>
-              </div>
-
-              <!-- Toggle -->
-              <button
-                v-else-if="input.type === 'toggle'"
-                :class="[
-                  'relative h-6 w-11 rounded-full transition-colors',
-                  formValues[input.id] ? 'bg-primary' : 'bg-muted'
-                ]"
-                @click="formValues[input.id] = !formValues[input.id]"
-              >
-                <span
-                  :class="[
-                    'absolute top-1 h-4 w-4 rounded-full bg-white transition-transform',
-                    formValues[input.id] ? 'left-6' : 'left-1'
-                  ]"
-                />
-              </button>
+            <!-- Scheduler -->
+            <div class="flex flex-col gap-2">
+              <label class="text-sm text-foreground">Scheduler</label>
+              <Select v-model="scheduler">
+                <SelectTrigger class="h-10 border-border bg-transparent">
+                  <SelectValue :placeholder="scheduler" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem v-for="s in schedulers" :key="s" :value="s">
+                    {{ s }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="border-t border-border p-4">
+      <!-- Number of Generations -->
+      <div class="mb-4 flex items-center justify-between">
+        <label class="text-sm text-foreground">Number of generations</label>
+        <div class="flex h-8 items-center gap-1">
+          <button
+            class="flex size-8 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+            @click="decrement(generations, 1, 1)"
+          >
+            <Icon name="minus" size="sm" />
+          </button>
+          <span class="w-8 text-center text-sm text-foreground">{{ generations }}</span>
+          <button
+            class="flex size-8 items-center justify-center rounded text-muted-foreground hover:bg-accent hover:text-foreground"
+            @click="increment(generations)"
+          >
+            <Icon name="plus" size="sm" />
+          </button>
+        </div>
+      </div>
 
       <!-- Run Button -->
-      <div class="border-t border-border p-3">
-        <button
-          :disabled="!canRun || isRunning"
-          :class="[
-            'flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-colors',
-            canRun && !isRunning
-              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-              : 'bg-muted text-muted-foreground'
-          ]"
-          @click="runWorkflow"
-        >
-          <Icon v-if="isRunning" name="spinner" size="sm" class="animate-spin" />
-          <Icon v-else name="play" size="sm" />
-          <span>{{ isRunning ? 'Running...' : 'Run' }}</span>
-        </button>
-      </div>
-    </template>
+      <button
+        :disabled="!canRun || isRunning"
+        :class="[
+          'flex h-11 w-full items-center justify-center gap-2 rounded-lg text-sm font-medium transition-colors',
+          canRun && !isRunning
+            ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+            : 'cursor-not-allowed bg-muted text-muted-foreground'
+        ]"
+        @click="runWorkflow"
+      >
+        <Icon v-if="isRunning" name="spinner" size="sm" class="animate-spin" />
+        <Icon v-else name="play" size="sm" />
+        {{ isRunning ? 'Running...' : 'Run' }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -291,31 +344,11 @@ async function runWorkflow(): Promise<void> {
 div::-webkit-scrollbar {
   width: 4px;
 }
-
 div::-webkit-scrollbar-track {
   background: transparent;
 }
-
 div::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.3);
+  background: hsl(var(--border));
   border-radius: 2px;
-}
-
-input[type='range'] {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 4px;
-  background: hsl(var(--muted-foreground) / 0.3);
-  border-radius: 2px;
-}
-
-input[type='range']::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 14px;
-  height: 14px;
-  background: hsl(var(--primary));
-  border-radius: 50%;
-  cursor: pointer;
 }
 </style>

@@ -5,6 +5,7 @@ export { default as WorkspaceSearchInput } from './WorkspaceSearchInput.vue'
 export { default as WorkspaceSortSelect } from './WorkspaceSortSelect.vue'
 export { default as WorkspaceFilterSelect } from './WorkspaceFilterSelect.vue'
 export { default as WorkspaceCard } from './WorkspaceCard.vue'
+export { default as ResourceListView } from './ResourceListView.vue'
 
 // Workflow components
 export { default as WorkflowCard } from './WorkflowCard.vue'

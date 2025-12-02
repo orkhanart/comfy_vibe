@@ -121,7 +121,7 @@ function closePropertiesPanel(): void {
           <span
             class="rounded bg-card/80 px-2.5 py-1 text-xs font-medium text-foreground shadow-sm backdrop-blur"
           >
-            {{ props.canvasId }}
+            {{ uiStore.activeWorkflowName }}
           </span>
         </div>
 
