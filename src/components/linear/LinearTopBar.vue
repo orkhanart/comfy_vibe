@@ -8,7 +8,6 @@ const router = useRouter()
 const uiStore = useUiStore()
 
 const sessionName = ref('Untitled session')
-const credits = ref(4625)
 const showMenu = ref(false)
 
 function handleLogoClick(): void {
@@ -35,103 +34,86 @@ function signOut(): void {
   router.push('/')
 }
 
-function toggleExperimentalUI(): void {
-  uiStore.toggleInterfaceVersion()
-}
-
 function toggleTheme(): void {
   uiStore.toggleTheme()
 }
 </script>
 
 <template>
-  <header class="flex h-10 shrink-0 items-center gap-1 border-b border-zinc-800 bg-zinc-950 px-2 select-none">
+  <header class="flex h-10 shrink-0 items-center gap-1 border-b border-border bg-background px-2 select-none">
     <!-- Logo Section with Dropdown -->
     <div class="relative">
       <button
-        class="flex items-center gap-1 rounded-md px-2 py-1.5 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+        class="flex items-center gap-1 rounded-md px-2 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
         @click="handleLogoClick"
       >
-        <img :src="uiStore.themeMode === 'dark' ? '/assets/images/comfy-logo-mono.svg' : '/comfy-logo-blue.svg'" alt="Comfy" class="h-5 w-5" />
+        <img :src="uiStore.themeMode === 'dark' ? '/assets/images/comfy-logo-mono.svg' : '/assets/images/comfy-logo-single.svg'" alt="Comfy" class="h-5 w-5" />
         <Icon name="chevron-down" size="xs" class="opacity-70" />
       </button>
 
       <!-- Dropdown Menu -->
-      <div v-if="showMenu" class="absolute left-0 top-full z-[100] mt-1 min-w-[240px] rounded-lg border border-zinc-800 bg-zinc-900 p-1 shadow-xl">
+      <div v-if="showMenu" class="absolute left-0 top-full z-[100] mt-1 min-w-[240px] rounded-lg border border-border bg-popover p-1 shadow-xl">
         <!-- File Section -->
-        <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-zinc-500">File</div>
-        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800">
-          <Icon name="file" size="sm" class="w-4 text-zinc-500" />
+        <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">File</div>
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent">
+          <Icon name="file" size="sm" class="w-4 text-muted-foreground" />
           <span class="flex-1">New Session</span>
-          <span class="text-[11px] text-zinc-600">Ctrl+N</span>
+          <span class="text-[11px] text-muted-foreground">Ctrl+N</span>
         </button>
-        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800">
-          <Icon name="folder-open" size="sm" class="w-4 text-zinc-500" />
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent">
+          <Icon name="folder-open" size="sm" class="w-4 text-muted-foreground" />
           <span class="flex-1">Open...</span>
-          <span class="text-[11px] text-zinc-600">Ctrl+O</span>
+          <span class="text-[11px] text-muted-foreground">Ctrl+O</span>
         </button>
-        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800">
-          <Icon name="save" size="sm" class="w-4 text-zinc-500" />
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent">
+          <Icon name="save" size="sm" class="w-4 text-muted-foreground" />
           <span class="flex-1">Save</span>
-          <span class="text-[11px] text-zinc-600">Ctrl+S</span>
+          <span class="text-[11px] text-muted-foreground">Ctrl+S</span>
         </button>
-        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800">
-          <Icon name="download" size="sm" class="w-4 text-zinc-500" />
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent">
+          <Icon name="download" size="sm" class="w-4 text-muted-foreground" />
           <span>Export...</span>
         </button>
 
-        <div class="mx-2 my-1 h-px bg-zinc-800" />
+        <div class="mx-2 my-1 h-px bg-border" />
 
         <!-- Workspace Section -->
-        <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-zinc-500">Workspace</div>
-        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="goToWorkspace">
-          <Icon name="home" size="sm" class="w-4 text-zinc-500" />
+        <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Workspace</div>
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent" @click="goToWorkspace">
+          <Icon name="home" size="sm" class="w-4 text-muted-foreground" />
           <span>Dashboard</span>
         </button>
-        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="goToProjects">
-          <Icon name="folder" size="sm" class="w-4 text-zinc-500" />
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent" @click="goToProjects">
+          <Icon name="folder" size="sm" class="w-4 text-muted-foreground" />
           <span>Projects</span>
         </button>
 
-        <div class="mx-2 my-1 h-px bg-zinc-800" />
+        <div class="mx-2 my-1 h-px bg-border" />
 
         <!-- Account Section -->
-        <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-zinc-500">Account</div>
-        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="goToSettings">
-          <Icon name="cog" size="sm" class="w-4 text-zinc-500" />
+        <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Account</div>
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent" @click="goToSettings">
+          <Icon name="cog" size="sm" class="w-4 text-muted-foreground" />
           <span>Settings</span>
         </button>
-        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="toggleTheme">
-          <Icon :name="uiStore.themeMode === 'dark' ? 'moon' : 'sun'" size="sm" class="w-4 text-zinc-500" />
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent" @click="toggleTheme">
+          <Icon :name="uiStore.themeMode === 'dark' ? 'moon' : 'sun'" size="sm" class="w-4 text-muted-foreground" />
           <span class="flex-1">{{ uiStore.themeMode === 'dark' ? 'Dark Mode' : 'Light Mode' }}</span>
           <div
             class="h-5 w-9 rounded-full p-0.5 transition-colors"
-            :class="uiStore.themeMode === 'dark' ? 'bg-blue-500' : 'bg-zinc-700'"
+            :class="uiStore.themeMode === 'dark' ? 'bg-primary' : 'bg-muted'"
           >
             <div
-              class="h-4 w-4 rounded-full bg-white transition-transform"
+              class="h-4 w-4 rounded-full bg-white shadow-sm transition-transform"
               :class="uiStore.themeMode === 'dark' ? 'translate-x-4' : 'translate-x-0'"
             />
           </div>
         </button>
-        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="toggleExperimentalUI">
-          <Icon name="sparkles" size="sm" class="w-4 text-zinc-500" />
-          <span class="flex-1">Experimental UI</span>
-          <div
-            class="h-5 w-9 rounded-full p-0.5 transition-colors"
-            :class="uiStore.interfaceVersion === 'v2' ? 'bg-blue-500' : 'bg-zinc-700'"
-          >
-            <div
-              class="h-4 w-4 rounded-full bg-white transition-transform"
-              :class="uiStore.interfaceVersion === 'v2' ? 'translate-x-4' : 'translate-x-0'"
-            />
-          </div>
-        </button>
 
-        <div class="mx-2 my-1 h-px bg-zinc-800" />
+        <div class="mx-2 my-1 h-px bg-border" />
 
-        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-red-400 transition-colors hover:bg-red-500/10" @click="signOut">
-          <Icon name="sign-out" size="sm" class="w-4 text-red-400" />
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-destructive transition-colors hover:bg-destructive/10" @click="signOut">
+          <Icon name="sign-out" size="sm" class="w-4 text-destructive" />
           <span>Sign out</span>
         </button>
       </div>
@@ -141,47 +123,57 @@ function toggleTheme(): void {
     </div>
 
     <!-- Divider -->
-    <div class="mx-1 h-5 w-px bg-zinc-800" />
+    <div class="mx-1 h-5 w-px bg-border" />
 
     <!-- Home Button -->
     <button
       v-tooltip.bottom="{ value: 'Home', showDelay: 50 }"
-      class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+      class="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
       @click="goToWorkspace"
     >
       <Icon name="home" size="md" />
     </button>
 
     <!-- Divider -->
-    <div class="mx-1 h-5 w-px bg-zinc-800" />
+    <div class="mx-1 h-5 w-px bg-border" />
 
     <!-- Session Name / Tabs Area -->
     <div class="flex flex-1 items-center">
       <div class="flex items-center gap-1">
-        <span class="rounded-md bg-zinc-800 px-3 py-1.5 text-xs text-zinc-100">{{ sessionName }}</span>
-        <button class="p-1 text-zinc-500 transition-colors hover:text-zinc-300">
+        <span class="rounded-md bg-muted px-3 py-1.5 text-xs text-foreground">{{ sessionName }}</span>
+        <button class="p-1 text-muted-foreground transition-colors hover:text-foreground">
           <Icon name="ellipsis-h" size="xs" />
         </button>
       </div>
     </div>
 
     <!-- Right Section -->
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1">
+      <!-- Mode Toggle -->
+      <div class="flex h-7 items-center rounded-md bg-muted p-0.5">
+        <button
+          class="flex h-6 items-center gap-1 rounded px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
+          @click="router.push({ name: 'canvas', params: { workspaceId: 'default', canvasId: 'main' } })"
+        >
+          <Icon name="sitemap" size="xs" />
+          Node
+        </button>
+        <button
+          class="flex h-6 items-center gap-1 rounded px-2 text-xs font-medium bg-background text-foreground shadow-sm"
+        >
+          <Icon name="sliders-h" size="xs" />
+          Linear
+        </button>
+      </div>
+
+      <!-- Divider -->
+      <div class="mx-1 h-5 w-px bg-border" />
+
       <button
-        v-tooltip.bottom="{ value: 'Help', showDelay: 50 }"
-        class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
+        v-tooltip.bottom="{ value: 'Share', showDelay: 50 }"
+        class="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
       >
-        <Icon name="question-circle" size="sm" />
-      </button>
-      <button
-        v-tooltip.bottom="{ value: 'Open in new window', showDelay: 50 }"
-        class="flex h-8 w-8 items-center justify-center rounded-md text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
-      >
-        <Icon name="external-link" size="sm" />
-      </button>
-      <span class="text-xs text-zinc-400">{{ credits.toLocaleString() }} credits</span>
-      <button class="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-500">
-        Upgrade
+        <Icon name="share-alt" size="sm" />
       </button>
     </div>
   </header>
