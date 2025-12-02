@@ -46,10 +46,10 @@ const generations = ref<GenerationItem[]>([
     status: 'completed',
     createdAt: new Date(Date.now() - 300000),
     images: [
-      '/assets/card_images/workflow_01.webp',
-      '/assets/card_images/workflow_02.webp',
-      '/assets/card_images/workflow_03.webp',
-      '/assets/card_images/workflow_04.webp',
+      'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=512&h=512&fit=crop',
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=512&h=512&fit=crop',
+      'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=512&h=512&fit=crop',
+      'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=512&h=512&fit=crop',
     ],
     batchSize: 4,
     parameters: {
@@ -67,8 +67,8 @@ const generations = ref<GenerationItem[]>([
     status: 'completed',
     createdAt: new Date(Date.now() - 600000),
     images: [
-      '/assets/card_images/workflow_02.webp',
-      '/assets/card_images/workflow_01.webp',
+      'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=512&h=512&fit=crop',
+      'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=512&h=512&fit=crop',
     ],
     batchSize: 2,
     parameters: {
@@ -150,11 +150,6 @@ function handleRerun(gen: GenerationItem): void {
   console.log('Rerun:', gen)
 }
 
-function getGridCols(count: number): string {
-  if (count === 1) return 'grid-cols-2'
-  if (count === 2) return 'grid-cols-4'
-  return 'grid-cols-4 sm:grid-cols-8'
-}
 </script>
 
 <template>
@@ -173,12 +168,12 @@ function getGridCols(count: number): string {
     </div>
 
     <!-- Generations List -->
-    <div class="flex-1 overflow-y-auto p-3">
-      <div class="flex flex-col gap-3">
+    <div class="flex-1 overflow-y-auto">
+      <div class="flex flex-col divide-y divide-border">
         <div
           v-for="gen in generations"
           :key="gen.id"
-          class="group rounded-lg border border-border bg-card/50 p-3 transition-colors hover:border-border/80"
+          class="group px-4 py-4"
         >
           <!-- Top Row: Status, Time, Batch Info, Actions -->
           <div class="mb-2 flex items-center justify-between">
@@ -220,15 +215,15 @@ function getGridCols(count: number): string {
             </div>
           </div>
 
-          <!-- Images Grid -->
+          <!-- Images Grid - Fixed size thumbnails -->
           <div
             v-if="gen.images.length > 0"
-            :class="['mb-2 grid gap-1.5', getGridCols(gen.images.length)]"
+            class="mb-2 flex flex-wrap gap-1.5"
           >
             <div
               v-for="(img, idx) in gen.images"
               :key="idx"
-              class="group/img relative aspect-square overflow-hidden rounded bg-muted"
+              class="group/img relative h-[33rem] w-[33rem] shrink-0 overflow-hidden rounded-lg bg-muted"
             >
               <img
                 :src="img"
@@ -247,19 +242,19 @@ function getGridCols(count: number): string {
             </div>
           </div>
 
-          <!-- Generating placeholder -->
+          <!-- Generating placeholder - Fixed size thumbnails -->
           <div
             v-else-if="gen.status === 'generating'"
-            :class="['mb-2 grid gap-1.5', getGridCols(gen.batchSize)]"
+            class="mb-2 flex flex-wrap gap-1.5"
           >
             <div
               v-for="i in gen.batchSize"
               :key="i"
-              class="flex aspect-square items-center justify-center overflow-hidden rounded bg-muted"
+              class="flex h-[33rem] w-[33rem] shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted"
             >
               <div class="flex flex-col items-center">
-                <Icon name="spinner" size="md" class="animate-spin text-primary" />
-                <span class="mt-1 text-[10px] text-muted-foreground">{{ gen.progress }}%</span>
+                <Icon name="spinner" size="sm" class="animate-spin text-primary" />
+                <span class="mt-1 text-[9px] text-muted-foreground">{{ gen.progress }}%</span>
               </div>
             </div>
           </div>
