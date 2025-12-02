@@ -51,7 +51,7 @@ const starterTemplates: Template[] = [
     <!-- Starter Templates -->
     <div class="mb-8">
       <h2 class="mb-3 text-sm font-medium text-zinc-900 dark:text-foreground">Start from a template</h2>
-      <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+      <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
         <TemplateCard
           v-for="template in starterTemplates"
           :key="template.id"

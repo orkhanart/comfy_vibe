@@ -4,7 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { WorkflowCard, AssetCard, ModelCard, FolderCard } from '@/components/workspace'
-import { FavoriteButton } from '@/components/common'
+import { FavoriteButton, ShareDialog } from '@/components/common'
 import { MOCK_WORKFLOWS, MOCK_ASSETS, MOCK_MODELS, getAssetIcon, type Workflow, type Asset, type Model } from '@/data/workspaceMockData'
 
 const route = useRoute()
@@ -230,6 +230,40 @@ const mainFolders = computed(() => [
 // User-created folders within project
 const userFolders = ref<{ id: string; name: string; icon: string; parentType: string }[]>([])
 
+// Home view state
+const homeSearchQuery = ref('')
+const homeViewMode = ref<'grid' | 'list'>('grid')
+const homeSortBy = ref<'name' | 'updated' | 'items'>('name')
+
+const homeSortOptions = [
+  { value: 'name', label: 'Name' },
+  { value: 'updated', label: 'Last updated' },
+  { value: 'items', label: 'Item count' }
+]
+
+const filteredFolders = computed(() => {
+  let allFolders = [
+    ...mainFolders.value.map(f => ({ ...f, isNative: true })),
+    ...userFolders.value.map(f => ({ ...f, isNative: false, count: 0 }))
+  ]
+
+  if (homeSearchQuery.value) {
+    const query = homeSearchQuery.value.toLowerCase()
+    allFolders = allFolders.filter(f => f.name.toLowerCase().includes(query))
+  }
+
+  allFolders.sort((a, b) => {
+    switch (homeSortBy.value) {
+      case 'name': return a.name.localeCompare(b.name)
+      case 'items': return (b.count || 0) - (a.count || 0)
+      case 'updated':
+      default: return 0
+    }
+  })
+
+  return allFolders
+})
+
 // Create folder dialog
 const showCreateFolder = ref(false)
 const newFolderName = ref('')
@@ -261,6 +295,9 @@ function goBack() {
 
 // Settings dialog
 const showSettings = ref(false)
+
+// Share dialog
+const showShareDialog = ref(false)
 
 // Project actions menu
 const projectMenuOpen = ref(false)
@@ -315,7 +352,7 @@ function handleProjectAction(action: string) {
           <!-- Share Button -->
           <button
             class="flex h-9 items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-foreground dark:hover:bg-zinc-700"
-            @click="handleProjectAction('share')"
+            @click="showShareDialog = true"
           >
             <Icon name="share" size="sm" />
             Share
@@ -381,50 +418,140 @@ function handleProjectAction(action: string) {
       <div class="flex-1 overflow-auto p-6">
         <!-- Home View - Folder Cards -->
         <template v-if="activeView === 'home'">
-          <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
-            <!-- Main Folders (Workflows, Models, Assets) -->
-            <FolderCard
-              v-for="folder in mainFolders"
-              :key="folder.id"
-              :folder="folder"
-              :item-count="folder.count"
-              :icon="folder.icon"
-              :icon-class="folder.iconClass"
-              @open="openFolder"
-              @open-menu="(id, event) => console.log('Folder menu:', id)"
-            />
+          <!-- Action Bar -->
+          <div class="mb-4 flex items-center gap-3">
+            <!-- Search -->
+            <div class="relative flex-1">
+              <Icon name="search" size="sm" class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input
+                v-model="homeSearchQuery"
+                type="text"
+                placeholder="Search folders..."
+                class="w-full rounded-md border border-zinc-200 bg-white py-2 pl-9 pr-4 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-400 focus:ring-1 focus:ring-zinc-400 dark:border-border dark:bg-muted dark:text-foreground dark:placeholder-zinc-500"
+              />
+            </div>
+            <!-- Sort -->
+            <div class="relative">
+              <select
+                v-model="homeSortBy"
+                class="appearance-none rounded-lg border border-zinc-200 bg-white py-2 pl-3 pr-8 text-sm text-zinc-700 outline-none transition-colors hover:border-zinc-300 dark:border-border dark:bg-muted dark:text-foreground"
+              >
+                <option v-for="option in homeSortOptions" :key="option.value" :value="option.value">
+                  {{ option.label }}
+                </option>
+              </select>
+              <Icon name="chevron-down" size="xs" class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
+            </div>
+            <!-- View Toggle -->
+            <div class="flex rounded-lg border border-zinc-200 dark:border-border">
+              <button
+                :class="['px-3 py-2 text-sm transition-colors', homeViewMode === 'grid' ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-700 dark:text-foreground' : 'text-muted-foreground hover:text-zinc-900 dark:hover:text-foreground']"
+                @click="homeViewMode = 'grid'"
+              >
+                <Icon name="th-large" size="md" />
+              </button>
+              <button
+                :class="['px-3 py-2 text-sm transition-colors', homeViewMode === 'list' ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-700 dark:text-foreground' : 'text-muted-foreground hover:text-zinc-900 dark:hover:text-foreground']"
+                @click="homeViewMode = 'list'"
+              >
+                <Icon name="list" size="md" />
+              </button>
+            </div>
+            <!-- New Folder -->
+            <button
+              class="flex h-9 items-center gap-1.5 rounded-lg bg-zinc-900 px-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+              @click="showCreateFolder = true"
+            >
+              <Icon name="folder-plus" size="xs" />
+              New Folder
+            </button>
+          </div>
 
-            <!-- User-Created Folders -->
+          <!-- Grid View -->
+          <div v-if="homeViewMode === 'grid'" class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+            <!-- All Folders -->
             <FolderCard
-              v-for="folder in userFolders"
+              v-for="folder in filteredFolders"
               :key="folder.id"
               :folder="folder"
-              :item-count="0"
-              icon="folder"
-              icon-class="text-amber-500 dark:text-amber-400"
+              :item-count="folder.count || 0"
+              :icon="folder.icon || 'folder'"
+              :icon-class="folder.iconClass || 'text-amber-500 dark:text-amber-400'"
+              :is-native="folder.isNative"
               @open="openFolder"
-              @open-menu="(id, event) => deleteFolder(id)"
+              @rename="(id) => console.log('Rename folder:', id)"
+              @move-to="(id) => console.log('Move folder:', id)"
+              @share="(id) => console.log('Share folder:', id)"
+              @delete="deleteFolder"
             />
 
             <!-- Create New Folder Card -->
             <div
-              class="group cursor-pointer rounded-xl border-2 border-dashed border-zinc-200 bg-white/50 transition-all hover:border-zinc-300 hover:bg-white hover:shadow-md dark:border-zinc-700 dark:bg-card/50 dark:hover:border-zinc-600 dark:hover:bg-card"
+              class="group cursor-pointer"
               @click="showCreateFolder = true"
             >
-              <div class="relative aspect-square overflow-hidden rounded-t-xl">
-                <div class="flex h-full w-full items-center justify-center">
-                  <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-zinc-100 transition-transform group-hover:scale-110 dark:bg-zinc-800">
-                    <Icon name="plus" size="3xl" class="text-zinc-400 dark:text-zinc-500" />
-                  </div>
+              <div class="relative aspect-square overflow-hidden rounded-xl border-2 border-dashed border-zinc-200 bg-zinc-50 transition-all duration-200 group-hover:scale-[1.01] group-hover:border-zinc-300 group-hover:shadow-xl dark:border-zinc-700 dark:bg-zinc-800/50 dark:group-hover:border-zinc-600">
+                <!-- Icon in top left -->
+                <div class="absolute left-3 top-3">
+                  <Icon name="folder-plus" size="xl" class="text-zinc-400 dark:text-zinc-500" />
                 </div>
               </div>
-              <div class="flex items-center gap-2 px-3 py-2.5">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
-                  <Icon name="folder-plus" size="sm" class="text-zinc-400 dark:text-zinc-500" />
-                </div>
+              <!-- Name -->
+              <div class="mt-2 flex items-center justify-between gap-1 px-1">
                 <h3 class="min-w-0 flex-1 truncate text-sm font-medium text-zinc-500 dark:text-zinc-400">New Folder</h3>
               </div>
             </div>
+          </div>
+
+          <!-- List View -->
+          <div v-else class="rounded-xl border border-zinc-200 bg-white dark:border-border dark:bg-card">
+            <div class="divide-y divide-zinc-100 dark:divide-zinc-800">
+              <div
+                v-for="folder in filteredFolders"
+                :key="folder.id"
+                class="flex cursor-pointer items-center gap-4 px-5 py-4 transition-colors hover:bg-zinc-50 dark:hover:bg-muted/50"
+                @click="openFolder(folder.id)"
+              >
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100 dark:bg-zinc-800">
+                  <Icon :name="folder.icon || 'folder'" size="lg" :class="folder.iconClass || 'text-amber-500 dark:text-amber-400'" />
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="font-medium text-zinc-900 dark:text-foreground">{{ folder.name }}</p>
+                  <p class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                    {{ folder.count || 0 }} items
+                    <span v-if="folder.isNative" class="ml-2 text-blue-500">System folder</span>
+                  </p>
+                </div>
+                <button
+                  class="shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                  @click.stop="openFolder(folder.id)"
+                >
+                  Open
+                </button>
+              </div>
+              <!-- New Folder Row -->
+              <div
+                class="flex cursor-pointer items-center gap-4 px-5 py-4 transition-colors hover:bg-zinc-50 dark:hover:bg-muted/50"
+                @click="showCreateFolder = true"
+              >
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border-2 border-dashed border-zinc-200 dark:border-zinc-700">
+                  <Icon name="plus" size="md" class="text-zinc-400" />
+                </div>
+                <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Create new folder</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div
+            v-if="filteredFolders.length === 0 && homeSearchQuery"
+            class="flex flex-col items-center justify-center rounded-lg border border-dashed border-zinc-300 py-16 dark:border-border"
+          >
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
+              <Icon name="search" size="xl" class="text-zinc-400" />
+            </div>
+            <p class="mt-4 text-sm font-medium text-zinc-900 dark:text-foreground">No folders found</p>
+            <p class="mt-1 text-sm text-muted-foreground">Try a different search term</p>
           </div>
 
           <!-- Create Folder Dialog -->
@@ -929,6 +1056,15 @@ function handleProjectAction(action: string) {
         </div>
       </Transition>
     </div>
+
+    <!-- Share Dialog -->
+    <ShareDialog
+      v-model:open="showShareDialog"
+      item-type="project"
+      :item-name="project.name"
+      :item-id="projectId"
+      @share="(users, linkAccess) => console.log('Shared with:', users, 'Link access:', linkAccess)"
+    />
   </div>
 </template>
 

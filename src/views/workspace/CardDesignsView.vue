@@ -163,21 +163,30 @@ function handleAction(action: string, id?: string) {
           :item-count="5"
           :subfolder-count="2"
           @open="handleAction('open', $event)"
-          @open-menu="handleAction('openMenu', $event)"
+          @rename="handleAction('rename', $event)"
+          @move-to="handleAction('moveTo', $event)"
+          @share="handleAction('share', $event)"
+          @delete="handleAction('delete', $event)"
         />
         <FolderCard
           :folder="{ ...sampleFolder, id: 'folder-2', name: 'Empty Folder' }"
           :item-count="0"
           :subfolder-count="0"
           @open="handleAction('open', $event)"
-          @open-menu="handleAction('openMenu', $event)"
+          @rename="handleAction('rename', $event)"
+          @move-to="handleAction('moveTo', $event)"
+          @share="handleAction('share', $event)"
+          @delete="handleAction('delete', $event)"
         />
         <FolderCard
           :folder="{ ...sampleFolder, id: 'folder-3', name: 'Large Folder' }"
           :item-count="128"
           :subfolder-count="12"
           @open="handleAction('open', $event)"
-          @open-menu="handleAction('openMenu', $event)"
+          @rename="handleAction('rename', $event)"
+          @move-to="handleAction('moveTo', $event)"
+          @share="handleAction('share', $event)"
+          @delete="handleAction('delete', $event)"
         />
       </div>
     </section>
@@ -187,7 +196,7 @@ function handleAction(action: string, id?: string) {
       <h2 class="mb-4 text-lg font-medium text-zinc-900 dark:text-foreground">FolderCard (Colored Variants)</h2>
       <p class="mb-4 text-sm text-muted-foreground">Used in: ProjectView home (FolderCard with custom icons and colors)</p>
       <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
-        <!-- Main Folders (Workflows, Models, Assets) -->
+        <!-- Main Folders (Workflows, Models, Assets) - Native folders -->
         <FolderCard
           v-for="folder in projectFolders"
           :key="folder.id"
@@ -195,8 +204,9 @@ function handleAction(action: string, id?: string) {
           :item-count="folder.count"
           :icon="folder.icon"
           :icon-class="folder.iconClass"
+          :is-native="true"
           @open="handleAction('openFolder', $event)"
-          @open-menu="handleAction('openMenu', $event)"
+          @share="handleAction('share', $event)"
         />
 
         <!-- User-Created Folder -->
@@ -206,7 +216,10 @@ function handleAction(action: string, id?: string) {
           icon="folder"
           icon-class="text-amber-500 dark:text-amber-400"
           @open="handleAction('openFolder', $event)"
-          @open-menu="handleAction('deleteFolder', $event)"
+          @rename="handleAction('rename', $event)"
+          @move-to="handleAction('moveTo', $event)"
+          @share="handleAction('share', $event)"
+          @delete="handleAction('delete', $event)"
         />
       </div>
     </section>

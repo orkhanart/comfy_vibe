@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { FavoriteButton } from '@/components/common'
 import type { Template } from '@/data/workspaceMockData'
+import { ref } from 'vue'
 
 interface Props {
   template: Template
@@ -12,8 +14,20 @@ defineProps<Props>()
 const emit = defineEmits<{
   open: [id: string]
   toggleFavorite: [id: string]
-  menu: [id: string, event: MouseEvent]
+  duplicate: [id: string]
+  share: [id: string]
 }>()
+
+const menuOpen = ref(false)
+
+function handleAction(action: string, id: string) {
+  menuOpen.value = false
+  switch (action) {
+    case 'open': emit('open', id); break
+    case 'duplicate': emit('duplicate', id); break
+    case 'share': emit('share', id); break
+  }
+}
 
 function formatUses(uses: number): string {
   if (uses >= 1000) {
@@ -85,13 +99,47 @@ function formatUses(uses: number): string {
       >
         {{ template.name }}
       </h3>
-      <button
-        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-foreground"
-        title="More options"
-        @click.stop="emit('menu', template.id, $event)"
-      >
-        <Icon name="ellipsis-h" size="sm" />
-      </button>
+      <Popover v-model:open="menuOpen">
+        <PopoverTrigger as-child>
+          <button
+            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-foreground"
+            title="More options"
+            @click.stop
+          >
+            <Icon name="ellipsis-h" size="sm" />
+          </button>
+        </PopoverTrigger>
+        <PopoverContent align="end" :side-offset="4" class="w-48 p-1">
+          <button
+            class="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            @click="handleAction('open', template.id)"
+          >
+            <Icon name="play" size="sm" class="text-zinc-400" />
+            Use Template
+          </button>
+          <button
+            class="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            @click="handleAction('duplicate', template.id)"
+          >
+            <Icon name="copy" size="sm" class="text-zinc-400" />
+            Duplicate
+          </button>
+          <button
+            class="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            @click="emit('toggleFavorite', template.id); menuOpen = false"
+          >
+            <Icon :name="template.favorite ? 'star-fill' : 'star'" size="sm" :class="template.favorite ? 'text-amber-500' : 'text-zinc-400'" />
+            {{ template.favorite ? 'Remove from Favorites' : 'Add to Favorites' }}
+          </button>
+          <button
+            class="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            @click="handleAction('share', template.id)"
+          >
+            <Icon name="share" size="sm" class="text-zinc-400" />
+            Share
+          </button>
+        </PopoverContent>
+      </Popover>
     </div>
   </div>
 </template>
