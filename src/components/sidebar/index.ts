@@ -1,0 +1,7 @@
+export { default as SidebarPanel } from './SidebarPanel.vue'
+export { default as SidebarIconBar } from './SidebarIconBar.vue'
+export { default as SidebarNodesTab } from './SidebarNodesTab.vue'
+export { default as SidebarModelsTab } from './SidebarModelsTab.vue'
+export { default as SidebarWorkflowsTab } from './SidebarWorkflowsTab.vue'
+export { default as SidebarAssetsTab } from './SidebarAssetsTab.vue'
+export { default as SidebarTemplatesTab } from './SidebarTemplatesTab.vue'
