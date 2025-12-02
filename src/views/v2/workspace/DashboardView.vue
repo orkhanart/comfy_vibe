@@ -47,14 +47,14 @@ const starterTemplates = [
       </div>
       <div class="flex items-center gap-2">
         <RouterLink
-          :to="`/${workspaceId}/create`"
+          :to="`/${workspaceId}/linear`"
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
           <Icon name="bolt" size="xs" />
           Linear
         </RouterLink>
         <RouterLink
-          :to="`/${workspaceId}/canvas`"
+          :to="`/nodemode/${workspaceId}/untitled`"
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
         >
           <Icon name="share-alt" size="xs" />

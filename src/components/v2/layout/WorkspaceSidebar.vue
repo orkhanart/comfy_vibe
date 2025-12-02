@@ -33,12 +33,6 @@ const isTeam = computed(() => props.workspaceId === 'team')
 
 const userMenuGroups = computed<MenuGroup[]>(() => [
   {
-    label: 'Create',
-    items: [
-      { label: 'Linear Mode', icon: 'bolt', route: `/${props.workspaceId}/create` }
-    ]
-  },
-  {
     label: 'Overview',
     items: [
       { label: 'Dashboard', icon: 'home', route: `/${props.workspaceId}` },
@@ -75,12 +69,6 @@ const userMenuGroups = computed<MenuGroup[]>(() => [
 ])
 
 const teamMenuGroups = computed<MenuGroup[]>(() => [
-  {
-    label: 'Create',
-    items: [
-      { label: 'Linear Mode', icon: 'bolt', route: `/${props.workspaceId}/create` }
-    ]
-  },
   {
     label: 'Overview',
     items: [
@@ -149,7 +137,7 @@ function signOut(): void {
           <button
             class="flex items-center gap-1.5 rounded-md px-2 py-1.5 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
           >
-            <img src="/comfy-logo-yellow.svg" alt="ComfyUI" class="h-6" />
+            <img :src="uiStore.themeMode === 'dark' ? '/comfy-logo-yellow.svg' : '/comfy-logo-blue.svg'" alt="ComfyUI" class="h-6" />
             <Icon name="chevron-down" size="xs" class="text-zinc-400" />
           </button>
         </PopoverTrigger>
@@ -215,6 +203,22 @@ function signOut(): void {
             <Icon name="cog" size="sm" class="w-4 text-zinc-400" />
             <span>Settings</span>
           </RouterLink>
+          <button
+            class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            @click="uiStore.toggleTheme()"
+          >
+            <Icon :name="uiStore.themeMode === 'dark' ? 'moon' : 'sun'" size="sm" class="w-4 text-zinc-400" />
+            <span class="flex-1">{{ uiStore.themeMode === 'dark' ? 'Dark Mode' : 'Light Mode' }}</span>
+            <div
+              class="h-5 w-9 rounded-full p-0.5 transition-colors"
+              :class="uiStore.themeMode === 'dark' ? 'bg-blue-500' : 'bg-zinc-300 dark:bg-zinc-600'"
+            >
+              <div
+                class="h-4 w-4 rounded-full bg-white transition-transform"
+                :class="uiStore.themeMode === 'dark' ? 'translate-x-4' : 'translate-x-0'"
+              />
+            </div>
+          </button>
           <button
             class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
             @click="uiStore.toggleInterfaceVersion()"

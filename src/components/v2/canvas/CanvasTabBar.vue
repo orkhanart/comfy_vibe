@@ -5,8 +5,10 @@ import { useRouter } from 'vue-router'
 import CanvasLogoMenu from './CanvasLogoMenu.vue'
 import CanvasTabs, { type CanvasTab } from './CanvasTabs.vue'
 import CanvasShareDialog from './CanvasShareDialog.vue'
+import { useUiStore } from '@/stores/uiStore'
 
 const router = useRouter()
+const uiStore = useUiStore()
 const showShareDialog = ref(false)
 
 const tabs = ref<CanvasTab[]>([
@@ -68,7 +70,7 @@ const activeWorkflowName = computed(() => {
         class="flex items-center gap-1 rounded-md px-2 py-1.5 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
         @click="handleLogoClick"
       >
-        <img src="/assets/images/comfy-logo-mono.svg" alt="Comfy" class="h-5 w-5" />
+        <img :src="uiStore.themeMode === 'dark' ? '/assets/images/comfy-logo-mono.svg' : '/comfy-logo-blue.svg'" alt="Comfy" class="h-5 w-5" />
         <Icon name="chevron-down" size="xs" class="opacity-70" />
       </button>
 

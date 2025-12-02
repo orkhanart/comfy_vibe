@@ -33,16 +33,9 @@ onUnmounted(() => {
 <template>
   <div class="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
     <!-- Global components -->
-    <Toaster richColors position="bottom-right" />
+    <Toaster richColors position="bottom-right" :theme="uiStore.themeMode === 'dark' ? 'dark' : 'light'" />
 
     <!-- Main content -->
     <RouterView />
   </div>
 </template>
-
-<style>
-/* Dark mode color scheme */
-.dark {
-  color-scheme: dark;
-}
-</style>

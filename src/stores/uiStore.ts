@@ -226,11 +226,17 @@ export const BOTTOM_BAR_TABS: SidebarTab[] = [
   { id: 'templates', label: 'Templates', icon: 'clone', tooltip: 'Templates' },
 ]
 
+export type ThemeMode = 'light' | 'dark' | 'system'
+
 export const useUiStore = defineStore('ui', () => {
   // Interface version: v1 = legacy, v2 = experimental
   const interfaceVersion = ref<InterfaceVersion>('v1')
   const leftSidebarOpen = ref(true)
   const rightSidebarOpen = ref(false)
+
+  // Theme mode: light, dark, or system - initialize from localStorage
+  const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('ui-theme') as ThemeMode : null
+  const themeMode = ref<ThemeMode>(storedTheme || 'dark')
 
   // Sidebar tab state (left sidebar)
   const activeSidebarTab = ref<SidebarTabId>(null)
@@ -325,6 +331,31 @@ export const useUiStore = defineStore('ui', () => {
     nodeSearchQuery.value = query
   }
 
+  // Theme functions
+  function setThemeMode(mode: ThemeMode): void {
+    themeMode.value = mode
+    applyTheme(mode)
+  }
+
+  function toggleTheme(): void {
+    const newMode = themeMode.value === 'dark' ? 'light' : 'dark'
+    setThemeMode(newMode)
+  }
+
+  function applyTheme(mode: ThemeMode): void {
+    const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    if (isDark) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+    // Persist to localStorage
+    localStorage.setItem('ui-theme', mode)
+  }
+
+  // Initialize theme on store creation
+  applyTheme(themeMode.value)
+
   return {
     interfaceVersion,
     interface2Enabled,
@@ -340,6 +371,8 @@ export const useUiStore = defineStore('ui', () => {
     nodePanelExpanded,
     expandedSubcategories,
     nodeSearchQuery,
+    // Theme
+    themeMode,
     // Functions
     setInterfaceVersion,
     toggleInterfaceVersion,
@@ -356,5 +389,8 @@ export const useUiStore = defineStore('ui', () => {
     closeNodePanel,
     toggleSubcategory,
     setNodeSearchQuery,
+    // Theme functions
+    setThemeMode,
+    toggleTheme,
   }
 })

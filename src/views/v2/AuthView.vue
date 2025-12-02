@@ -4,8 +4,10 @@ import { useRouter } from 'vue-router'
 import { User, Users } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { useUiStore } from '@/stores/uiStore'
 
 const router = useRouter()
+const uiStore = useUiStore()
 
 const username = ref('')
 
@@ -54,7 +56,7 @@ function signIn(accountType: AccountType): void {
         <!-- Mobile Logo -->
         <div class="mb-8 lg:hidden">
           <img
-            src="/assets/images/comfy-logo-mono.svg"
+            :src="uiStore.themeMode === 'dark' ? '/assets/images/comfy-logo-mono.svg' : '/comfy-logo-blue.svg'"
             alt="ComfyUI"
             class="h-8"
           />

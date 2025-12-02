@@ -38,6 +38,10 @@ function signOut(): void {
 function toggleExperimentalUI(): void {
   uiStore.toggleInterfaceVersion()
 }
+
+function toggleTheme(): void {
+  uiStore.toggleTheme()
+}
 </script>
 
 <template>
@@ -48,7 +52,7 @@ function toggleExperimentalUI(): void {
         class="flex items-center gap-1 rounded-md px-2 py-1.5 text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-100"
         @click="handleLogoClick"
       >
-        <img src="/assets/images/comfy-logo-mono.svg" alt="Comfy" class="h-5 w-5" />
+        <img :src="uiStore.themeMode === 'dark' ? '/assets/images/comfy-logo-mono.svg' : '/comfy-logo-blue.svg'" alt="Comfy" class="h-5 w-5" />
         <Icon name="chevron-down" size="xs" class="opacity-70" />
       </button>
 
@@ -96,6 +100,19 @@ function toggleExperimentalUI(): void {
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="goToSettings">
           <Icon name="cog" size="sm" class="w-4 text-zinc-500" />
           <span>Settings</span>
+        </button>
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="toggleTheme">
+          <Icon :name="uiStore.themeMode === 'dark' ? 'moon' : 'sun'" size="sm" class="w-4 text-zinc-500" />
+          <span class="flex-1">{{ uiStore.themeMode === 'dark' ? 'Dark Mode' : 'Light Mode' }}</span>
+          <div
+            class="h-5 w-9 rounded-full p-0.5 transition-colors"
+            :class="uiStore.themeMode === 'dark' ? 'bg-blue-500' : 'bg-zinc-700'"
+          >
+            <div
+              class="h-4 w-4 rounded-full bg-white transition-transform"
+              :class="uiStore.themeMode === 'dark' ? 'translate-x-4' : 'translate-x-0'"
+            />
+          </div>
         </button>
         <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-200 transition-colors hover:bg-zinc-800" @click="toggleExperimentalUI">
           <Icon name="sparkles" size="sm" class="w-4 text-zinc-500" />

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
@@ -8,6 +8,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <title>ComfyUI Prototypes</title>
+    <script>
+      // Prevent flash of wrong theme - check localStorage before Vue loads
+      (function() {
+        const stored = localStorage.getItem('ui-theme');
+        if (stored === 'light') {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

@@ -2,6 +2,9 @@
 /* NOTE: Font imports moved to index.html to avoid @import order issues */
 @import 'tailwindcss';
 
+/* Configure dark mode to use class strategy */
+@variant dark (&:where(.dark, .dark *));
+
 /* ===================== Design Tokens ===================== */
 @theme {
   /* Font Families */
@@ -110,28 +113,28 @@
 /* ===================== Root Variables ===================== */
 :root {
   /* Base colors - Light mode */
-  --fg-color: #000;
-  --bg-color: #fff;
+  --fg-color: #1a1a1a;
+  --bg-color: #ffffff;
   --comfy-menu-bg: #353535;
-  --input-text: #ddd;
-  --border-color: #4e4e4e;
+  --input-text: #333;
+  --border-color: #d1d5db;
 
-  /* Semantic tokens - Light mode */
-  --base-foreground: var(--color-charcoal-800);
-  --base-background: var(--color-white);
-  --muted-foreground: var(--color-smoke-800);
-  --secondary-background: var(--color-smoke-200);
-  --secondary-background-hover: var(--color-smoke-300);
+  /* Semantic tokens - Light mode - improved contrast */
+  --base-foreground: #111827;
+  --base-background: #ffffff;
+  --muted-foreground: #6b7280;
+  --secondary-background: #f3f4f6;
+  --secondary-background-hover: #e5e7eb;
   --primary-background: var(--color-azure-600);
   --primary-background-hover: var(--color-azure-400);
-  --border-default: var(--color-smoke-400);
-  --border-subtle: var(--color-smoke-300);
+  --border-default: #d1d5db;
+  --border-subtle: #e5e7eb;
 
-  /* Interface colors */
-  --interface-panel-surface: var(--color-white);
-  --interface-stroke: var(--color-smoke-300);
-  --button-surface: var(--color-white);
-  --button-hover-surface: var(--color-smoke-200);
+  /* Interface colors - Light mode */
+  --interface-panel-surface: #ffffff;
+  --interface-stroke: #e5e7eb;
+  --button-surface: #ffffff;
+  --button-hover-surface: #f3f4f6;
 
   /* shadcn semantic mappings - reuse existing tokens */
   --background: var(--base-background);
@@ -157,26 +160,40 @@
 }
 
 /* ===================== Dark Theme ===================== */
+.dark,
 .dark-theme {
-  --fg-color: #fff;
-  --bg-color: #202020;
+  --fg-color: #f9fafb;
+  --bg-color: #09090b;
 
-  /* Semantic tokens - Dark mode */
-  --base-foreground: var(--color-white);
-  --base-background: var(--color-charcoal-800);
-  --muted-foreground: var(--color-smoke-700);
-  --secondary-background: var(--color-charcoal-600);
-  --secondary-background-hover: var(--color-charcoal-400);
-  --primary-background: var(--color-azure-600);
-  --primary-background-hover: var(--color-azure-400);
-  --border-default: var(--color-charcoal-200);
-  --border-subtle: var(--color-charcoal-300);
+  /* Semantic tokens - Dark mode - explicit values for better reliability */
+  --base-foreground: #f9fafb;
+  --base-background: #09090b;
+  --muted-foreground: #a1a1aa;
+  --secondary-background: #27272a;
+  --secondary-background-hover: #3f3f46;
+  --primary-background: #0b8ce9;
+  --primary-background-hover: #31b9f4;
+  --border-default: #3f3f46;
+  --border-subtle: #27272a;
 
-  /* Interface colors */
-  --interface-panel-surface: var(--color-charcoal-800);
-  --interface-stroke: var(--color-charcoal-400);
-  --button-surface: var(--color-charcoal-600);
-  --button-hover-surface: var(--color-charcoal-400);
+  /* Interface colors - Dark mode */
+  --interface-panel-surface: #18181b;
+  --interface-stroke: #27272a;
+  --button-surface: #27272a;
+  --button-hover-surface: #3f3f46;
+
+  /* shadcn semantic mappings - dark mode overrides */
+  --background: var(--base-background);
+  --foreground: var(--base-foreground);
+  --card: var(--interface-panel-surface);
+  --card-foreground: var(--base-foreground);
+  --popover: var(--interface-panel-surface);
+  --popover-foreground: var(--base-foreground);
+  --muted: var(--secondary-background);
+  --accent: var(--secondary-background);
+  --accent-foreground: var(--base-foreground);
+  --border: var(--border-default);
+  --input: var(--border-default);
 }
 
 /* ===================== Tailwind Theme Inline ===================== */
@@ -223,11 +240,16 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+html.dark {
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
   background-color: var(--bg-color);
   color: var(--fg-color);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #app {
