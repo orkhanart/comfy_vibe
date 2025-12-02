@@ -1,23 +1,15 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import CanvasLogoMenu from './CanvasLogoMenu.vue'
-import CanvasTabs, { type CanvasTab } from './CanvasTabs.vue'
+import CanvasTabs from './CanvasTabs.vue'
 import CanvasShareDialog from './CanvasShareDialog.vue'
 import { useUiStore } from '@/stores/uiStore'
 
 const router = useRouter()
 const uiStore = useUiStore()
 const showShareDialog = ref(false)
-
-const tabs = ref<CanvasTab[]>([
-  { id: 'workflow-1', name: 'Main Workflow', isActive: true },
-  { id: 'workflow-2', name: 'Upscale Pipeline', isActive: false, isDirty: true },
-  { id: 'workflow-3', name: 'ControlNet Test', isActive: false },
-])
-
-const activeTabId = ref('workflow-1')
 const showMenu = ref(false)
 
 function handleLogoClick(): void {
@@ -27,39 +19,6 @@ function handleLogoClick(): void {
 function handleHomeClick(): void {
   router.push({ name: 'workspace-dashboard', params: { workspaceId: 'default' } })
 }
-
-function selectTab(tabId: string): void {
-  activeTabId.value = tabId
-  tabs.value = tabs.value.map(tab => ({
-    ...tab,
-    isActive: tab.id === tabId
-  }))
-}
-
-function closeTab(tabId: string): void {
-  const index = tabs.value.findIndex(t => t.id === tabId)
-  if (index > -1) {
-    tabs.value.splice(index, 1)
-    if (tabId === activeTabId.value && tabs.value.length > 0) {
-      const newIndex = Math.min(index, tabs.value.length - 1)
-      selectTab(tabs.value[newIndex]!.id)
-    }
-  }
-}
-
-function createNewTab(): void {
-  const newId = `workflow-${Date.now()}`
-  tabs.value.push({
-    id: newId,
-    name: 'Untitled Workflow',
-    isActive: false,
-  })
-  selectTab(newId)
-}
-
-const activeWorkflowName = computed(() => {
-  return tabs.value.find(t => t.id === activeTabId.value)?.name || 'Workflow'
-})
 </script>
 
 <template>
@@ -94,11 +53,11 @@ const activeWorkflowName = computed(() => {
 
     <!-- Tabs Section -->
     <CanvasTabs
-      :tabs="tabs"
-      :active-tab-id="activeTabId"
-      @select="selectTab"
-      @close="closeTab"
-      @new="createNewTab"
+      :tabs="uiStore.workflowTabs"
+      :active-tab-id="uiStore.activeWorkflowTabId"
+      @select="uiStore.selectWorkflowTab"
+      @close="uiStore.closeWorkflowTab"
+      @new="uiStore.createWorkflowTab"
     />
 
     <!-- Right Section -->
@@ -135,7 +94,7 @@ const activeWorkflowName = computed(() => {
     <!-- Share Dialog -->
     <CanvasShareDialog
       v-model:visible="showShareDialog"
-      :workflow-name="activeWorkflowName"
+      :workflow-name="uiStore.activeWorkflowName"
     />
   </div>
 </template>

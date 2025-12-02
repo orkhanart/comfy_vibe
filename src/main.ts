@@ -6,6 +6,7 @@ import App from './App.vue'
 import router from './router'
 
 import { vTooltip } from './directives/tooltip'
+import { initPostHog } from './plugins/posthog'
 
 import './assets/css/main.css'
 
@@ -17,6 +18,9 @@ app.use(pinia)
 
 // Vue Router
 app.use(router)
+
+// PostHog Analytics
+initPostHog(router)
 
 // Custom tooltip directive
 app.directive('tooltip', vTooltip)

@@ -24,6 +24,7 @@
     "es-toolkit": "^1.39.9",
     "lucide-vue-next": "^0.555.0",
     "pinia": "^2.2.2",
+    "posthog-js": "^1.299.0",
     "reka-ui": "^2.6.1",
     "tailwind-merge": "^3.4.0",
     "vue": "^3.5.13",

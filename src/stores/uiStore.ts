@@ -217,6 +217,17 @@ export const SIDEBAR_TABS: SidebarTab[] = [
 
 export type ThemeMode = 'light' | 'dark' | 'system'
 
+// ============================================================================
+// WORKFLOW TABS (shared between Node Mode and Linear Mode)
+// ============================================================================
+
+export interface WorkflowTab {
+  id: string
+  name: string
+  isActive: boolean
+  isDirty?: boolean
+}
+
 export const useUiStore = defineStore('ui', () => {
   const leftSidebarOpen = ref(true)
   const rightSidebarOpen = ref(false)
@@ -224,6 +235,18 @@ export const useUiStore = defineStore('ui', () => {
   // Theme mode: light, dark, or system - initialize from localStorage
   const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('ui-theme') as ThemeMode : null
   const themeMode = ref<ThemeMode>(storedTheme || 'dark')
+
+  // Workflow tabs (shared between Node Mode and Linear Mode)
+  const workflowTabs = ref<WorkflowTab[]>([
+    { id: 'workflow-1', name: 'Main Workflow', isActive: true },
+    { id: 'workflow-2', name: 'Upscale Pipeline', isActive: false, isDirty: true },
+    { id: 'workflow-3', name: 'ControlNet Test', isActive: false },
+  ])
+  const activeWorkflowTabId = ref('workflow-1')
+
+  const activeWorkflowName = computed(() => {
+    return workflowTabs.value.find(t => t.id === activeWorkflowTabId.value)?.name || 'Workflow'
+  })
 
   // Sidebar tab state (left sidebar)
   const activeSidebarTab = ref<SidebarTabId>(null)
@@ -300,6 +323,36 @@ export const useUiStore = defineStore('ui', () => {
     setThemeMode(newMode)
   }
 
+  // Workflow tab functions
+  function selectWorkflowTab(tabId: string): void {
+    activeWorkflowTabId.value = tabId
+    workflowTabs.value = workflowTabs.value.map(tab => ({
+      ...tab,
+      isActive: tab.id === tabId
+    }))
+  }
+
+  function closeWorkflowTab(tabId: string): void {
+    const index = workflowTabs.value.findIndex(t => t.id === tabId)
+    if (index > -1) {
+      workflowTabs.value.splice(index, 1)
+      if (tabId === activeWorkflowTabId.value && workflowTabs.value.length > 0) {
+        const newIndex = Math.min(index, workflowTabs.value.length - 1)
+        selectWorkflowTab(workflowTabs.value[newIndex]!.id)
+      }
+    }
+  }
+
+  function createWorkflowTab(): void {
+    const newId = `workflow-${Date.now()}`
+    workflowTabs.value.push({
+      id: newId,
+      name: 'Untitled Workflow',
+      isActive: false,
+    })
+    selectWorkflowTab(newId)
+  }
+
   function applyTheme(mode: ThemeMode): void {
     const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
     if (isDark) {
@@ -325,6 +378,10 @@ export const useUiStore = defineStore('ui', () => {
     nodePanelExpanded,
     expandedSubcategories,
     nodeSearchQuery,
+    // Workflow tabs
+    workflowTabs,
+    activeWorkflowTabId,
+    activeWorkflowName,
     // Theme
     themeMode,
     // Functions
@@ -338,6 +395,10 @@ export const useUiStore = defineStore('ui', () => {
     closeNodePanel,
     toggleSubcategory,
     setNodeSearchQuery,
+    // Workflow tab functions
+    selectWorkflowTab,
+    closeWorkflowTab,
+    createWorkflowTab,
     // Theme functions
     setThemeMode,
     toggleTheme,

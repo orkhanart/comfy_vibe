@@ -95,6 +95,7 @@ declare module 'vue' {
     SelectItem: typeof import('./components/ui/select/SelectItem.vue')['default']
     SelectTrigger: typeof import('./components/ui/select/SelectTrigger.vue')['default']
     SelectValue: typeof import('./components/ui/select/SelectValue.vue')['default']
+    ShareDialog: typeof import('./components/common/ShareDialog.vue')['default']
     SidebarAssetsTab: typeof import('./components/sidebar/SidebarAssetsTab.vue')['default']
     SidebarGridCard: typeof import('./components/common/sidebar/SidebarGridCard.vue')['default']
     SidebarIconBar: typeof import('./components/sidebar/SidebarIconBar.vue')['default']

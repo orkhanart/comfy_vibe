@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Icon } from '@/components/ui/icon'
+
 export interface CanvasTab {
   id: string
   name: string

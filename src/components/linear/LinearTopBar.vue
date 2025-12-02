@@ -3,11 +3,11 @@ import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/uiStore'
+import CanvasTabs from '@/components/canvas/CanvasTabs.vue'
 
 const router = useRouter()
 const uiStore = useUiStore()
 
-const sessionName = ref('Untitled session')
 const showMenu = ref(false)
 
 function handleLogoClick(): void {
@@ -137,23 +137,22 @@ function toggleTheme(): void {
     <!-- Divider -->
     <div class="mx-1 h-5 w-px bg-border" />
 
-    <!-- Session Name / Tabs Area -->
-    <div class="flex flex-1 items-center">
-      <div class="flex items-center gap-1">
-        <span class="rounded-md bg-muted px-3 py-1.5 text-xs text-foreground">{{ sessionName }}</span>
-        <button class="p-1 text-muted-foreground transition-colors hover:text-foreground">
-          <Icon name="ellipsis-h" size="xs" />
-        </button>
-      </div>
-    </div>
+    <!-- Tabs Section -->
+    <CanvasTabs
+      :tabs="uiStore.workflowTabs"
+      :active-tab-id="uiStore.activeWorkflowTabId"
+      @select="uiStore.selectWorkflowTab"
+      @close="uiStore.closeWorkflowTab"
+      @new="uiStore.createWorkflowTab"
+    />
 
     <!-- Right Section -->
-    <div class="flex items-center gap-1">
+    <div class="ml-auto flex items-center gap-1">
       <!-- Mode Toggle -->
       <div class="flex h-7 items-center rounded-md bg-muted p-0.5">
         <button
           class="flex h-6 items-center gap-1 rounded px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-          @click="router.push({ name: 'canvas', params: { workspaceId: 'default', canvasId: 'main' } })"
+          @click="router.push({ name: 'node-editor' })"
         >
           <Icon name="sitemap" size="xs" />
           Node
