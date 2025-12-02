@@ -3,13 +3,12 @@ import { Icon } from '@/components/ui/icon'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { WorkflowCard, AssetCard, ModelCard } from '@/components/workspace'
+import { WorkflowCard, AssetCard, ModelCard, FolderCard } from '@/components/workspace'
 import { FavoriteButton } from '@/components/common'
 import { MOCK_WORKFLOWS, MOCK_ASSETS, MOCK_MODELS, getAssetIcon, type Workflow, type Asset, type Model } from '@/data/workspaceMockData'
 
 const route = useRoute()
 const router = useRouter()
-const workspaceId = computed(() => route.params.workspaceId as string)
 const projectId = computed(() => route.params.projectId as string)
 
 // Mock project data
@@ -71,7 +70,7 @@ function toggleWorkflowFavorite(workflowId: string) {
 }
 
 function openWorkflow(workflowId: string) {
-  router.push(`/nodemode/${workspaceId.value}/${workflowId}`)
+  router.push(`/node`)
 }
 
 // =====================
@@ -221,10 +220,11 @@ function closeModelInfo() {
 type View = 'home' | 'workflows' | 'models' | 'assets'
 const activeView = ref<View>('home')
 
+// Native folders use blue color to indicate they're system folders (can't be deleted)
 const mainFolders = computed(() => [
-  { id: 'workflows', label: 'Workflows', icon: 'sitemap', color: 'bg-purple-100 dark:bg-purple-500/20', iconColor: 'text-purple-600 dark:text-purple-400', count: workflows.value.length },
-  { id: 'models', label: 'Models', icon: 'box', color: 'bg-orange-100 dark:bg-orange-500/20', iconColor: 'text-orange-600 dark:text-orange-400', count: models.value.length },
-  { id: 'assets', label: 'Assets', icon: 'images', color: 'bg-blue-100 dark:bg-blue-500/20', iconColor: 'text-blue-600 dark:text-blue-400', count: assets.value.length },
+  { id: 'workflows', name: 'Workflows', icon: 'sitemap', iconClass: 'text-blue-500 dark:text-blue-400', count: workflows.value.length },
+  { id: 'models', name: 'Models', icon: 'box', iconClass: 'text-blue-500 dark:text-blue-400', count: models.value.length },
+  { id: 'assets', name: 'Assets', icon: 'images', iconClass: 'text-blue-500 dark:text-blue-400', count: assets.value.length },
 ])
 
 // User-created folders within project
@@ -383,70 +383,28 @@ function handleProjectAction(action: string) {
         <template v-if="activeView === 'home'">
           <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
             <!-- Main Folders (Workflows, Models, Assets) -->
-            <div
+            <FolderCard
               v-for="folder in mainFolders"
               :key="folder.id"
-              class="group cursor-pointer rounded-xl bg-white transition-all hover:shadow-md dark:bg-card"
-              @click="openFolder(folder.id)"
-            >
-              <!-- Folder Visual -->
-              <div class="relative aspect-square overflow-hidden rounded-t-xl bg-zinc-100 dark:bg-zinc-800">
-                <div class="flex h-full w-full items-center justify-center">
-                  <div :class="['flex h-20 w-20 items-center justify-center rounded-2xl transition-transform group-hover:scale-110', folder.color]">
-                    <Icon :name="folder.icon" size="3xl" :class="folder.iconColor" />
-                  </div>
-                </div>
-                <!-- Item count badge -->
-                <div class="absolute bottom-2 right-2">
-                  <span class="rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
-                    {{ folder.count }} items
-                  </span>
-                </div>
-              </div>
-              <!-- Footer -->
-              <div class="flex items-center gap-2 px-3 py-2.5">
-                <div :class="['flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', folder.color]">
-                  <Icon :name="folder.icon" size="sm" :class="folder.iconColor" />
-                </div>
-                <h3 class="min-w-0 flex-1 truncate text-sm font-medium text-zinc-900 dark:text-foreground">{{ folder.label }}</h3>
-                <button
-                  class="flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-zinc-900 px-3 text-xs font-medium text-white opacity-0 transition-all hover:bg-zinc-800 group-hover:opacity-100 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
-                  @click.stop="openFolder(folder.id)"
-                >
-                  <Icon name="external-link" size="xs" />
-                  Open
-                </button>
-              </div>
-            </div>
+              :folder="folder"
+              :item-count="folder.count"
+              :icon="folder.icon"
+              :icon-class="folder.iconClass"
+              @open="openFolder"
+              @open-menu="(id, event) => console.log('Folder menu:', id)"
+            />
 
             <!-- User-Created Folders -->
-            <div
+            <FolderCard
               v-for="folder in userFolders"
               :key="folder.id"
-              class="group cursor-pointer rounded-xl bg-white transition-all hover:shadow-md dark:bg-card"
-              @click="openFolder(folder.id)"
-            >
-              <div class="relative aspect-square overflow-hidden rounded-t-xl bg-zinc-100 dark:bg-zinc-800">
-                <div class="flex h-full w-full items-center justify-center">
-                  <div class="flex h-20 w-20 items-center justify-center rounded-2xl bg-zinc-200 transition-transform group-hover:scale-110 dark:bg-zinc-700">
-                    <Icon name="folder" size="3xl" class="text-zinc-500 dark:text-zinc-400" />
-                  </div>
-                </div>
-              </div>
-              <div class="flex items-center gap-2 px-3 py-2.5">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-200 dark:bg-zinc-700">
-                  <Icon name="folder" size="sm" class="text-zinc-500 dark:text-zinc-400" />
-                </div>
-                <h3 class="min-w-0 flex-1 truncate text-sm font-medium text-zinc-900 dark:text-foreground">{{ folder.name }}</h3>
-                <button
-                  class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-zinc-400 opacity-0 transition-all hover:bg-red-100 hover:text-red-600 group-hover:opacity-100 dark:hover:bg-red-500/20 dark:hover:text-red-400"
-                  title="Delete folder"
-                  @click.stop="deleteFolder(folder.id)"
-                >
-                  <Icon name="trash" size="sm" />
-                </button>
-              </div>
-            </div>
+              :folder="folder"
+              :item-count="0"
+              icon="folder"
+              icon-class="text-amber-500 dark:text-amber-400"
+              @open="openFolder"
+              @open-menu="(id, event) => deleteFolder(id)"
+            />
 
             <!-- Create New Folder Card -->
             <div

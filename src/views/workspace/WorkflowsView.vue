@@ -16,7 +16,6 @@ import { useFolders } from '@/composables/common/useFolders'
 
 const route = useRoute()
 const router = useRouter()
-const workspaceId = computed(() => route.params.workspaceId as string)
 
 // Folder functionality
 const {
@@ -161,16 +160,12 @@ function closeFileInfo() {
 
 // Navigation
 function openWorkflow(workflowId: string) {
-  router.push(`/nodemode/${workspaceId.value}/${workflowId}`)
+  router.push('/node')
 }
 
 function openInMode(workflowId: string, mode: 'node' | 'linear') {
   closeMenu()
-  if (mode === 'node') {
-    router.push(`/nodemode/${workspaceId.value}/${workflowId}`)
-  } else {
-    router.push(`/linear/${workspaceId.value}/${workflowId}`)
-  }
+  router.push('/node')
 }
 </script>
 

@@ -1,17 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
-
 import WorkspaceSidebar from './WorkspaceSidebar.vue'
-
-const route = useRoute()
-
-const workspaceId = computed(() => route.params.workspaceId as string)
 </script>
 
 <template>
   <div class="flex h-screen bg-white dark:bg-background">
-    <WorkspaceSidebar :workspace-id="workspaceId" />
+    <WorkspaceSidebar />
     <main class="flex-1 overflow-auto bg-zinc-50/50 dark:bg-card/50">
       <slot />
     </main>

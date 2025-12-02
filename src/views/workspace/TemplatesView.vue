@@ -20,7 +20,6 @@ import {
 
 const route = useRoute()
 const router = useRouter()
-const workspaceId = computed(() => route.params.workspaceId as string)
 
 type ViewMode = 'grid' | 'list'
 
@@ -65,7 +64,7 @@ const filteredTemplates = computed(() => {
 })
 
 function openTemplate(templateId: string): void {
-  router.push(`/nodemode/${workspaceId.value}/${templateId}`)
+  router.push('/node')
 }
 </script>
 

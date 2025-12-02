@@ -99,41 +99,37 @@ function handleProjectAction(action: string, projectId: string) {
   closeProjectMenu()
 }
 
-const props = defineProps<{
-  workspaceId: string
-}>()
-
 const route = useRoute()
 const router = useRouter()
 
-const menuGroups = computed<MenuGroup[]>(() => [
+const menuGroups: MenuGroup[] = [
   {
     label: 'Overview',
     items: [
-      { label: 'Home', icon: 'home', route: `/${props.workspaceId}` },
-      { label: 'Recents', icon: 'clock', route: `/${props.workspaceId}/recents` },
-      { label: 'Templates', icon: 'th-large', route: `/${props.workspaceId}/templates` }
+      { label: 'Home', icon: 'home', route: '/workspace' },
+      { label: 'Recents', icon: 'clock', route: '/workspace/recents' },
+      { label: 'Templates', icon: 'th-large', route: '/workspace/templates' }
     ]
   },
   {
     label: 'My Library',
     items: [
-      { label: 'Workflows', icon: 'sitemap', route: `/${props.workspaceId}/workflows` },
-      { label: 'Assets', icon: 'images', route: `/${props.workspaceId}/assets` },
-      { label: 'Models', icon: 'box', route: `/${props.workspaceId}/models` }
+      { label: 'Workflows', icon: 'sitemap', route: '/workspace/workflows' },
+      { label: 'Assets', icon: 'images', route: '/workspace/assets' },
+      { label: 'Models', icon: 'box', route: '/workspace/models' }
     ]
   }
-])
+]
 
-const trashItem = computed<MenuItem>(() => ({
+const trashItem: MenuItem = {
   label: 'Trash',
   icon: 'trash',
-  route: `/${props.workspaceId}/trash`
-}))
+  route: '/workspace/trash'
+}
 
 function isActive(itemRoute?: string): boolean {
   if (!itemRoute) return false
-  if (itemRoute === `/${props.workspaceId}`) {
+  if (itemRoute === '/workspace') {
     return route.path === itemRoute
   }
   return route.path.startsWith(itemRoute)
@@ -191,7 +187,7 @@ function signOut(): void {
             Workspace
           </div>
           <RouterLink
-            :to="`/${workspaceId}`"
+            :to="'/workspace'"
             class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-foreground dark:hover:bg-muted"
             @click="logoMenuOpen = false"
           >
@@ -206,7 +202,7 @@ function signOut(): void {
             Account
           </div>
           <RouterLink
-            :to="`/${workspaceId}/settings`"
+            :to="'/workspace/settings'"
             class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-foreground dark:hover:bg-muted"
             @click="logoMenuOpen = false"
           >
@@ -244,10 +240,10 @@ function signOut(): void {
 
       <!-- Settings -->
       <RouterLink
-        :to="`/${workspaceId}/settings`"
+        :to="'/workspace/settings'"
         :class="[
           'flex h-8 w-8 items-center justify-center rounded-md transition-colors',
-          isActive(`/${workspaceId}/settings`)
+          isActive('/workspace/settings')
             ? 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
             : 'text-muted-foreground hover:bg-zinc-100 hover:text-zinc-700 dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-foreground'
         ]"
@@ -347,10 +343,10 @@ function signOut(): void {
         <ul class="flex flex-col gap-0.5">
           <li v-for="project in projects" :key="project.id" class="group relative">
             <RouterLink
-              :to="`/${workspaceId}/projects/${project.id}`"
+              :to="`/workspace/projects/${project.id}`"
               :class="[
                 'flex items-center gap-2 rounded-md px-2 py-1.5 pr-8 text-sm transition-colors',
-                isActive(`/${workspaceId}/projects/${project.id}`)
+                isActive(`/workspace/projects/${project.id}`)
                   ? 'bg-zinc-900 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900'
                   : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-foreground'
               ]"
@@ -368,7 +364,7 @@ function signOut(): void {
                     projectMenuOpen === project.id
                       ? 'opacity-100'
                       : 'opacity-0 group-hover:opacity-100',
-                    isActive(`/${workspaceId}/projects/${project.id}`)
+                    isActive(`/workspace/projects/${project.id}`)
                       ? 'text-white/70 hover:bg-white/10 hover:text-white dark:text-zinc-900/70 dark:hover:bg-zinc-900/10 dark:hover:text-zinc-900'
                       : 'text-zinc-400 hover:bg-zinc-200 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-foreground'
                   ]"
@@ -482,7 +478,7 @@ function signOut(): void {
           <div class="my-2 h-px bg-zinc-200 dark:bg-zinc-700" />
 
           <RouterLink
-            :to="`/${workspaceId}/settings`"
+            :to="'/workspace/settings'"
             class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-foreground dark:hover:bg-muted"
             @click="accountMenuOpen = false"
           >

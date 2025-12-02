@@ -14,7 +14,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./views/HomeView.vue')
   },
   {
-    path: '/:workspaceId',
+    path: '/node',
+    name: 'node',
+    component: () => import('./views/CanvasView.vue')
+  },
+  {
+    path: '/workspace',
     component: () => import('./views/WorkspaceView.vue'),
     props: true,
     children: [
@@ -74,6 +79,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./views/workspace/SettingsView.vue')
       },
       {
+        path: 'card-designs',
+        name: 'workspace-card-designs',
+        component: () => import('./views/workspace/CardDesignsView.vue')
+      },
+      {
         path: 'projects/:projectId',
         name: 'workspace-project',
         component: () => import('./views/workspace/ProjectView.vue')
@@ -81,7 +91,7 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
-    path: '/nodemode/:workspaceId/:workflowId',
+    path: '/nodemode/:workflowId?',
     name: 'node-editor',
     component: () => import('./views/CanvasView.vue'),
     props: true

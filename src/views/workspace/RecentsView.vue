@@ -13,11 +13,9 @@ import {
 
 const route = useRoute()
 const router = useRouter()
-const workspaceId = computed(() => route.params.workspaceId as string)
-
 function openItem(item: { id: string; type: string }) {
   if (item.type === 'workflow' || item.type === 'template') {
-    router.push(`/nodemode/${workspaceId.value}/${item.id}`)
+    router.push('/node')
   }
 }
 

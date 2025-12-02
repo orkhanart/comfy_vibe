@@ -40,17 +40,12 @@ export function useFolders(type: FolderType) {
 
   // Navigation
   function navigateToFolder(folderId: string | null) {
-    const workspaceId = route.params.workspaceId
-
     if (folderId === null) {
       // Navigate to root
-      router.push({ name: `workspace-${type}`, params: { workspaceId } })
+      router.push(`/workspace/${type}`)
     } else {
       // Navigate to folder
-      router.push({
-        name: `workspace-${type}-folder`,
-        params: { workspaceId, folderId }
-      })
+      router.push(`/workspace/${type}/folder/${folderId}`)
     }
   }
 

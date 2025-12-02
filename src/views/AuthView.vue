@@ -15,9 +15,7 @@ type AccountType = 'user' | 'teams'
 
 function signIn(accountType: AccountType): void {
   if (!username.value.trim()) return
-
-  const workspaceId = accountType === 'teams' ? 'team' : username.value.trim()
-  router.push(`/${workspaceId}`)
+  router.push('/workspace')
 }
 </script>
 
