@@ -134,6 +134,9 @@ const emit = defineEmits<{
 
     <!-- Content -->
     <template v-if="!isEmpty">
+      <!-- Folders Slot (appears before items) -->
+      <slot name="folders" />
+
       <!-- Grid View -->
       <div
         v-if="viewMode === 'grid'"

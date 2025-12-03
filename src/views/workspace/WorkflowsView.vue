@@ -170,36 +170,6 @@ function openWorkflow() {
       @navigate="navigateToFolder"
     />
 
-    <!-- Folders Section -->
-    <div v-if="foldersAtCurrentLevel.length > 0" class="mb-6">
-      <h3 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Folders</h3>
-      <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
-        <div v-for="folder in foldersAtCurrentLevel" :key="folder.id" class="relative">
-          <FolderCard
-            :folder="folder"
-            :item-count="getItemCount(folder.id, workflows)"
-            :subfolder-count="getSubfolderCount(folder.id)"
-            @open="handleFolderOpen"
-            @open-menu="handleOpenFolderMenu"
-          />
-          <FolderContextMenu
-            v-if="openFolderMenuId === folder.id"
-            :folder-id="folder.id"
-            class="absolute right-0 top-full z-50"
-            @open="handleFolderOpen"
-            @rename="closeFolderMenu"
-            @delete="handleFolderDelete"
-            @close="closeFolderMenu"
-          />
-        </div>
-      </div>
-    </div>
-
-    <!-- Workflows Section Header -->
-    <h3 v-if="foldersAtCurrentLevel.length > 0 && filteredWorkflows.length > 0" class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-      Workflows
-    </h3>
-
     <!-- Resource List -->
     <ResourceListView
       v-model:search-query="searchQuery"
@@ -214,6 +184,37 @@ function openWorkflow() {
       :empty-description="searchQuery ? 'Try a different search term' : 'Import or save a workflow to get started'"
       @create-folder="showCreateFolderDialog = true"
     >
+      <!-- Folders Section -->
+      <template #folders>
+        <div v-if="foldersAtCurrentLevel.length > 0" class="mb-6">
+          <h3 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Folders</h3>
+          <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+            <div v-for="folder in foldersAtCurrentLevel" :key="folder.id" class="relative">
+              <FolderCard
+                :folder="folder"
+                :item-count="getItemCount(folder.id, workflows)"
+                :subfolder-count="getSubfolderCount(folder.id)"
+                @open="handleFolderOpen"
+                @open-menu="handleOpenFolderMenu"
+              />
+              <FolderContextMenu
+                v-if="openFolderMenuId === folder.id"
+                :folder-id="folder.id"
+                class="absolute right-0 top-full z-50"
+                @open="handleFolderOpen"
+                @rename="closeFolderMenu"
+                @delete="handleFolderDelete"
+                @close="closeFolderMenu"
+              />
+            </div>
+          </div>
+        </div>
+        <!-- Workflows Section Header -->
+        <h3 v-if="foldersAtCurrentLevel.length > 0 && filteredWorkflows.length > 0" class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+          Workflows
+        </h3>
+      </template>
+
       <template #grid>
         <div v-for="workflow in filteredWorkflows" :key="workflow.id" class="relative">
           <WorkflowCard

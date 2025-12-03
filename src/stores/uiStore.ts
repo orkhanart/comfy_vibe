@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-export type SidebarTabId = 'nodes' | 'models' | 'workflows' | 'assets' | 'templates' | 'library' | 'packages' | null
+export type SidebarTabId = 'nodes' | 'models' | 'library' | null
 
 export interface SidebarTab {
   id: Exclude<SidebarTabId, null>
@@ -209,13 +209,40 @@ export const NODE_CATEGORIES: NodeCategory[] = [
 export const SIDEBAR_TABS: SidebarTab[] = [
   { id: 'nodes', label: 'Nodes', icon: 'sitemap', tooltip: 'Node Library' },
   { id: 'models', label: 'Models', icon: 'box', tooltip: 'Model Library' },
-  { id: 'workflows', label: 'Workflows', icon: 'folder-open', tooltip: 'Workflows' },
-  { id: 'assets', label: 'Assets', icon: 'images', tooltip: 'Assets' },
-  { id: 'templates', label: 'Templates', icon: 'clone', tooltip: 'Templates' },
-  { id: 'library', label: 'Library', icon: 'bookmark', tooltip: 'Library' },
+  { id: 'library', label: 'Asset Library', icon: 'library', tooltip: 'Asset Library' },
 ]
 
 export type ThemeMode = 'light' | 'dark' | 'system'
+
+// ============================================================================
+// SIDEBAR SHORTCUTS
+// ============================================================================
+
+export type ShortcutType =
+  | 'library-section'  // My Library, Projects, Templates
+  | 'library-folder'   // Workflows, Models, Assets folders
+  | 'workflow'         // Individual workflow
+  | 'model'            // Individual model
+  | 'asset'            // Individual asset
+  | 'project'          // Individual project
+  | 'node'             // Node from node library
+  | 'node-category'    // Node category
+
+export interface SidebarShortcut {
+  id: string
+  label: string
+  icon: string
+  type: ShortcutType
+  // For library navigation
+  section?: 'my-library' | 'projects' | 'templates'
+  filter?: 'All' | 'Workflows' | 'Models' | 'Assets'
+  // For individual items
+  itemId?: string
+  thumbnail?: string
+  // For nodes
+  nodeCategory?: string
+  nodeName?: string
+}
 
 // ============================================================================
 // WORKFLOW TABS (shared between Node Mode and Linear Mode)
@@ -251,10 +278,18 @@ export const useUiStore = defineStore('ui', () => {
   // Sidebar tab state (left sidebar)
   const activeSidebarTab = ref<SidebarTabId>(null)
 
+  // Library navigation state (for shortcuts)
+  const activeLibrarySection = ref<'my-library' | 'projects' | 'templates'>('my-library')
+  const activeLibraryFilter = ref<'All' | 'Workflows' | 'Models' | 'Assets'>('All')
+
   // Node category state (TouchDesigner/Houdini-style)
   const activeNodeCategory = ref<NodeCategoryId>(null)
   const expandedSubcategories = ref<Set<string>>(new Set())
   const nodeSearchQuery = ref('')
+
+  // Sidebar shortcuts - load from localStorage
+  const storedShortcuts = typeof window !== 'undefined' ? localStorage.getItem('sidebar-shortcuts') : null
+  const sidebarShortcuts = ref<SidebarShortcut[]>(storedShortcuts ? JSON.parse(storedShortcuts) : [])
 
   // Sidebar panel is expanded when a tab is active
   const sidebarPanelExpanded = computed(() => activeSidebarTab.value !== null)
@@ -367,6 +402,100 @@ export const useUiStore = defineStore('ui', () => {
   // Initialize theme on store creation
   applyTheme(themeMode.value)
 
+  // Sidebar shortcut functions
+  function addSidebarShortcut(shortcut: SidebarShortcut): void {
+    // Check if already exists
+    if (sidebarShortcuts.value.some(s => s.id === shortcut.id)) return
+    sidebarShortcuts.value.push(shortcut)
+    saveSidebarShortcuts()
+  }
+
+  function removeSidebarShortcut(shortcutId: string): void {
+    const index = sidebarShortcuts.value.findIndex(s => s.id === shortcutId)
+    if (index > -1) {
+      sidebarShortcuts.value.splice(index, 1)
+      saveSidebarShortcuts()
+    }
+  }
+
+  function reorderSidebarShortcuts(fromIndex: number, toIndex: number): void {
+    const [removed] = sidebarShortcuts.value.splice(fromIndex, 1)
+    if (removed) {
+      sidebarShortcuts.value.splice(toIndex, 0, removed)
+      saveSidebarShortcuts()
+    }
+  }
+
+  function saveSidebarShortcuts(): void {
+    localStorage.setItem('sidebar-shortcuts', JSON.stringify(sidebarShortcuts.value))
+  }
+
+  function openShortcut(shortcut: SidebarShortcut): void {
+    console.log('[Shortcut] Opening shortcut:', shortcut)
+
+    switch (shortcut.type) {
+      case 'library-section':
+      case 'library-folder':
+        // Open library tab and navigate to section/filter
+        activeSidebarTab.value = 'library'
+        if (shortcut.section) {
+          activeLibrarySection.value = shortcut.section
+        }
+        if (shortcut.filter) {
+          activeLibraryFilter.value = shortcut.filter
+        }
+        break
+
+      case 'workflow':
+      case 'model':
+      case 'asset':
+        // Open library and navigate to the item
+        activeSidebarTab.value = 'library'
+        if (shortcut.section) {
+          activeLibrarySection.value = shortcut.section
+        }
+        // TODO: Implement item selection/opening
+        console.log('[Shortcut] Opening item:', shortcut.itemId)
+        break
+
+      case 'project':
+        // Open library projects section
+        activeSidebarTab.value = 'library'
+        activeLibrarySection.value = 'projects'
+        // TODO: Implement project selection
+        console.log('[Shortcut] Opening project:', shortcut.itemId)
+        break
+
+      case 'node':
+        // Open nodes panel and highlight the node
+        activeSidebarTab.value = 'nodes'
+        if (shortcut.nodeCategory) {
+          activeNodeCategory.value = shortcut.nodeCategory as NodeCategoryId
+        }
+        console.log('[Shortcut] Opening node:', shortcut.nodeName)
+        break
+
+      case 'node-category':
+        // Open nodes panel to category
+        activeSidebarTab.value = 'nodes'
+        if (shortcut.nodeCategory) {
+          activeNodeCategory.value = shortcut.nodeCategory as NodeCategoryId
+        }
+        break
+
+      default:
+        console.warn('[Shortcut] Unknown shortcut type:', shortcut.type)
+    }
+  }
+
+  function setLibrarySection(section: 'my-library' | 'projects' | 'templates'): void {
+    activeLibrarySection.value = section
+  }
+
+  function setLibraryFilter(filter: 'All' | 'Workflows' | 'Models' | 'Assets'): void {
+    activeLibraryFilter.value = filter
+  }
+
   return {
     leftSidebarOpen,
     rightSidebarOpen,
@@ -402,5 +531,16 @@ export const useUiStore = defineStore('ui', () => {
     // Theme functions
     setThemeMode,
     toggleTheme,
+    // Library navigation
+    activeLibrarySection,
+    activeLibraryFilter,
+    setLibrarySection,
+    setLibraryFilter,
+    // Sidebar shortcuts
+    sidebarShortcuts,
+    addSidebarShortcut,
+    removeSidebarShortcut,
+    reorderSidebarShortcuts,
+    openShortcut,
   }
 })

@@ -429,3 +429,168 @@ export function createTeamModelsData(members: TeamMember[]): TeamModel[] {
   ]
 }
 
+// ============================================================================
+// LIBRARY SIDEBAR DATA (My Library, Projects, Shared, Templates)
+// ============================================================================
+
+export type LibraryItemType = 'workflow' | 'model' | 'asset' | 'folder' | 'template'
+
+export interface LibraryItem {
+  id: string
+  name: string
+  type: LibraryItemType
+  icon?: string
+  size?: string
+  updatedAt: string
+  thumbnail?: string
+  nodeCount?: number // for workflows
+  description?: string // for templates
+}
+
+export interface LibraryFolder {
+  id: string
+  name: string
+  icon?: string
+  color?: string
+  items: LibraryItem[]
+  isExpanded?: boolean
+}
+
+export interface LibrarySection {
+  id: 'my-library' | 'projects' | 'shared' | 'templates'
+  label: string
+  icon: string
+  isExpanded: boolean
+  items?: LibraryItem[] // Direct items (for My Library)
+  folders?: LibraryFolder[] // Folders (for Projects, Shared)
+}
+
+export const LIBRARY_SECTIONS_DATA: LibrarySection[] = [
+  {
+    id: 'my-library',
+    label: 'My Library',
+    icon: 'user',
+    isExpanded: true,
+    folders: [
+      {
+        id: 'my-workflows',
+        name: 'Workflows',
+        icon: 'sitemap',
+        isExpanded: true,
+        items: [
+          { id: 'my-wf-1', name: 'Portrait Generator', type: 'workflow', updatedAt: '1 hour ago', nodeCount: 14 },
+          { id: 'my-wf-2', name: 'Landscape SDXL', type: 'workflow', updatedAt: '3 hours ago', nodeCount: 18 },
+          { id: 'my-wf-3', name: 'Product Photography', type: 'workflow', updatedAt: '1 day ago', nodeCount: 12 },
+        ],
+      },
+      {
+        id: 'my-models',
+        name: 'Models',
+        icon: 'box',
+        isExpanded: false,
+        items: [
+          { id: 'my-model-1', name: 'Custom Style LoRA', type: 'model', size: '144 MB', updatedAt: '1 day ago' },
+          { id: 'my-model-2', name: 'Portrait LoRA v2', type: 'model', size: '72 MB', updatedAt: '3 days ago' },
+        ],
+      },
+      {
+        id: 'my-assets',
+        name: 'Assets',
+        icon: 'image',
+        isExpanded: false,
+        items: [
+          { id: 'my-asset-1', name: 'Reference Pack', type: 'asset', updatedAt: '2 days ago' },
+          { id: 'my-asset-2', name: 'Brand Logos', type: 'asset', updatedAt: '1 week ago' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'projects',
+    label: 'Projects',
+    icon: 'folder',
+    isExpanded: true,
+    folders: [
+      {
+        id: 'proj-workflows',
+        name: 'Workflows',
+        icon: 'sitemap',
+        isExpanded: false,
+        items: [
+          { id: 'proj-wf-1', name: 'Hero Image Generator', type: 'workflow', updatedAt: '2 hours ago', nodeCount: 12 },
+          { id: 'proj-wf-2', name: 'Background Removal', type: 'workflow', updatedAt: '1 day ago', nodeCount: 8 },
+          { id: 'proj-wf-3', name: 'Social Media Generator', type: 'workflow', updatedAt: '5 hours ago', nodeCount: 15 },
+        ],
+      },
+      {
+        id: 'proj-models',
+        name: 'Models',
+        icon: 'box',
+        isExpanded: false,
+        items: [
+          { id: 'proj-model-1', name: 'Product LoRA v2', type: 'model', size: '144 MB', updatedAt: '3 days ago' },
+          { id: 'proj-model-2', name: 'Brand Style', type: 'model', size: '72 MB', updatedAt: '1 week ago' },
+        ],
+      },
+      {
+        id: 'proj-assets',
+        name: 'Assets',
+        icon: 'image',
+        isExpanded: false,
+        items: [
+          { id: 'proj-asset-1', name: 'Product Images', type: 'asset', updatedAt: '2 days ago' },
+          { id: 'proj-asset-2', name: 'Brand Assets', type: 'asset', updatedAt: '1 week ago' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'shared',
+    label: 'Shared',
+    icon: 'users',
+    isExpanded: false,
+    folders: [
+      {
+        id: 'shared-workflows',
+        name: 'Workflows',
+        icon: 'sitemap',
+        isExpanded: false,
+        items: [
+          { id: 'shared-wf-1', name: 'Standard Thumbnail', type: 'workflow', updatedAt: '3 hours ago', nodeCount: 10 },
+          { id: 'shared-wf-2', name: 'Quick Upscale', type: 'workflow', updatedAt: '1 day ago', nodeCount: 5 },
+        ],
+      },
+      {
+        id: 'shared-models',
+        name: 'Models',
+        icon: 'box',
+        isExpanded: false,
+        items: [
+          { id: 'shared-model-1', name: 'Brand Checkpoint', type: 'model', size: '6.94 GB', updatedAt: '1 week ago' },
+        ],
+      },
+      {
+        id: 'shared-assets',
+        name: 'Assets',
+        icon: 'image',
+        isExpanded: false,
+        items: [
+          { id: 'shared-asset-1', name: 'Team Resources', type: 'asset', updatedAt: '2 weeks ago' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'templates',
+    label: 'Templates',
+    icon: 'clone',
+    isExpanded: false,
+    items: [
+      { id: 'tpl-1', name: 'Text to Image (Basic)', type: 'template', description: 'Simple txt2img workflow', nodeCount: 6, updatedAt: 'Official' },
+      { id: 'tpl-2', name: 'Image to Image', type: 'template', description: 'Transform existing images', nodeCount: 8, updatedAt: 'Official' },
+      { id: 'tpl-3', name: 'SDXL + Refiner', type: 'template', description: 'High quality SDXL pipeline', nodeCount: 14, updatedAt: 'Official' },
+      { id: 'tpl-4', name: 'ControlNet Canny', type: 'template', description: 'Edge-guided generation', nodeCount: 12, updatedAt: 'Official' },
+    ],
+  },
+]
+

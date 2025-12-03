@@ -69,6 +69,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./views/workspace/TemplatesView.vue')
       },
       {
+        path: 'nodes',
+        name: 'workspace-nodes',
+        component: () => import('./views/workspace/NodesView.vue')
+      },
+      {
         path: 'trash',
         name: 'workspace-trash',
         component: () => import('./views/workspace/TrashView.vue')

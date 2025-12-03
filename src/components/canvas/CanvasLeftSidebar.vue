@@ -2,12 +2,22 @@
 // Sidebar Components
 import { SidebarIconBar } from '@/components/sidebar'
 import SidebarPanel from '@/components/sidebar/SidebarPanel.vue'
+
+const emit = defineEmits<{
+  'extend-library': []
+  'extend-nodes': []
+  'extend-models': []
+}>()
 </script>
 
 <template>
   <div class="flex h-full">
     <SidebarIconBar />
-    <SidebarPanel />
+    <SidebarPanel
+      @extend-library="emit('extend-library')"
+      @extend-nodes="emit('extend-nodes')"
+      @extend-models="emit('extend-models')"
+    />
   </div>
 </template>
 

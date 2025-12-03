@@ -11,9 +11,15 @@ import CanvasRightToolbar from '@/components/canvas/CanvasRightToolbar.vue'
 import CanvasRunControls from '@/components/canvas/CanvasRunControls.vue'
 import NodePropertiesPanel from '@/components/canvas/NodePropertiesPanel.vue'
 import { FlowNode } from '@/components/nodes'
+import { NodesExtendedModal, ModelsExtendedModal, LibraryExtendedModal } from '@/components/common'
 import { useWorkspaceStore } from '@/stores/workspaceStore'
 import { useUiStore } from '@/stores/uiStore'
 import { DEMO_WORKFLOW_NODES, DEMO_WORKFLOW_EDGES } from '@/data/workflowMockData'
+
+// Extended view modals
+const showNodesModal = ref(false)
+const showModelsModal = ref(false)
+const showLibraryModal = ref(false)
 
 import type { CanvasRouteParams } from '@/types/canvas'
 import type { FlowNodeData, NodeState } from '@/types/node'
@@ -81,6 +87,19 @@ function toggleCollapsed(): void {
 function closePropertiesPanel(): void {
   selectedNode.value = null
 }
+
+// Extended view modals
+function handleExtendLibrary(): void {
+  showLibraryModal.value = true
+}
+
+function handleExtendNodes(): void {
+  showNodesModal.value = true
+}
+
+function handleExtendModels(): void {
+  showModelsModal.value = true
+}
 </script>
 
 <template>
@@ -91,7 +110,11 @@ function closePropertiesPanel(): void {
     <!-- Main content area -->
     <div class="flex flex-1 overflow-hidden">
       <!-- Left sidebar -->
-      <CanvasLeftSidebar />
+      <CanvasLeftSidebar
+        @extend-library="handleExtendLibrary"
+        @extend-nodes="handleExtendNodes"
+        @extend-models="handleExtendModels"
+      />
 
       <!-- Canvas area -->
       <main class="relative flex-1 bg-muted">
@@ -138,6 +161,11 @@ function closePropertiesPanel(): void {
         @toggle-collapsed="toggleCollapsed"
       />
     </div>
+
+    <!-- Extended View Modals -->
+    <NodesExtendedModal v-model:visible="showNodesModal" />
+    <ModelsExtendedModal v-model:visible="showModelsModal" />
+    <LibraryExtendedModal v-model:visible="showLibraryModal" />
   </div>
 </template>
 

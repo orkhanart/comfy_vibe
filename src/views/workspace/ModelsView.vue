@@ -174,36 +174,6 @@ function closeModelInfo() {
         @navigate="navigateToFolder"
       />
 
-      <!-- Folders Section -->
-      <div v-if="foldersAtCurrentLevel.length > 0" class="mb-6">
-        <h3 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Folders</h3>
-        <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
-          <div v-for="folder in foldersAtCurrentLevel" :key="folder.id" class="relative">
-            <FolderCard
-              :folder="folder"
-              :item-count="getItemCount(folder.id, models)"
-              :subfolder-count="getSubfolderCount(folder.id)"
-              @open="handleFolderOpen"
-              @open-menu="handleOpenFolderMenu"
-            />
-            <FolderContextMenu
-              v-if="openFolderMenuId === folder.id"
-              :folder-id="folder.id"
-              class="absolute right-0 top-full z-50"
-              @open="handleFolderOpen"
-              @rename="closeFolderMenu"
-              @delete="handleFolderDelete"
-              @close="closeFolderMenu"
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- Models Section Header -->
-      <h3 v-if="foldersAtCurrentLevel.length > 0 && filteredModels.length > 0" class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-        Models
-      </h3>
-
       <!-- Resource List -->
       <ResourceListView
         v-model:search-query="searchQuery"
@@ -233,6 +203,37 @@ function closeModelInfo() {
             </select>
             <Icon name="chevron-down" size="xs" class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400" />
           </div>
+        </template>
+
+        <!-- Folders Section -->
+        <template #folders>
+          <div v-if="foldersAtCurrentLevel.length > 0" class="mb-6">
+            <h3 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Folders</h3>
+            <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
+              <div v-for="folder in foldersAtCurrentLevel" :key="folder.id" class="relative">
+                <FolderCard
+                  :folder="folder"
+                  :item-count="getItemCount(folder.id, models)"
+                  :subfolder-count="getSubfolderCount(folder.id)"
+                  @open="handleFolderOpen"
+                  @open-menu="handleOpenFolderMenu"
+                />
+                <FolderContextMenu
+                  v-if="openFolderMenuId === folder.id"
+                  :folder-id="folder.id"
+                  class="absolute right-0 top-full z-50"
+                  @open="handleFolderOpen"
+                  @rename="closeFolderMenu"
+                  @delete="handleFolderDelete"
+                  @close="closeFolderMenu"
+                />
+              </div>
+            </div>
+          </div>
+          <!-- Models Section Header -->
+          <h3 v-if="foldersAtCurrentLevel.length > 0 && filteredModels.length > 0" class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Models
+          </h3>
         </template>
 
         <template #grid>

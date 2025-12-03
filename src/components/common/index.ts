@@ -1,2 +1,6 @@
 export { default as FavoriteButton } from './FavoriteButton.vue'
 export { default as ShareDialog } from './ShareDialog.vue'
+export { default as ExtendedViewModal } from './ExtendedViewModal.vue'
+export { default as NodesExtendedModal } from './NodesExtendedModal.vue'
+export { default as ModelsExtendedModal } from './ModelsExtendedModal.vue'
+export { default as LibraryExtendedModal } from './LibraryExtendedModal.vue'
