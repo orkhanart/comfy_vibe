@@ -139,15 +139,6 @@ function handleExtendModels(): void {
           @zoom-out="zoomOut()"
         />
 
-        <!-- Workflow name -->
-        <div class="absolute left-4 top-4 z-10">
-          <span
-            class="rounded bg-card/80 px-2.5 py-1 text-xs font-medium text-foreground shadow-sm backdrop-blur"
-          >
-            {{ uiStore.activeWorkflowName }}
-          </span>
-        </div>
-
         <!-- Run Controls (top-right) -->
         <WorkflowEditorRunControls />
       </main>
