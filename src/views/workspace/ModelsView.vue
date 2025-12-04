@@ -75,6 +75,9 @@ const searchQuery = ref('')
 const filterType = ref('all')
 const filterBaseModel = ref('all')
 
+// Ownership tabs
+const activeTab = ref<'all' | 'private' | 'shared' | 'imported'>('all')
+
 const sortOptions = [
   { value: 'updated', label: 'Last updated' },
   { value: 'name', label: 'Name' },
@@ -87,11 +90,21 @@ const filterOptions = MODEL_TYPES.map(type => ({
   label: type === 'all' ? 'All Types' : type.charAt(0).toUpperCase() + type.slice(1)
 }))
 
-// Models data
-const models = ref<Model[]>([...MOCK_MODELS])
+// Models data with ownership info (mock)
+const models = ref<(Model & { ownership: 'private' | 'shared' | 'imported' })[]>(
+  MOCK_MODELS.map((m, i) => ({
+    ...m,
+    ownership: i % 4 === 0 ? 'shared' as const : i % 4 === 1 ? 'imported' as const : 'private' as const
+  }))
+)
 
 const filteredModels = computed(() => {
   let result = filterItemsByFolder(models.value)
+
+  // Filter by ownership tab
+  if (activeTab.value !== 'all') {
+    result = result.filter(m => m.ownership === activeTab.value)
+  }
 
   if (showFavoritesOnly.value) {
     result = result.filter(m => m.favorite)
@@ -241,6 +254,42 @@ function handleViewDrop(e: DragEvent) {
             Import
           </button>
         </div>
+      </div>
+
+      <!-- Ownership Tabs -->
+      <div class="mb-4 flex items-center gap-1 border-b border-border">
+        <button
+          class="flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors"
+          :class="activeTab === 'all' ? 'border-foreground text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+          @click="activeTab = 'all'"
+        >
+          <Icon name="layers" size="sm" />
+          All
+        </button>
+        <button
+          class="flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors"
+          :class="activeTab === 'private' ? 'border-foreground text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+          @click="activeTab = 'private'"
+        >
+          <Icon name="lock" size="sm" />
+          Private
+        </button>
+        <button
+          class="flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors"
+          :class="activeTab === 'imported' ? 'border-foreground text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+          @click="activeTab = 'imported'"
+        >
+          <Icon name="download" size="sm" />
+          Imported
+        </button>
+        <button
+          class="flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors"
+          :class="activeTab === 'shared' ? 'border-foreground text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+          @click="activeTab = 'shared'"
+        >
+          <Icon name="users" size="sm" />
+          Shared
+        </button>
       </div>
 
       <!-- Resource List -->

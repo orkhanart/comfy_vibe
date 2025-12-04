@@ -67,17 +67,30 @@ const sortBy = ref('updated')
 const showFavoritesOnly = ref(false)
 const searchQuery = ref('')
 
+// Ownership tabs
+const activeTab = ref<'all' | 'private' | 'shared'>('all')
+
 const sortOptions = [
   { value: 'updated', label: 'Last updated' },
   { value: 'name', label: 'Name' },
   { value: 'nodes', label: 'Node count' }
 ]
 
-// Workflows data
-const workflows = ref<Workflow[]>([...MOCK_WORKFLOWS])
+// Workflows data with ownership info (mock)
+const workflows = ref<(Workflow & { ownership: 'private' | 'shared' })[]>(
+  MOCK_WORKFLOWS.map((w, i) => ({
+    ...w,
+    ownership: i % 3 === 0 ? 'shared' as const : 'private' as const
+  }))
+)
 
 const filteredWorkflows = computed(() => {
   let result = filterItemsByFolder(workflows.value)
+
+  // Filter by ownership tab
+  if (activeTab.value !== 'all') {
+    result = result.filter(w => w.ownership === activeTab.value)
+  }
 
   if (showFavoritesOnly.value) {
     result = result.filter(w => w.favorite)
@@ -237,6 +250,34 @@ function handleViewDrop(e: DragEvent) {
           New Workflow
         </button>
       </div>
+    </div>
+
+    <!-- Ownership Tabs -->
+    <div class="mb-4 flex items-center gap-1 border-b border-border">
+      <button
+        class="flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors"
+        :class="activeTab === 'all' ? 'border-foreground text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+        @click="activeTab = 'all'"
+      >
+        <Icon name="layers" size="sm" />
+        All
+      </button>
+      <button
+        class="flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors"
+        :class="activeTab === 'private' ? 'border-foreground text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+        @click="activeTab = 'private'"
+      >
+        <Icon name="lock" size="sm" />
+        Private
+      </button>
+      <button
+        class="flex items-center gap-1.5 border-b-2 px-3 py-2 text-sm font-medium transition-colors"
+        :class="activeTab === 'shared' ? 'border-foreground text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'"
+        @click="activeTab = 'shared'"
+      >
+        <Icon name="users" size="sm" />
+        Shared
+      </button>
     </div>
 
     <!-- Resource List -->

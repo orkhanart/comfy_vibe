@@ -227,6 +227,22 @@ function handleExtend(): void {
           >
             <Icon :name="viewMode === 'grid' ? 'list' : 'th-large'" size="sm" />
           </button>
+
+          <!-- Assets Action Buttons -->
+          <template v-if="activeSidebarTab === 'assets'">
+            <button
+              v-tooltip.bottom="{ value: 'Create Folder', showDelay: 50 }"
+              class="flex h-7 w-7 items-center justify-center rounded bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <Icon name="folder-plus" size="sm" />
+            </button>
+            <button
+              v-tooltip.bottom="{ value: 'Upload Asset', showDelay: 50 }"
+              class="flex h-7 w-7 items-center justify-center rounded bg-muted text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            >
+              <Icon name="upload" size="sm" />
+            </button>
+          </template>
         </div>
       </div>
 
