@@ -72,6 +72,7 @@ declare module 'vue' {
     LinearHistoryPanel: typeof import('./components/linear/LinearHistoryPanel.vue')['default']
     LinearIconSidebar: typeof import('./components/linear/LinearIconSidebar.vue')['default']
     LinearInputPanel: typeof import('./components/linear/LinearInputPanel.vue')['default']
+    LinearMediaViewerModal: typeof import('./components/linear/LinearMediaViewerModal.vue')['default']
     LinearModelsPanel: typeof import('./components/linear/LinearModelsPanel.vue')['default']
     LinearNodeItem: typeof import('./components/linear/LinearNodeItem.vue')['default']
     LinearOutputGallery: typeof import('./components/linear/LinearOutputGallery.vue')['default']
