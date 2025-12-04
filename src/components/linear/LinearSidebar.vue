@@ -84,7 +84,7 @@ function setSort(value: string): void {
 <template>
   <div class="flex h-full">
     <!-- Icon Bar -->
-    <nav class="flex w-12 flex-col items-center border-r border-border bg-zinc-950 py-2">
+    <nav class="flex w-12 flex-col items-center border-r border-border bg-background py-2">
       <!-- Tab buttons -->
       <div class="flex flex-col gap-1">
         <button
