@@ -260,6 +260,45 @@ export interface WorkflowTab {
   isDirty?: boolean
 }
 
+// ============================================================================
+// SUBGRAPHS (reusable workflow components)
+// ============================================================================
+
+export interface SubgraphInput {
+  id: string
+  name: string
+  type: string // e.g., 'IMAGE', 'LATENT', 'MODEL', 'CONDITIONING', etc.
+}
+
+export interface SubgraphOutput {
+  id: string
+  name: string
+  type: string
+}
+
+export interface SubgraphWidget {
+  id: string
+  name: string
+  type: 'number' | 'string' | 'boolean' | 'combo'
+  value: any
+  config?: Record<string, any> // min, max, step for numbers; options for combo
+}
+
+export interface Subgraph {
+  id: string
+  name: string
+  description?: string
+  color?: string
+  inputs: SubgraphInput[]
+  outputs: SubgraphOutput[]
+  widgets: SubgraphWidget[]
+  // The actual workflow data stored as JSON
+  workflowData?: Record<string, any>
+  createdAt: number
+  updatedAt: number
+  isDirty?: boolean
+}
+
 export const useUiStore = defineStore('ui', () => {
   const leftSidebarOpen = ref(true)
   const rightSidebarOpen = ref(false)
@@ -275,6 +314,63 @@ export const useUiStore = defineStore('ui', () => {
     { id: 'workflow-3', name: 'ControlNet Test', mode: 'workflow', isActive: false },
   ])
   const activeWorkflowTabId = ref('workflow-1')
+
+  // Subgraphs (reusable workflow components)
+  const subgraphs = ref<Subgraph[]>([
+    {
+      id: 'subgraph-1',
+      name: 'Image Upscaler',
+      description: 'Upscales images using ESRGAN',
+      color: '#4DD0E1',
+      inputs: [
+        { id: 'input-1', name: 'image', type: 'IMAGE' },
+      ],
+      outputs: [
+        { id: 'output-1', name: 'upscaled_image', type: 'IMAGE' },
+      ],
+      widgets: [
+        { id: 'widget-1', name: 'scale', type: 'number', value: 2, config: { min: 1, max: 4, step: 1 } },
+      ],
+      createdAt: Date.now() - 86400000,
+      updatedAt: Date.now() - 3600000,
+    },
+    {
+      id: 'subgraph-2',
+      name: 'Prompt Enhancer',
+      description: 'Enhances prompts with style keywords',
+      color: '#FFAB40',
+      inputs: [
+        { id: 'input-1', name: 'prompt', type: 'STRING' },
+      ],
+      outputs: [
+        { id: 'output-1', name: 'enhanced_prompt', type: 'STRING' },
+      ],
+      widgets: [
+        { id: 'widget-1', name: 'style', type: 'combo', value: 'cinematic', config: { options: ['cinematic', 'anime', 'photorealistic', 'artistic'] } },
+      ],
+      createdAt: Date.now() - 172800000,
+      updatedAt: Date.now() - 7200000,
+    },
+    {
+      id: 'subgraph-3',
+      name: 'ControlNet Preprocessor',
+      description: 'Applies ControlNet preprocessing',
+      color: '#B39DDB',
+      inputs: [
+        { id: 'input-1', name: 'image', type: 'IMAGE' },
+      ],
+      outputs: [
+        { id: 'output-1', name: 'control_image', type: 'IMAGE' },
+      ],
+      widgets: [
+        { id: 'widget-1', name: 'preprocessor', type: 'combo', value: 'canny', config: { options: ['canny', 'depth', 'openpose', 'lineart'] } },
+        { id: 'widget-2', name: 'resolution', type: 'number', value: 512, config: { min: 256, max: 2048, step: 64 } },
+      ],
+      createdAt: Date.now() - 259200000,
+      updatedAt: Date.now() - 14400000,
+    },
+  ])
+  const activeSubgraphId = ref<string | null>(null)
 
   const activeWorkflowName = computed(() => {
     return workflowTabs.value.find(t => t.id === activeWorkflowTabId.value)?.name || 'Workflow'
@@ -405,6 +501,69 @@ export const useUiStore = defineStore('ui', () => {
     })
     selectWorkflowTab(newId)
   }
+
+  // Subgraph functions
+  function selectSubgraph(subgraphId: string): void {
+    activeSubgraphId.value = subgraphId
+    console.log('[Subgraph] Selected:', subgraphId)
+  }
+
+  function createSubgraph(): Subgraph {
+    const newId = `subgraph-${Date.now()}`
+    const newSubgraph: Subgraph = {
+      id: newId,
+      name: 'Untitled Subgraph',
+      inputs: [],
+      outputs: [],
+      widgets: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    }
+    subgraphs.value.push(newSubgraph)
+    activeSubgraphId.value = newId
+    return newSubgraph
+  }
+
+  function updateSubgraph(subgraphId: string, updates: Partial<Subgraph>): void {
+    const index = subgraphs.value.findIndex(s => s.id === subgraphId)
+    if (index > -1) {
+      subgraphs.value[index] = {
+        ...subgraphs.value[index]!,
+        ...updates,
+        updatedAt: Date.now(),
+      }
+    }
+  }
+
+  function deleteSubgraph(subgraphId: string): void {
+    const index = subgraphs.value.findIndex(s => s.id === subgraphId)
+    if (index > -1) {
+      subgraphs.value.splice(index, 1)
+      if (activeSubgraphId.value === subgraphId) {
+        activeSubgraphId.value = subgraphs.value[0]?.id || null
+      }
+    }
+  }
+
+  function duplicateSubgraph(subgraphId: string): Subgraph | null {
+    const original = subgraphs.value.find(s => s.id === subgraphId)
+    if (!original) return null
+
+    const newId = `subgraph-${Date.now()}`
+    const duplicate: Subgraph = {
+      ...JSON.parse(JSON.stringify(original)),
+      id: newId,
+      name: `${original.name} (Copy)`,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    }
+    subgraphs.value.push(duplicate)
+    return duplicate
+  }
+
+  const activeSubgraph = computed(() => {
+    return subgraphs.value.find(s => s.id === activeSubgraphId.value) || null
+  })
 
   function applyTheme(mode: ThemeMode): void {
     const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
@@ -554,6 +713,15 @@ export const useUiStore = defineStore('ui', () => {
     selectWorkflowTab,
     closeWorkflowTab,
     createWorkflowTab,
+    // Subgraph functions
+    subgraphs,
+    activeSubgraphId,
+    activeSubgraph,
+    selectSubgraph,
+    createSubgraph,
+    updateSubgraph,
+    deleteSubgraph,
+    duplicateSubgraph,
     // Theme functions
     setThemeMode,
     toggleTheme,

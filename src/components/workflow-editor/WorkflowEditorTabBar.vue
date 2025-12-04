@@ -17,6 +17,7 @@ const showShareDialog = ref(false)
 const showMenu = ref(false)
 const showProjectsDropdown = ref(false)
 const showWorkflowsDropdown = ref(false)
+const showSubgraphsDropdown = ref(false)
 const activeContextMenu = ref<string | null>(null)
 
 // Mock data for projects and workflows
@@ -44,6 +45,12 @@ const selectedWorkflowName = computed(() => {
   return workflows.value.find(w => w.id === selectedWorkflow.value)?.name || 'Select workflow'
 })
 
+const selectedSubgraph = ref<string | null>(null)
+const selectedSubgraphName = computed(() => {
+  if (!selectedSubgraph.value) return 'Subgraphs'
+  return uiStore.subgraphs.find(s => s.id === selectedSubgraph.value)?.name || 'Subgraphs'
+})
+
 function handleLogoClick(): void {
   showMenu.value = !showMenu.value
 }
@@ -65,12 +72,23 @@ function handleWorkflowSelect(workflowId: string): void {
   console.log('Selected workflow:', workflowId)
 }
 
+function handleCreateWorkflow(): void {
+  uiStore.createWorkflowTab('workflow')
+  showWorkflowsDropdown.value = false
+}
+
+function handleImportWorkflow(): void {
+  // TODO: Implement import workflow dialog
+  console.log('Import workflow')
+  showWorkflowsDropdown.value = false
+}
+
 function toggleContextMenu(itemId: string, event: MouseEvent): void {
   event.stopPropagation()
   activeContextMenu.value = activeContextMenu.value === itemId ? null : itemId
 }
 
-function handleContextAction(action: string, itemId: string, itemType: 'project' | 'workflow'): void {
+function handleContextAction(action: string, itemId: string, itemType: 'project' | 'workflow' | 'subgraph'): void {
   console.log(`Action: ${action} on ${itemType} ${itemId}`)
   activeContextMenu.value = null
 
@@ -79,10 +97,14 @@ function handleContextAction(action: string, itemId: string, itemType: 'project'
       // TODO: Implement rename
       break
     case 'duplicate':
-      // TODO: Implement duplicate
+      if (itemType === 'subgraph') {
+        uiStore.duplicateSubgraph(itemId)
+      }
       break
     case 'delete':
-      // TODO: Implement delete
+      if (itemType === 'subgraph') {
+        uiStore.deleteSubgraph(itemId)
+      }
       break
     case 'move':
       // TODO: Implement move
@@ -91,6 +113,19 @@ function handleContextAction(action: string, itemId: string, itemType: 'project'
       showShareDialog.value = true
       break
   }
+}
+
+function handleSubgraphSelect(subgraphId: string): void {
+  selectedSubgraph.value = subgraphId
+  showSubgraphsDropdown.value = false
+  uiStore.selectSubgraph(subgraphId)
+  console.log('Selected subgraph:', subgraphId)
+}
+
+function handleCreateSubgraph(): void {
+  const newSubgraph = uiStore.createSubgraph()
+  selectedSubgraph.value = newSubgraph.id
+  showSubgraphsDropdown.value = false
 }
 </script>
 
@@ -204,19 +239,28 @@ function handleContextAction(action: string, itemId: string, itemType: 'project'
     <!-- Separator Slash -->
     <span class="text-muted-foreground/50 text-sm">/</span>
 
-    <!-- Workflows Dropdown -->
-    <Popover v-model:open="showWorkflowsDropdown">
-      <PopoverTrigger as-child>
-        <button
-          class="flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors hover:bg-accent"
-        >
-          <Icon name="sitemap" size="xs" class="shrink-0 opacity-60" />
-          <span class="max-w-[120px] truncate">{{ selectedWorkflowName }}</span>
-          <Icon name="chevron-down" size="xs" class="shrink-0 opacity-50" />
-        </button>
-      </PopoverTrigger>
+    <!-- Workflows Tab + Dropdown -->
+    <div class="flex items-center">
+      <!-- Workflow Tab (clickable to open/focus the workflow) -->
+      <button
+        class="flex h-7 items-center gap-1.5 rounded-l-md px-2 text-xs font-medium transition-colors hover:bg-accent bg-accent/30"
+        @click="handleWorkflowSelect(selectedWorkflow)"
+      >
+        <Icon name="sitemap" size="xs" class="shrink-0 opacity-60" />
+        <span class="max-w-[120px] truncate">{{ selectedWorkflowName }}</span>
+      </button>
+      <!-- Dropdown Trigger (separate button) -->
+      <Popover v-model:open="showWorkflowsDropdown">
+        <PopoverTrigger as-child>
+          <button
+            class="flex h-7 items-center justify-center rounded-r-md px-1 text-xs transition-colors hover:bg-accent border-l border-border/50"
+          >
+            <Icon name="chevron-down" size="xs" class="opacity-50" />
+          </button>
+        </PopoverTrigger>
       <PopoverContent align="start" :side-offset="4" class="w-[220px] p-1">
         <div class="flex flex-col">
+          <!-- Workflow List -->
           <div
             v-for="workflow in workflows"
             :key="workflow.id"
@@ -276,6 +320,132 @@ function handleContextAction(action: string, itemId: string, itemType: 'project'
                 </button>
               </PopoverContent>
             </Popover>
+          </div>
+
+          <!-- Action Buttons Row -->
+          <div class="flex items-center gap-1 mt-1 pt-1 border-t border-border">
+            <button
+              class="flex flex-1 items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-sm text-accent-foreground transition-colors hover:bg-accent/80"
+              @click="handleCreateWorkflow"
+            >
+              <Icon name="plus" size="xs" />
+              <span>New Workflow</span>
+            </button>
+            <button
+              v-tooltip.bottom="{ value: 'Import workflow', showDelay: 50 }"
+              class="flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              @click="handleImportWorkflow"
+            >
+              <Icon name="upload" size="sm" />
+            </button>
+          </div>
+        </div>
+      </PopoverContent>
+      </Popover>
+    </div>
+
+    <!-- Separator Slash -->
+    <span class="text-muted-foreground/50 text-sm">/</span>
+
+    <!-- Subgraphs Dropdown -->
+    <Popover v-model:open="showSubgraphsDropdown">
+      <PopoverTrigger as-child>
+        <button
+          class="flex h-7 items-center gap-1.5 rounded-md px-2 text-xs font-medium transition-colors hover:bg-accent"
+        >
+          <Icon name="cubes" size="xs" class="shrink-0 opacity-60" />
+          <span class="max-w-[120px] truncate">{{ selectedSubgraphName }}</span>
+          <Icon name="chevron-down" size="xs" class="shrink-0 opacity-50" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" :side-offset="4" class="w-[240px] p-1">
+        <div class="flex flex-col">
+          <!-- Create New Subgraph Button -->
+          <button
+            class="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm text-primary transition-colors hover:bg-accent mb-1"
+            @click="handleCreateSubgraph"
+          >
+            <Icon name="plus" size="sm" class="opacity-80" />
+            <span>New Subgraph</span>
+          </button>
+          <div class="h-px bg-border mb-1" />
+
+          <!-- Subgraph List -->
+          <div
+            v-for="subgraph in uiStore.subgraphs"
+            :key="subgraph.id"
+            class="group flex items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent cursor-pointer"
+            :class="{ 'bg-accent/50': subgraph.id === selectedSubgraph }"
+            @click="handleSubgraphSelect(subgraph.id)"
+          >
+            <div class="flex items-center gap-2 min-w-0">
+              <div
+                class="h-3 w-3 rounded-sm shrink-0"
+                :style="{ backgroundColor: subgraph.color || '#78909C' }"
+              />
+              <div class="flex flex-col min-w-0">
+                <span class="truncate">{{ subgraph.name }}</span>
+                <span v-if="subgraph.description" class="text-xs text-muted-foreground truncate">
+                  {{ subgraph.description }}
+                </span>
+              </div>
+            </div>
+            <Popover>
+              <PopoverTrigger as-child>
+                <button
+                  class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground/50 transition-colors hover:bg-accent-foreground/10 hover:text-foreground"
+                  @click.stop
+                >
+                  <Icon name="ellipsis-v" size="sm" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="start" side="right" :side-offset="4" class="w-[140px] p-1">
+                <button
+                  class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent"
+                  @click="handleContextAction('rename', subgraph.id, 'subgraph')"
+                >
+                  <Icon name="edit" size="xs" class="opacity-60" />
+                  Rename
+                </button>
+                <button
+                  class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent"
+                  @click="handleContextAction('duplicate', subgraph.id, 'subgraph')"
+                >
+                  <Icon name="copy" size="xs" class="opacity-60" />
+                  Duplicate
+                </button>
+                <button
+                  class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent"
+                  @click="handleContextAction('move', subgraph.id, 'subgraph')"
+                >
+                  <Icon name="folder" size="xs" class="opacity-60" />
+                  Move
+                </button>
+                <button
+                  class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent"
+                  @click="handleContextAction('share', subgraph.id, 'subgraph')"
+                >
+                  <Icon name="share-alt" size="xs" class="opacity-60" />
+                  Share
+                </button>
+                <div class="my-1 h-px bg-border" />
+                <button
+                  class="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-destructive transition-colors hover:bg-destructive/10"
+                  @click="handleContextAction('delete', subgraph.id, 'subgraph')"
+                >
+                  <Icon name="trash" size="xs" class="opacity-60" />
+                  Delete
+                </button>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <!-- Empty State -->
+          <div
+            v-if="uiStore.subgraphs.length === 0"
+            class="px-2 py-4 text-center text-sm text-muted-foreground"
+          >
+            No subgraphs yet
           </div>
         </div>
       </PopoverContent>
