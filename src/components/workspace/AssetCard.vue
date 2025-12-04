@@ -4,12 +4,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { FavoriteButton } from '@/components/common'
 import { getAssetIcon, type Asset } from '@/data/workspaceMockData'
 import { ref } from 'vue'
+import { DRAG_MIME_TYPE, type DragItem } from '@/composables/common/useFolders'
 
 interface Props {
   asset: Asset
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
   open: [id: string]
@@ -22,6 +23,7 @@ const emit = defineEmits<{
 }>()
 
 const menuOpen = ref(false)
+const isDragging = ref(false)
 
 function handleAction(action: string, id: string) {
   menuOpen.value = false
@@ -34,12 +36,39 @@ function handleAction(action: string, id: string) {
     case 'delete': emit('delete', id); break
   }
 }
+
+function handleDragStart(e: DragEvent) {
+  if (!e.dataTransfer) return
+
+  const dragItem: DragItem = {
+    type: 'asset',
+    id: props.asset.id,
+    name: props.asset.name,
+    folderId: props.asset.folderId ?? null,
+  }
+
+  e.dataTransfer.setData(DRAG_MIME_TYPE, JSON.stringify(dragItem))
+  e.dataTransfer.setData('text/plain', JSON.stringify(dragItem))
+  e.dataTransfer.effectAllowed = 'move'
+
+  isDragging.value = true
+}
+
+function handleDragEnd() {
+  isDragging.value = false
+}
 </script>
 
 <template>
   <div
-    class="group cursor-pointer"
+    :class="[
+      'group cursor-pointer transition-opacity',
+      isDragging && 'opacity-50'
+    ]"
+    draggable="true"
     @click="emit('open', asset.id)"
+    @dragstart="handleDragStart"
+    @dragend="handleDragEnd"
   >
     <!-- Thumbnail with hover overlay -->
     <div class="relative aspect-square overflow-hidden rounded-xl bg-zinc-100 transition-all duration-200 group-hover:scale-[1.01] group-hover:shadow-xl dark:bg-zinc-800">

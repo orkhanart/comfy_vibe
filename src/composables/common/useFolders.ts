@@ -12,6 +12,16 @@ import {
 
 export type FolderType = 'workflows' | 'assets' | 'models'
 
+// Drag and drop types
+export interface DragItem {
+  type: 'workflow' | 'asset' | 'model' | 'folder'
+  id: string
+  name: string
+  folderId?: string | null
+}
+
+export const DRAG_MIME_TYPE = 'application/x-workspace-item'
+
 export function useFolders(type: FolderType) {
   const route = useRoute()
   const router = useRouter()
@@ -112,6 +122,63 @@ export function useFolders(type: FolderType) {
     return countSubfolders(folderId, type)
   }
 
+  // Move an item to a folder
+  function moveItemToFolder<T extends { id: string; folderId?: string | null }>(
+    items: T[],
+    itemId: string,
+    targetFolderId: string | null
+  ): boolean {
+    const item = items.find(i => i.id === itemId)
+    if (item) {
+      item.folderId = targetFolderId
+      return true
+    }
+    return false
+  }
+
+  // Move a folder to another folder (or to root)
+  function moveFolderToFolder(folderId: string, targetFolderId: string | null): boolean {
+    const folder = MOCK_FOLDERS.find(f => f.id === folderId)
+    if (!folder) return false
+
+    // Prevent moving a folder into itself or its descendants
+    if (targetFolderId) {
+      let checkId: string | null = targetFolderId
+      while (checkId) {
+        if (checkId === folderId) return false
+        const parent = MOCK_FOLDERS.find(f => f.id === checkId)
+        checkId = parent?.parentId ?? null
+      }
+    }
+
+    folder.parentId = targetFolderId
+    folder.updatedAt = Date.now()
+    return true
+  }
+
+  // Check if a drop target is valid for an item
+  function canDropInFolder(dragItem: DragItem, targetFolderId: string | null): boolean {
+    // Can't drop in the same folder
+    if (dragItem.folderId === targetFolderId) return false
+
+    // For folders, prevent circular references
+    if (dragItem.type === 'folder') {
+      if (dragItem.id === targetFolderId) return false
+
+      // Check if target is a descendant of the dragged folder
+      if (targetFolderId) {
+        let checkId: string | null = targetFolderId
+        while (checkId) {
+          if (checkId === dragItem.id) return false
+          const parent = MOCK_FOLDERS.find(f => f.id === checkId)
+          checkId = parent?.parentId ?? null
+        }
+      }
+    }
+
+    return true
+  }
+
   return {
     // State
     currentFolderId,
@@ -133,5 +200,10 @@ export function useFolders(type: FolderType) {
     filterItemsByFolder,
     getItemCount,
     getSubfolderCount,
+
+    // Drag and drop
+    moveItemToFolder,
+    moveFolderToFolder,
+    canDropInFolder,
   }
 }

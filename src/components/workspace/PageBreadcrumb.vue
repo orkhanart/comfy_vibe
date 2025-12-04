@@ -12,8 +12,10 @@ const props = withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <nav class="mb-4 flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-    <Icon :name="icon" size="sm" />
-    <span>{{ label }}</span>
+  <nav class="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+    <span class="flex items-center gap-1.5 rounded px-1.5 py-0.5">
+      <Icon :name="icon" size="sm" />
+      <span>{{ label }}</span>
+    </span>
   </nav>
 </template>

@@ -37,6 +37,21 @@ function signOut(): void {
 function toggleTheme(): void {
   uiStore.toggleTheme()
 }
+
+function handleTabSelect(tabId: string): void {
+  const mode = uiStore.getWorkflowMode(tabId)
+  uiStore.selectWorkflowTab(tabId)
+  // Navigate to the correct mode if different from current
+  if (mode === 'node') {
+    router.push({ name: 'node-editor' })
+  }
+  // Already in linear mode, no navigation needed
+}
+
+function handleNewWorkflow(): void {
+  // Create new workflow in current mode (linear)
+  uiStore.createWorkflowTab('linear')
+}
 </script>
 
 <template>
@@ -141,9 +156,9 @@ function toggleTheme(): void {
     <CanvasTabs
       :tabs="uiStore.workflowTabs"
       :active-tab-id="uiStore.activeWorkflowTabId"
-      @select="uiStore.selectWorkflowTab"
+      @select="handleTabSelect"
       @close="uiStore.closeWorkflowTab"
-      @new="uiStore.createWorkflowTab"
+      @new="handleNewWorkflow"
     />
 
     <!-- Right Section -->

@@ -16,7 +16,7 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="group cursor-pointer rounded-lg border border-border bg-card p-2 transition-all hover:border-border/80 hover:bg-accent/50"
+    class="group aspect-square cursor-pointer rounded-lg border border-border bg-card p-2 transition-all hover:border-border/80 hover:bg-accent/50"
     :draggable="props.draggable"
     @click="emit('click')"
   >
@@ -27,7 +27,7 @@ const emit = defineEmits<{
     </div>
 
     <!-- Title -->
-    <div class="truncate text-xs text-muted-foreground group-hover:text-foreground">
+    <div class="line-clamp-2 text-xs text-muted-foreground group-hover:text-foreground">
       {{ props.title }}
     </div>
 

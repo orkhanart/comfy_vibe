@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-export type SidebarTabId = 'nodes' | 'models' | 'library' | 'queue' | null
+export type SidebarTabId = 'nodes' | 'models' | 'workflows' | 'assets' | 'templates' | null
 
 export interface SidebarTab {
   id: Exclude<SidebarTabId, null>
@@ -209,8 +209,9 @@ export const NODE_CATEGORIES: NodeCategory[] = [
 export const SIDEBAR_TABS: SidebarTab[] = [
   { id: 'nodes', label: 'Nodes', icon: 'sitemap', tooltip: 'Node Library' },
   { id: 'models', label: 'Models', icon: 'box', tooltip: 'Model Library' },
-  { id: 'library', label: 'Asset Library', icon: 'library', tooltip: 'Asset Library' },
-  { id: 'queue', label: 'Queue', icon: 'list', tooltip: 'Queue' },
+  { id: 'workflows', label: 'Workflows', icon: 'workflow', tooltip: 'Workflows' },
+  { id: 'assets', label: 'Assets', icon: 'images', tooltip: 'Assets' },
+  { id: 'templates', label: 'Templates', icon: 'th-large', tooltip: 'Templates' },
 ]
 
 export type ThemeMode = 'light' | 'dark' | 'system'
@@ -235,8 +236,8 @@ export interface SidebarShortcut {
   icon: string
   type: ShortcutType
   // For library navigation
-  section?: 'my-library' | 'projects' | 'templates'
-  filter?: 'All' | 'Workflows' | 'Models' | 'Assets'
+  section?: 'shared' | 'projects'
+  filter?: 'All' | 'Workflows' | 'Assets'
   // For individual items
   itemId?: string
   thumbnail?: string
@@ -249,9 +250,12 @@ export interface SidebarShortcut {
 // WORKFLOW TABS (shared between Node Mode and Linear Mode)
 // ============================================================================
 
+export type WorkflowMode = 'node' | 'linear'
+
 export interface WorkflowTab {
   id: string
   name: string
+  mode: WorkflowMode
   isActive: boolean
   isDirty?: boolean
 }
@@ -266,9 +270,9 @@ export const useUiStore = defineStore('ui', () => {
 
   // Workflow tabs (shared between Node Mode and Linear Mode)
   const workflowTabs = ref<WorkflowTab[]>([
-    { id: 'workflow-1', name: 'Main Workflow', isActive: true },
-    { id: 'workflow-2', name: 'Upscale Pipeline', isActive: false, isDirty: true },
-    { id: 'workflow-3', name: 'ControlNet Test', isActive: false },
+    { id: 'workflow-1', name: 'Main Workflow', mode: 'node', isActive: true },
+    { id: 'workflow-2', name: 'Upscale Pipeline', mode: 'linear', isActive: false, isDirty: true },
+    { id: 'workflow-3', name: 'ControlNet Test', mode: 'node', isActive: false },
   ])
   const activeWorkflowTabId = ref('workflow-1')
 
@@ -276,12 +280,20 @@ export const useUiStore = defineStore('ui', () => {
     return workflowTabs.value.find(t => t.id === activeWorkflowTabId.value)?.name || 'Workflow'
   })
 
+  const activeWorkflowMode = computed(() => {
+    return workflowTabs.value.find(t => t.id === activeWorkflowTabId.value)?.mode || 'node'
+  })
+
+  function getWorkflowMode(tabId: string): WorkflowMode {
+    return workflowTabs.value.find(t => t.id === tabId)?.mode || 'node'
+  }
+
   // Sidebar tab state (left sidebar)
   const activeSidebarTab = ref<SidebarTabId>(null)
 
   // Library navigation state (for shortcuts)
-  const activeLibrarySection = ref<'my-library' | 'projects' | 'templates'>('my-library')
-  const activeLibraryFilter = ref<'All' | 'Workflows' | 'Models' | 'Assets'>('All')
+  const activeLibrarySection = ref<'shared' | 'projects'>('shared')
+  const activeLibraryFilter = ref<'All' | 'Workflows' | 'Assets'>('All')
 
   // Node category state (TouchDesigner/Houdini-style)
   const activeNodeCategory = ref<NodeCategoryId>(null)
@@ -383,11 +395,12 @@ export const useUiStore = defineStore('ui', () => {
     }
   }
 
-  function createWorkflowTab(): void {
+  function createWorkflowTab(mode: WorkflowMode = 'node'): void {
     const newId = `workflow-${Date.now()}`
     workflowTabs.value.push({
       id: newId,
       name: 'Untitled Workflow',
+      mode,
       isActive: false,
     })
     selectWorkflowTab(newId)
@@ -499,11 +512,11 @@ export const useUiStore = defineStore('ui', () => {
     }
   }
 
-  function setLibrarySection(section: 'my-library' | 'projects' | 'templates'): void {
+  function setLibrarySection(section: 'shared' | 'projects'): void {
     activeLibrarySection.value = section
   }
 
-  function setLibraryFilter(filter: 'All' | 'Workflows' | 'Models' | 'Assets'): void {
+  function setLibraryFilter(filter: 'All' | 'Workflows' | 'Assets'): void {
     activeLibraryFilter.value = filter
   }
 
@@ -522,6 +535,8 @@ export const useUiStore = defineStore('ui', () => {
     workflowTabs,
     activeWorkflowTabId,
     activeWorkflowName,
+    activeWorkflowMode,
+    getWorkflowMode,
     // Theme
     themeMode,
     // Functions

@@ -127,14 +127,14 @@ async function runWorkflow() {
 </script>
 
 <template>
-  <div class="flex h-full w-80 flex-col border-l border-border bg-background">
-    <!-- Header -->
-    <div class="flex h-10 items-center border-b border-border px-3">
-      <span class="text-xs font-medium uppercase tracking-wide text-muted-foreground">Info</span>
+  <div class="flex h-full w-80 flex-col border-l border-border bg-card/95">
+    <!-- Header - matches Queue header height -->
+    <div class="flex h-10 items-center justify-between border-b border-border px-4">
+      <span class="text-sm font-medium text-foreground">Run workflow</span>
     </div>
 
     <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto">
+    <div class="flex-1 overflow-y-auto bg-black/20">
       <div class="flex flex-col gap-5 p-4">
         <!-- Image Upload -->
         <div class="flex flex-col gap-2">

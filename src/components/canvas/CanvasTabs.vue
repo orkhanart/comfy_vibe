@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
+import type { WorkflowMode } from '@/stores/uiStore'
 
 export interface CanvasTab {
   id: string
   name: string
+  mode: WorkflowMode
   isActive: boolean
   isDirty?: boolean
 }
@@ -23,6 +25,10 @@ function handleClose(tabId: string, event: MouseEvent): void {
   event.stopPropagation()
   emit('close', tabId)
 }
+
+function getModeIcon(mode: WorkflowMode): string {
+  return mode === 'node' ? 'sitemap' : 'sliders-h'
+}
 </script>
 
 <template>
@@ -32,7 +38,7 @@ function handleClose(tabId: string, event: MouseEvent): void {
       <button
         v-for="tab in props.tabs"
         :key="tab.id"
-        class="group flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-1.5 text-xs transition-colors"
+        class="group flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs transition-colors"
         :class="[
           tab.id === props.activeTabId
             ? 'bg-accent text-accent-foreground'
@@ -40,6 +46,7 @@ function handleClose(tabId: string, event: MouseEvent): void {
         ]"
         @click="emit('select', tab.id)"
       >
+        <Icon :name="getModeIcon(tab.mode)" size="xs" class="shrink-0 opacity-60" />
         <span class="max-w-[150px] truncate">{{ tab.name }}</span>
         <span v-if="tab.isDirty" class="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
         <span

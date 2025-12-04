@@ -3,6 +3,7 @@ import { Icon } from '@/components/ui/icon'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import type { Folder } from '@/data/workspaceMockData'
 import { ref } from 'vue'
+import { DRAG_MIME_TYPE, type DragItem } from '@/composables/common/useFolders'
 
 interface Props {
   folder: Folder
@@ -29,9 +30,12 @@ const emit = defineEmits<{
   moveTo: [id: string]
   share: [id: string]
   delete: [id: string]
+  drop: [folderId: string, dragItem: DragItem]
 }>()
 
 const menuOpen = ref(false)
+const isDragging = ref(false)
+const isDragOver = ref(false)
 
 function handleAction(action: string, id: string) {
   menuOpen.value = false
@@ -43,15 +47,104 @@ function handleAction(action: string, id: string) {
     case 'delete': emit('delete', id); break
   }
 }
+
+// Drag handlers (for dragging the folder itself)
+function handleDragStart(e: DragEvent) {
+  if (!e.dataTransfer) return
+
+  const dragItem: DragItem = {
+    type: 'folder',
+    id: props.folder.id,
+    name: props.folder.name,
+    folderId: props.folder.parentId,
+  }
+
+  e.dataTransfer.setData(DRAG_MIME_TYPE, JSON.stringify(dragItem))
+  e.dataTransfer.setData('text/plain', JSON.stringify(dragItem))
+  e.dataTransfer.effectAllowed = 'move'
+
+  isDragging.value = true
+}
+
+function handleDragEnd() {
+  isDragging.value = false
+}
+
+// Drop handlers (for receiving drops)
+function handleDragEnter(e: DragEvent) {
+  e.preventDefault()
+  if (e.dataTransfer?.types.includes(DRAG_MIME_TYPE)) {
+    isDragOver.value = true
+  }
+}
+
+function handleDragOver(e: DragEvent) {
+  e.preventDefault()
+  if (e.dataTransfer?.types.includes(DRAG_MIME_TYPE)) {
+    e.dataTransfer.dropEffect = 'move'
+  }
+}
+
+function handleDragLeave(e: DragEvent) {
+  // Only set isDragOver to false if we're leaving the folder element entirely
+  const relatedTarget = e.relatedTarget as HTMLElement | null
+  const currentTarget = e.currentTarget as HTMLElement
+  if (!currentTarget.contains(relatedTarget)) {
+    isDragOver.value = false
+  }
+}
+
+function handleDrop(e: DragEvent) {
+  e.preventDefault()
+  e.stopPropagation()
+  isDragOver.value = false
+
+  if (!e.dataTransfer) return
+
+  const data = e.dataTransfer.getData(DRAG_MIME_TYPE)
+  if (!data) return
+
+  try {
+    const dragItem: DragItem = JSON.parse(data)
+
+    // Don't allow dropping on itself
+    if (dragItem.type === 'folder' && dragItem.id === props.folder.id) return
+
+    // Don't allow dropping if already in this folder
+    if (dragItem.folderId === props.folder.id) return
+
+    emit('drop', props.folder.id, dragItem)
+  } catch {
+    // Invalid JSON, ignore
+  }
+}
 </script>
 
 <template>
   <div
-    class="group cursor-pointer"
+    :class="[
+      'group cursor-pointer transition-all',
+      isDragging && 'opacity-50',
+      isDragOver && 'scale-105'
+    ]"
+    draggable="true"
     @click="emit('open', folder.id)"
+    @dragstart="handleDragStart"
+    @dragend="handleDragEnd"
+    @dragenter="handleDragEnter"
+    @dragover="handleDragOver"
+    @dragleave="handleDragLeave"
+    @drop="handleDrop"
   >
     <!-- Folder icon with hover overlay -->
-    <div class="relative aspect-square overflow-hidden rounded-xl bg-zinc-100 transition-all duration-200 group-hover:scale-[1.01] group-hover:shadow-xl dark:bg-zinc-800">
+    <div
+      :class="[
+        'relative aspect-square overflow-hidden rounded-xl transition-all duration-200 group-hover:scale-[1.01] group-hover:shadow-xl',
+        isDragOver
+          ? 'bg-blue-100 ring-2 ring-blue-500 dark:bg-blue-900/30'
+          : 'bg-zinc-100 dark:bg-zinc-800'
+      ]"
+    >
       <!-- Icon in top left -->
       <div class="absolute left-3 top-3">
         <Icon :name="icon" size="xl" :class="iconClass" />

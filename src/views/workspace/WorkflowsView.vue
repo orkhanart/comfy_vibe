@@ -11,10 +11,9 @@ import {
   FolderContextMenu,
   CreateFolderDialog,
   ResourceListView,
-  PageBreadcrumb,
 } from '@/components/workspace'
 import { MOCK_WORKFLOWS, type Workflow } from '@/data/workspaceMockData'
-import { useFolders } from '@/composables/common/useFolders'
+import { useFolders, DRAG_MIME_TYPE, type DragItem } from '@/composables/common/useFolders'
 
 const router = useRouter()
 
@@ -29,6 +28,8 @@ const {
   deleteFolder,
   getItemCount,
   getSubfolderCount,
+  moveItemToFolder,
+  moveFolderToFolder,
 } = useFolders('workflows')
 
 // Create folder dialog
@@ -135,39 +136,108 @@ function closeFileInfo() {
 function openWorkflow() {
   router.push('/node')
 }
+
+// Drag and drop
+const isDragOverView = ref(false)
+
+function handleFolderDrop(targetFolderId: string, dragItem: DragItem) {
+  if (dragItem.type === 'folder') {
+    moveFolderToFolder(dragItem.id, targetFolderId)
+  } else if (dragItem.type === 'workflow') {
+    moveItemToFolder(workflows.value, dragItem.id, targetFolderId)
+  }
+}
+
+function handleBreadcrumbDrop(targetFolderId: string | null, dragItem: DragItem) {
+  if (dragItem.type === 'folder') {
+    moveFolderToFolder(dragItem.id, targetFolderId)
+  } else if (dragItem.type === 'workflow') {
+    moveItemToFolder(workflows.value, dragItem.id, targetFolderId)
+  }
+}
+
+function handleViewDragEnter(e: DragEvent) {
+  if (e.dataTransfer?.types.includes(DRAG_MIME_TYPE)) {
+    isDragOverView.value = true
+  }
+}
+
+function handleViewDragOver(e: DragEvent) {
+  e.preventDefault()
+  if (e.dataTransfer?.types.includes(DRAG_MIME_TYPE)) {
+    e.dataTransfer.dropEffect = 'move'
+  }
+}
+
+function handleViewDragLeave(e: DragEvent) {
+  const relatedTarget = e.relatedTarget as HTMLElement | null
+  const currentTarget = e.currentTarget as HTMLElement
+  if (!currentTarget.contains(relatedTarget)) {
+    isDragOverView.value = false
+  }
+}
+
+function handleViewDrop(e: DragEvent) {
+  e.preventDefault()
+  isDragOverView.value = false
+
+  if (!e.dataTransfer) return
+
+  const data = e.dataTransfer.getData(DRAG_MIME_TYPE)
+  if (!data) return
+
+  try {
+    const dragItem: DragItem = JSON.parse(data)
+
+    // Don't do anything if already in this folder
+    if (dragItem.folderId === currentFolderId.value) return
+
+    // Move to current folder
+    if (dragItem.type === 'folder') {
+      moveFolderToFolder(dragItem.id, currentFolderId.value)
+    } else if (dragItem.type === 'workflow') {
+      moveItemToFolder(workflows.value, dragItem.id, currentFolderId.value)
+    }
+  } catch {
+    // Invalid JSON, ignore
+  }
+}
 </script>
 
 <template>
-  <div class="p-4" @click="closeMenu">
-    <PageBreadcrumb label="Workflows" icon="sitemap" />
-
-    <!-- Header Actions -->
-    <div class="mb-4 flex items-center justify-end">
-      <div class="flex items-center gap-2">
+  <div
+    class="p-4"
+    @click="closeMenu"
+    @dragenter="handleViewDragEnter"
+    @dragover="handleViewDragOver"
+    @dragleave="handleViewDragLeave"
+    @drop="handleViewDrop"
+  >
+    <!-- Header with Breadcrumb and Actions -->
+    <div class="mb-4 flex items-center justify-between">
+      <FolderBreadcrumbs
+        :path="breadcrumbPath"
+        root-label="Workflows"
+        root-icon="sitemap"
+        @navigate="navigateToFolder"
+        @drop="handleBreadcrumbDrop"
+      />
+      <div class="flex items-center gap-1.5">
         <button
-          class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-border dark:bg-muted dark:text-foreground dark:hover:bg-accent"
+          class="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-border dark:bg-muted dark:text-foreground dark:hover:bg-accent"
         >
           <Icon name="upload" size="xs" />
-          Import Workflow
+          Import
         </button>
         <button
-          class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
+          class="inline-flex items-center gap-1.5 rounded-md bg-zinc-900 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
           @click="openWorkflow"
         >
           <Icon name="plus" size="xs" />
-          Create New Workflow
+          New Workflow
         </button>
       </div>
     </div>
-
-    <!-- Breadcrumbs -->
-    <FolderBreadcrumbs
-      v-if="currentFolderId"
-      :path="breadcrumbPath"
-      root-label="Workflows"
-      class="mb-4"
-      @navigate="navigateToFolder"
-    />
 
     <!-- Resource List -->
     <ResourceListView
@@ -183,39 +253,29 @@ function openWorkflow() {
       :empty-description="searchQuery ? 'Try a different search term' : 'Import or save a workflow to get started'"
       @create-folder="showCreateFolderDialog = true"
     >
-      <!-- Folders Section -->
-      <template #folders>
-        <div v-if="foldersAtCurrentLevel.length > 0" class="mb-6">
-          <h3 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Folders</h3>
-          <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
-            <div v-for="folder in foldersAtCurrentLevel" :key="folder.id" class="relative">
-              <FolderCard
-                :folder="folder"
-                :item-count="getItemCount(folder.id, workflows)"
-                :subfolder-count="getSubfolderCount(folder.id)"
-                @open="handleFolderOpen"
-                @open-menu="handleOpenFolderMenu"
-              />
-              <FolderContextMenu
-                v-if="openFolderMenuId === folder.id"
-                :folder-id="folder.id"
-                class="absolute right-0 top-full z-50"
-                @open="handleFolderOpen"
-                @rename="closeFolderMenu"
-                @delete="handleFolderDelete"
-                @close="closeFolderMenu"
-              />
-            </div>
-          </div>
-        </div>
-        <!-- Workflows Section Header -->
-        <h3 v-if="foldersAtCurrentLevel.length > 0 && filteredWorkflows.length > 0" class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Workflows
-        </h3>
-      </template>
-
       <template #grid>
-        <div v-for="workflow in filteredWorkflows" :key="workflow.id" class="relative">
+        <!-- Folders -->
+        <div v-for="folder in foldersAtCurrentLevel" :key="'folder-' + folder.id" class="relative">
+          <FolderCard
+            :folder="folder"
+            :item-count="getItemCount(folder.id, workflows)"
+            :subfolder-count="getSubfolderCount(folder.id)"
+            @open="handleFolderOpen"
+            @open-menu="handleOpenFolderMenu"
+            @drop="handleFolderDrop"
+          />
+          <FolderContextMenu
+            v-if="openFolderMenuId === folder.id"
+            :folder-id="folder.id"
+            class="absolute right-0 top-full z-50"
+            @open="handleFolderOpen"
+            @rename="closeFolderMenu"
+            @delete="handleFolderDelete"
+            @close="closeFolderMenu"
+          />
+        </div>
+        <!-- Workflows -->
+        <div v-for="workflow in filteredWorkflows" :key="'workflow-' + workflow.id" class="relative">
           <WorkflowCard
             :workflow="workflow"
             @open="openWorkflow"

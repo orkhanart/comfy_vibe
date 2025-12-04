@@ -1,9 +1,6 @@
 <script setup lang="ts">
-import { Icon } from '@/components/ui/icon'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { FavoriteButton } from '@/components/common'
 import type { Template } from '@/data/workspaceMockData'
-import { ref } from 'vue'
 
 interface Props {
   template: Template
@@ -14,27 +11,7 @@ defineProps<Props>()
 const emit = defineEmits<{
   open: [id: string]
   toggleFavorite: [id: string]
-  duplicate: [id: string]
-  share: [id: string]
 }>()
-
-const menuOpen = ref(false)
-
-function handleAction(action: string, id: string) {
-  menuOpen.value = false
-  switch (action) {
-    case 'open': emit('open', id); break
-    case 'duplicate': emit('duplicate', id); break
-    case 'share': emit('share', id); break
-  }
-}
-
-function formatUses(uses: number): string {
-  if (uses >= 1000) {
-    return `${(uses / 1000).toFixed(1)}k`
-  }
-  return uses.toString()
-}
 </script>
 
 <template>
@@ -49,97 +26,48 @@ function formatUses(uses: number): string {
         :alt="template.name"
         class="h-full w-full object-cover"
       />
-      <!-- Hover overlay -->
+      <!-- Overlay -->
       <div class="absolute inset-0 flex flex-col justify-between p-2">
-        <!-- Top row -->
+        <!-- Top row - Provider badge (if exists) -->
         <div class="flex items-start justify-between">
-          <!-- Tags -->
+          <div>
+            <!-- Provider badge placeholder - could be added to Template type -->
+          </div>
+          <!-- Favorite on hover -->
+          <FavoriteButton
+            :is-favorite="template.favorite"
+            variant="overlay"
+            size="md"
+            class="opacity-0 transition-opacity group-hover:opacity-100"
+            @toggle="emit('toggleFavorite', template.id)"
+          />
+        </div>
+        <!-- Bottom row - Tags -->
+        <div class="flex items-end justify-between gap-2">
+          <!-- Tags at bottom (ComfyUI style) -->
           <div class="flex flex-wrap gap-1">
             <span
-              v-for="tag in template.tags.slice(0, 2)"
+              v-for="tag in template.tags?.slice(0, 3)"
               :key="tag"
               class="rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm"
             >
               {{ tag }}
             </span>
           </div>
-          <!-- Favorite -->
-          <FavoriteButton
-            :is-favorite="template.favorite"
-            variant="overlay"
-            size="md"
-            @toggle="emit('toggleFavorite', template.id)"
-          />
-        </div>
-        <!-- Bottom row -->
-        <div class="flex items-end justify-between">
-          <!-- Uses count -->
-          <span class="inline-flex items-center gap-1 rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
-            <Icon name="users" size="xs" />
-            {{ formatUses(template.uses) }}
-          </span>
-          <!-- Hover actions -->
-          <div class="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-            <button
-              class="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-900/70 text-white backdrop-blur-sm transition-colors hover:bg-zinc-900/90"
-              title="Use"
-              @click.stop="emit('open', template.id)"
-            >
-              <Icon name="play" size="sm" />
-            </button>
-          </div>
         </div>
       </div>
     </div>
-    <!-- Name & Menu -->
-    <div class="mt-2 flex items-center justify-between gap-1 px-1">
+    <!-- Name & Description -->
+    <div class="mt-2.5 px-0.5">
       <h3
         :title="template.name"
-        class="min-w-0 flex-1 truncate text-sm font-medium text-zinc-900 dark:text-foreground"
+        class="truncate text-sm font-semibold text-zinc-900 dark:text-foreground"
       >
         {{ template.name }}
       </h3>
-      <Popover v-model:open="menuOpen">
-        <PopoverTrigger as-child>
-          <button
-            class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-zinc-400 transition-all hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-foreground"
-            title="More options"
-            @click.stop
-          >
-            <Icon name="ellipsis-h" size="sm" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent align="end" :side-offset="4" class="w-48 p-1">
-          <button
-            class="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            @click="handleAction('open', template.id)"
-          >
-            <Icon name="play" size="sm" class="text-zinc-400" />
-            Use Template
-          </button>
-          <button
-            class="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            @click="handleAction('duplicate', template.id)"
-          >
-            <Icon name="copy" size="sm" class="text-zinc-400" />
-            Duplicate
-          </button>
-          <button
-            class="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            @click="emit('toggleFavorite', template.id); menuOpen = false"
-          >
-            <Icon :name="template.favorite ? 'star-fill' : 'star'" size="sm" :class="template.favorite ? 'text-amber-500' : 'text-zinc-400'" />
-            {{ template.favorite ? 'Remove from Favorites' : 'Add to Favorites' }}
-          </button>
-          <button
-            class="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-zinc-700 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            @click="handleAction('share', template.id)"
-          >
-            <Icon name="share" size="sm" class="text-zinc-400" />
-            Share
-          </button>
-        </PopoverContent>
-      </Popover>
+      <p class="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+        {{ template.description }}
+      </p>
     </div>
   </div>
 </template>

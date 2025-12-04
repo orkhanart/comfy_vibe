@@ -19,6 +19,21 @@ function handleLogoClick(): void {
 function handleHomeClick(): void {
   router.push({ name: 'workspace-dashboard', params: { workspaceId: 'default' } })
 }
+
+function handleTabSelect(tabId: string): void {
+  const mode = uiStore.getWorkflowMode(tabId)
+  uiStore.selectWorkflowTab(tabId)
+  // Navigate to the correct mode if different from current
+  if (mode === 'linear') {
+    router.push({ name: 'linear' })
+  }
+  // Already in node mode, no navigation needed
+}
+
+function handleNewWorkflow(): void {
+  // Create new workflow in current mode (node)
+  uiStore.createWorkflowTab('node')
+}
 </script>
 
 <template>
@@ -55,9 +70,9 @@ function handleHomeClick(): void {
     <CanvasTabs
       :tabs="uiStore.workflowTabs"
       :active-tab-id="uiStore.activeWorkflowTabId"
-      @select="uiStore.selectWorkflowTab"
+      @select="handleTabSelect"
       @close="uiStore.closeWorkflowTab"
-      @new="uiStore.createWorkflowTab"
+      @new="handleNewWorkflow"
     />
 
     <!-- Right Section -->

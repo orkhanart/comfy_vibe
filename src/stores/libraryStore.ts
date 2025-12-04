@@ -2,18 +2,12 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import {
   MOCK_WORKFLOWS,
-  MOCK_MODELS,
   MOCK_ASSETS,
-  MOCK_TEMPLATES,
-  type Workflow,
-  type Model,
-  type Asset,
-  type Template,
 } from '@/data/workspaceMockData'
 
 // Types
 export type LibraryItemType = 'workflow' | 'model' | 'asset' | 'folder' | 'template'
-export type LibrarySectionId = 'recent' | 'my-library' | 'projects' | 'shared' | 'templates'
+export type LibrarySectionId = 'recent' | 'shared' | 'projects'
 export type LibraryViewMode = 'grid' | 'list'
 
 export interface LibraryItem {
@@ -80,9 +74,9 @@ export const useLibraryStore = defineStore('library', () => {
   const searchQuery = ref('')
 
   // Navigation state
-  const selectedFolderId = ref<string | null>('my-workflows') // default to My Library > Workflows
-  const expandedSections = ref<Set<string>>(new Set(['my-library']))
-  const expandedFolders = ref<Set<string>>(new Set(['my-workflows']))
+  const selectedFolderId = ref<string | null>('shared-workflows') // default to Shared > Workflows
+  const expandedSections = ref<Set<string>>(new Set(['shared']))
+  const expandedFolders = ref<Set<string>>(new Set(['shared-workflows']))
 
   // Recent items (max 5)
   const recentItems = ref<RecentItem[]>([])
@@ -103,14 +97,13 @@ export const useLibraryStore = defineStore('library', () => {
   // Sections configuration
   const sections = ref<LibrarySection[]>([
     {
-      id: 'my-library',
-      label: 'My Library',
-      icon: 'user',
+      id: 'shared',
+      label: 'Shared',
+      icon: 'users',
       isExpanded: true,
       folders: [
-        { id: 'my-workflows', name: 'Workflows', parentId: 'my-library', icon: 'sitemap', isSystem: true },
-        { id: 'my-models', name: 'Models', parentId: 'my-library', icon: 'box', isSystem: true },
-        { id: 'my-assets', name: 'Assets', parentId: 'my-library', icon: 'image', isSystem: true },
+        { id: 'shared-workflows', name: 'Workflows', parentId: 'shared', icon: 'sitemap', isSystem: true },
+        { id: 'shared-assets', name: 'Assets', parentId: 'shared', icon: 'image', isSystem: true },
       ],
     },
     {
@@ -120,29 +113,7 @@ export const useLibraryStore = defineStore('library', () => {
       isExpanded: false,
       folders: [
         { id: 'proj-workflows', name: 'Workflows', parentId: 'projects', icon: 'sitemap', isSystem: true },
-        { id: 'proj-models', name: 'Models', parentId: 'projects', icon: 'box', isSystem: true },
         { id: 'proj-assets', name: 'Assets', parentId: 'projects', icon: 'image', isSystem: true },
-      ],
-    },
-    {
-      id: 'shared',
-      label: 'Shared',
-      icon: 'users',
-      isExpanded: false,
-      folders: [
-        { id: 'shared-workflows', name: 'Workflows', parentId: 'shared', icon: 'sitemap', isSystem: true },
-        { id: 'shared-models', name: 'Models', parentId: 'shared', icon: 'box', isSystem: true },
-        { id: 'shared-assets', name: 'Assets', parentId: 'shared', icon: 'image', isSystem: true },
-      ],
-    },
-    {
-      id: 'templates',
-      label: 'Templates',
-      icon: 'clone',
-      isExpanded: false,
-      folders: [
-        { id: 'tpl-official', name: 'Official', parentId: 'templates', icon: 'verified', isSystem: true },
-        { id: 'tpl-community', name: 'Community', parentId: 'templates', icon: 'users', isSystem: true },
       ],
     },
   ])
@@ -152,7 +123,7 @@ export const useLibraryStore = defineStore('library', () => {
     id: wf.id,
     name: wf.name,
     type: 'workflow' as const,
-    parentId: 'my-workflows',
+    parentId: 'shared-workflows',
     thumbnail: wf.thumbnail,
     nodeCount: wf.nodeCount,
     description: wf.description,
@@ -162,24 +133,11 @@ export const useLibraryStore = defineStore('library', () => {
     tags: wf.tags,
   }))
 
-  const modelItems: LibraryItem[] = MOCK_MODELS.map(model => ({
-    id: model.id,
-    name: model.name,
-    type: 'model' as const,
-    parentId: 'my-models',
-    thumbnail: model.thumbnail,
-    size: model.size,
-    updatedAt: model.updatedAt,
-    favorite: model.favorite,
-    modelType: model.type,
-    baseModel: model.baseModel,
-  }))
-
   const assetItems: LibraryItem[] = MOCK_ASSETS.map(asset => ({
     id: asset.id,
     name: asset.name,
     type: 'asset' as const,
-    parentId: 'my-assets',
+    parentId: 'shared-assets',
     thumbnail: asset.thumbnail,
     size: asset.size,
     updatedAt: asset.updatedAt,
@@ -188,25 +146,10 @@ export const useLibraryStore = defineStore('library', () => {
     dimensions: asset.dimensions,
   }))
 
-  const templateItems: LibraryItem[] = MOCK_TEMPLATES.map(tpl => ({
-    id: tpl.id,
-    name: tpl.name,
-    type: 'template' as const,
-    parentId: 'tpl-official',
-    thumbnail: tpl.thumbnail,
-    description: tpl.description,
-    updatedAt: 'Official',
-    isReadOnly: true,
-    favorite: tpl.favorite,
-    tags: tpl.tags,
-  }))
-
   // Combined items
   const items = ref<LibraryItem[]>([
     ...workflowItems,
-    ...modelItems,
     ...assetItems,
-    ...templateItems,
   ])
 
   // Computed

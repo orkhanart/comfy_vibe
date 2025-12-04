@@ -1,9 +1,18 @@
 // Mock data for sidebar tabs
 // TODO: Replace with real API data from ComfyUI backend
 
+export interface NodePort {
+  name: string
+  type: string
+  color: string
+}
+
 export interface NodeItem {
   name: string
   display: string
+  description?: string
+  inputs?: NodePort[]
+  outputs?: NodePort[]
 }
 
 export interface NodeCategory {
@@ -37,7 +46,11 @@ export interface WorkflowItem {
 
 export interface AssetItem {
   name: string
-  type: string
+  type: 'image' | 'video' | 'audio'
+  source: 'generated' | 'imported'
+  thumbnail?: string
+  size?: string
+  createdAt?: string
 }
 
 export interface TemplateItem {
@@ -62,12 +75,77 @@ export const NODE_CATEGORIES_DATA: NodeCategory[] = [
     icon: 'download',
     expanded: true,
     nodes: [
-      { name: 'CheckpointLoaderSimple', display: 'Load Checkpoint' },
-      { name: 'VAELoader', display: 'Load VAE' },
-      { name: 'LoraLoader', display: 'Load LoRA' },
-      { name: 'CLIPLoader', display: 'Load CLIP' },
-      { name: 'ControlNetLoader', display: 'Load ControlNet Model' },
-      { name: 'UNETLoader', display: 'Load Diffusion Model' },
+      {
+        name: 'CheckpointLoaderSimple',
+        display: 'Load Checkpoint',
+        description: 'Load a checkpoint model file',
+        inputs: [
+          { name: 'ckpt_name', type: 'STRING', color: 'bg-gray-500' },
+        ],
+        outputs: [
+          { name: 'MODEL', type: 'MODEL', color: 'bg-purple-500' },
+          { name: 'CLIP', type: 'CLIP', color: 'bg-yellow-500' },
+          { name: 'VAE', type: 'VAE', color: 'bg-red-500' },
+        ]
+      },
+      {
+        name: 'VAELoader',
+        display: 'Load VAE',
+        description: 'Load a VAE model',
+        inputs: [
+          { name: 'vae_name', type: 'STRING', color: 'bg-gray-500' },
+        ],
+        outputs: [
+          { name: 'VAE', type: 'VAE', color: 'bg-red-500' },
+        ]
+      },
+      {
+        name: 'LoraLoader',
+        display: 'Load LoRA',
+        description: 'Load and apply a LoRA to a model',
+        inputs: [
+          { name: 'model', type: 'MODEL', color: 'bg-purple-500' },
+          { name: 'clip', type: 'CLIP', color: 'bg-yellow-500' },
+          { name: 'lora_name', type: 'STRING', color: 'bg-gray-500' },
+        ],
+        outputs: [
+          { name: 'MODEL', type: 'MODEL', color: 'bg-purple-500' },
+          { name: 'CLIP', type: 'CLIP', color: 'bg-yellow-500' },
+        ]
+      },
+      {
+        name: 'CLIPLoader',
+        display: 'Load CLIP',
+        description: 'Load a CLIP model',
+        inputs: [
+          { name: 'clip_name', type: 'STRING', color: 'bg-gray-500' },
+        ],
+        outputs: [
+          { name: 'CLIP', type: 'CLIP', color: 'bg-yellow-500' },
+        ]
+      },
+      {
+        name: 'ControlNetLoader',
+        display: 'Load ControlNet Model',
+        description: 'Load a ControlNet model',
+        inputs: [
+          { name: 'control_net_name', type: 'STRING', color: 'bg-gray-500' },
+        ],
+        outputs: [
+          { name: 'CONTROL_NET', type: 'CONTROL_NET', color: 'bg-cyan-500' },
+        ]
+      },
+      {
+        name: 'UNETLoader',
+        display: 'Load Diffusion Model',
+        description: 'Load a diffusion model (UNET)',
+        inputs: [
+          { name: 'unet_name', type: 'STRING', color: 'bg-gray-500' },
+        ],
+        outputs: [
+          { name: 'MODEL', type: 'MODEL', color: 'bg-purple-500' },
+        ]
+      },
     ]
   },
   {
@@ -76,10 +154,54 @@ export const NODE_CATEGORIES_DATA: NodeCategory[] = [
     icon: 'sliders-h',
     expanded: false,
     nodes: [
-      { name: 'CLIPTextEncode', display: 'CLIP Text Encode (Prompt)' },
-      { name: 'ConditioningCombine', display: 'Conditioning (Combine)' },
-      { name: 'ConditioningSetArea', display: 'Conditioning (Set Area)' },
-      { name: 'ControlNetApply', display: 'Apply ControlNet' },
+      {
+        name: 'CLIPTextEncode',
+        display: 'CLIP Text Encode (Prompt)',
+        description: 'Encode text into CLIP embeddings',
+        inputs: [
+          { name: 'clip', type: 'CLIP', color: 'bg-yellow-500' },
+          { name: 'text', type: 'STRING', color: 'bg-gray-500' },
+        ],
+        outputs: [
+          { name: 'CONDITIONING', type: 'CONDITIONING', color: 'bg-orange-500' },
+        ]
+      },
+      {
+        name: 'ConditioningCombine',
+        display: 'Conditioning (Combine)',
+        description: 'Combine two conditioning inputs',
+        inputs: [
+          { name: 'conditioning_1', type: 'CONDITIONING', color: 'bg-orange-500' },
+          { name: 'conditioning_2', type: 'CONDITIONING', color: 'bg-orange-500' },
+        ],
+        outputs: [
+          { name: 'CONDITIONING', type: 'CONDITIONING', color: 'bg-orange-500' },
+        ]
+      },
+      {
+        name: 'ConditioningSetArea',
+        display: 'Conditioning (Set Area)',
+        description: 'Set area for conditioning',
+        inputs: [
+          { name: 'conditioning', type: 'CONDITIONING', color: 'bg-orange-500' },
+        ],
+        outputs: [
+          { name: 'CONDITIONING', type: 'CONDITIONING', color: 'bg-orange-500' },
+        ]
+      },
+      {
+        name: 'ControlNetApply',
+        display: 'Apply ControlNet',
+        description: 'Apply ControlNet to conditioning',
+        inputs: [
+          { name: 'conditioning', type: 'CONDITIONING', color: 'bg-orange-500' },
+          { name: 'control_net', type: 'CONTROL_NET', color: 'bg-cyan-500' },
+          { name: 'image', type: 'IMAGE', color: 'bg-blue-500' },
+        ],
+        outputs: [
+          { name: 'CONDITIONING', type: 'CONDITIONING', color: 'bg-orange-500' },
+        ]
+      },
     ]
   },
   {
@@ -88,9 +210,48 @@ export const NODE_CATEGORIES_DATA: NodeCategory[] = [
     icon: 'box',
     expanded: false,
     nodes: [
-      { name: 'KSampler', display: 'KSampler' },
-      { name: 'KSamplerAdvanced', display: 'KSampler (Advanced)' },
-      { name: 'SamplerCustom', display: 'SamplerCustom' },
+      {
+        name: 'KSampler',
+        display: 'KSampler',
+        description: 'Sample latents using various samplers',
+        inputs: [
+          { name: 'model', type: 'MODEL', color: 'bg-purple-500' },
+          { name: 'positive', type: 'CONDITIONING', color: 'bg-orange-500' },
+          { name: 'negative', type: 'CONDITIONING', color: 'bg-orange-500' },
+          { name: 'latent_image', type: 'LATENT', color: 'bg-pink-500' },
+        ],
+        outputs: [
+          { name: 'LATENT', type: 'LATENT', color: 'bg-pink-500' },
+        ]
+      },
+      {
+        name: 'KSamplerAdvanced',
+        display: 'KSampler (Advanced)',
+        description: 'Advanced sampler with more options',
+        inputs: [
+          { name: 'model', type: 'MODEL', color: 'bg-purple-500' },
+          { name: 'positive', type: 'CONDITIONING', color: 'bg-orange-500' },
+          { name: 'negative', type: 'CONDITIONING', color: 'bg-orange-500' },
+          { name: 'latent_image', type: 'LATENT', color: 'bg-pink-500' },
+        ],
+        outputs: [
+          { name: 'LATENT', type: 'LATENT', color: 'bg-pink-500' },
+        ]
+      },
+      {
+        name: 'SamplerCustom',
+        display: 'SamplerCustom',
+        description: 'Custom sampler configuration',
+        inputs: [
+          { name: 'model', type: 'MODEL', color: 'bg-purple-500' },
+          { name: 'positive', type: 'CONDITIONING', color: 'bg-orange-500' },
+          { name: 'negative', type: 'CONDITIONING', color: 'bg-orange-500' },
+          { name: 'latent_image', type: 'LATENT', color: 'bg-pink-500' },
+        ],
+        outputs: [
+          { name: 'LATENT', type: 'LATENT', color: 'bg-pink-500' },
+        ]
+      },
     ]
   },
   {
@@ -99,11 +260,62 @@ export const NODE_CATEGORIES_DATA: NodeCategory[] = [
     icon: 'th-large',
     expanded: false,
     nodes: [
-      { name: 'EmptyLatentImage', display: 'Empty Latent Image' },
-      { name: 'LatentUpscale', display: 'Upscale Latent' },
-      { name: 'LatentComposite', display: 'Latent Composite' },
-      { name: 'VAEDecode', display: 'VAE Decode' },
-      { name: 'VAEEncode', display: 'VAE Encode' },
+      {
+        name: 'EmptyLatentImage',
+        display: 'Empty Latent Image',
+        description: 'Create an empty latent image',
+        inputs: [],
+        outputs: [
+          { name: 'LATENT', type: 'LATENT', color: 'bg-pink-500' },
+        ]
+      },
+      {
+        name: 'LatentUpscale',
+        display: 'Upscale Latent',
+        description: 'Upscale a latent image',
+        inputs: [
+          { name: 'samples', type: 'LATENT', color: 'bg-pink-500' },
+        ],
+        outputs: [
+          { name: 'LATENT', type: 'LATENT', color: 'bg-pink-500' },
+        ]
+      },
+      {
+        name: 'LatentComposite',
+        display: 'Latent Composite',
+        description: 'Composite two latent images',
+        inputs: [
+          { name: 'samples_to', type: 'LATENT', color: 'bg-pink-500' },
+          { name: 'samples_from', type: 'LATENT', color: 'bg-pink-500' },
+        ],
+        outputs: [
+          { name: 'LATENT', type: 'LATENT', color: 'bg-pink-500' },
+        ]
+      },
+      {
+        name: 'VAEDecode',
+        display: 'VAE Decode',
+        description: 'Decode latent to image using VAE',
+        inputs: [
+          { name: 'samples', type: 'LATENT', color: 'bg-pink-500' },
+          { name: 'vae', type: 'VAE', color: 'bg-red-500' },
+        ],
+        outputs: [
+          { name: 'IMAGE', type: 'IMAGE', color: 'bg-blue-500' },
+        ]
+      },
+      {
+        name: 'VAEEncode',
+        display: 'VAE Encode',
+        description: 'Encode image to latent using VAE',
+        inputs: [
+          { name: 'pixels', type: 'IMAGE', color: 'bg-blue-500' },
+          { name: 'vae', type: 'VAE', color: 'bg-red-500' },
+        ],
+        outputs: [
+          { name: 'LATENT', type: 'LATENT', color: 'bg-pink-500' },
+        ]
+      },
     ]
   },
   {
@@ -112,11 +324,56 @@ export const NODE_CATEGORIES_DATA: NodeCategory[] = [
     icon: 'image',
     expanded: false,
     nodes: [
-      { name: 'LoadImage', display: 'Load Image' },
-      { name: 'SaveImage', display: 'Save Image' },
-      { name: 'PreviewImage', display: 'Preview Image' },
-      { name: 'ImageScale', display: 'Upscale Image' },
-      { name: 'ImageInvert', display: 'Invert Image' },
+      {
+        name: 'LoadImage',
+        display: 'Load Image',
+        description: 'Load an image from disk',
+        inputs: [],
+        outputs: [
+          { name: 'IMAGE', type: 'IMAGE', color: 'bg-blue-500' },
+          { name: 'MASK', type: 'MASK', color: 'bg-white' },
+        ]
+      },
+      {
+        name: 'SaveImage',
+        display: 'Save Image',
+        description: 'Save an image to disk',
+        inputs: [
+          { name: 'images', type: 'IMAGE', color: 'bg-blue-500' },
+        ],
+        outputs: []
+      },
+      {
+        name: 'PreviewImage',
+        display: 'Preview Image',
+        description: 'Preview an image in the UI',
+        inputs: [
+          { name: 'images', type: 'IMAGE', color: 'bg-blue-500' },
+        ],
+        outputs: []
+      },
+      {
+        name: 'ImageScale',
+        display: 'Upscale Image',
+        description: 'Upscale an image',
+        inputs: [
+          { name: 'image', type: 'IMAGE', color: 'bg-blue-500' },
+        ],
+        outputs: [
+          { name: 'IMAGE', type: 'IMAGE', color: 'bg-blue-500' },
+        ]
+      },
+      {
+        name: 'ImageInvert',
+        display: 'Invert Image',
+        description: 'Invert image colors',
+        inputs: [
+          { name: 'image', type: 'IMAGE', color: 'bg-blue-500' },
+        ],
+        outputs: [
+          { name: 'IMAGE', type: 'IMAGE', color: 'bg-blue-500' },
+        ]
+      },
     ]
   },
   {
@@ -213,9 +470,14 @@ export const WORKFLOWS_DATA: WorkflowItem[] = [
 ]
 
 export const ASSETS_DATA: AssetItem[] = [
-  { name: 'reference_01.png', type: 'image' },
-  { name: 'mask_template.png', type: 'image' },
-  { name: 'init_image.jpg', type: 'image' },
+  { name: 'reference_01.png', type: 'image', source: 'imported', thumbnail: '/assets/card_images/workflow_01.webp', size: '2.4 MB', createdAt: '2 hours ago' },
+  { name: 'mask_template.png', type: 'image', source: 'imported', thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp', size: '1.1 MB', createdAt: '1 day ago' },
+  { name: 'init_image.jpg', type: 'image', source: 'imported', thumbnail: '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp', size: '856 KB', createdAt: '3 days ago' },
+  { name: 'output_001.png', type: 'image', source: 'generated', thumbnail: '/assets/card_images/228616f4-12ad-426d-84fb-f20e488ba7ee.webp', size: '3.2 MB', createdAt: '1 hour ago' },
+  { name: 'portrait_final.png', type: 'image', source: 'generated', thumbnail: '/assets/card_images/683255d3-1d10-43d9-a6ff-ef142061e88a.webp', size: '4.1 MB', createdAt: '5 hours ago' },
+  { name: 'landscape_v2.png', type: 'image', source: 'generated', thumbnail: '/assets/card_images/91f1f589-ddb4-4c4f-b3a7-ba30fc271987.webp', size: '5.8 MB', createdAt: 'Yesterday' },
+  { name: 'concept_art.png', type: 'image', source: 'generated', thumbnail: '/assets/card_images/28e9f7ea-ef00-48e8-849d-8752a34939c7.webp', size: '2.9 MB', createdAt: '2 days ago' },
+  { name: 'background_audio.mp3', type: 'audio', source: 'imported', size: '4.2 MB', createdAt: '1 week ago' },
 ]
 
 // Team Library Types
@@ -468,7 +730,7 @@ export interface LibrarySection {
 export const LIBRARY_SECTIONS_DATA: LibrarySection[] = [
   {
     id: 'my-library',
-    label: 'My Library',
+    label: 'Personal',
     icon: 'user',
     isExpanded: true,
     folders: [

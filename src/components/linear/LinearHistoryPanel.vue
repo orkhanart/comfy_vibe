@@ -153,14 +153,14 @@ function handleRerun(gen: GenerationItem): void {
 </script>
 
 <template>
-  <main class="flex h-full flex-1 flex-col bg-background">
+  <main class="flex h-full flex-1 flex-col" style="background-color: var(--color-canvas-bg)">
     <!-- Header -->
-    <div class="flex items-center justify-between border-b border-border px-4 py-2">
+    <div class="flex h-10 items-center justify-between border-b border-border bg-black/20 px-4">
       <span class="text-sm font-medium text-foreground">Queue</span>
       <div class="flex items-center gap-2">
         <button
           v-tooltip.bottom="'Clear all'"
-          class="flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
         >
           <Icon name="trash" size="xs" />
         </button>
@@ -215,15 +215,15 @@ function handleRerun(gen: GenerationItem): void {
             </div>
           </div>
 
-          <!-- Images Grid - Fixed size thumbnails -->
+          <!-- Images Grid - 4 per row -->
           <div
             v-if="gen.images.length > 0"
-            class="mb-2 flex flex-wrap gap-1.5"
+            class="mb-2 grid grid-cols-4 gap-1.5"
           >
             <div
               v-for="(img, idx) in gen.images"
               :key="idx"
-              class="group/img relative h-[33rem] w-[33rem] shrink-0 overflow-hidden rounded-lg bg-muted"
+              class="group/img relative aspect-square overflow-hidden rounded-lg bg-muted"
             >
               <img
                 :src="img"
@@ -242,15 +242,15 @@ function handleRerun(gen: GenerationItem): void {
             </div>
           </div>
 
-          <!-- Generating placeholder - Fixed size thumbnails -->
+          <!-- Generating placeholder - 4 per row -->
           <div
             v-else-if="gen.status === 'generating'"
-            class="mb-2 flex flex-wrap gap-1.5"
+            class="mb-2 grid grid-cols-4 gap-1.5"
           >
             <div
               v-for="i in gen.batchSize"
               :key="i"
-              class="flex h-[33rem] w-[33rem] shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted"
+              class="flex aspect-square items-center justify-center overflow-hidden rounded-lg bg-muted"
             >
               <div class="flex flex-col items-center">
                 <Icon name="spinner" size="sm" class="animate-spin text-primary" />

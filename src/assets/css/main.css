@@ -15,7 +15,22 @@
   --color-white: #ffffff;
   --color-black: #000000;
 
-  /* Custom Colors - Charcoal palette (dark backgrounds) */
+  /* ========== ComfyUI Core Palette ========== */
+
+  /* Neutral/Gray palette - matching ComfyUI dark theme */
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f4f4f5;
+  --color-neutral-200: #e4e4e7;
+  --color-neutral-300: #d4d4d8;
+  --color-neutral-400: #a1a1aa;
+  --color-neutral-500: #71717a;
+  --color-neutral-600: #52525b;
+  --color-neutral-700: #3f3f46;
+  --color-neutral-800: #27272a;
+  --color-neutral-900: #18181b;
+  --color-neutral-950: #09090b;
+
+  /* Charcoal palette (legacy dark backgrounds - kept for compatibility) */
   --color-charcoal-100: #55565e;
   --color-charcoal-200: #494a50;
   --color-charcoal-300: #3c3d42;
@@ -35,16 +50,63 @@
   --color-smoke-700: #a0a0a0;
   --color-smoke-800: #8a8a8a;
 
-  /* Azure palette (blues) */
+  /* ComfyUI Primary Blue */
+  --color-comfy-blue-50: #eff6ff;
+  --color-comfy-blue-100: #dbeafe;
+  --color-comfy-blue-200: #bfdbfe;
+  --color-comfy-blue-300: #93c5fd;
+  --color-comfy-blue-400: #60a5fa;
+  --color-comfy-blue-500: #3b82f6;
+  --color-comfy-blue-600: #1a56db;
+  --color-comfy-blue-700: #1d4ed8;
+  --color-comfy-blue-800: #1e40af;
+  --color-comfy-blue-900: #1e3a8a;
+
+  /* Azure palette (accent blues) */
   --color-azure-300: #78bae9;
   --color-azure-400: #31b9f4;
+  --color-azure-500: #0ea5e9;
   --color-azure-600: #0b8ce9;
+  --color-azure-700: #0369a1;
 
   /* Accent colors */
+  --color-coral-400: #ff7a73;
   --color-coral-500: #f75951;
   --color-coral-600: #e04e48;
+  --color-jade-300: #6ee7b7;
   --color-jade-400: #47e469;
+  --color-jade-500: #22c55e;
+  --color-gold-400: #fbbf24;
   --color-gold-500: #fdab34;
+  --color-gold-600: #d97706;
+
+  /* ========== ComfyUI Node Slot Colors ========== */
+  /* These match the official ComfyUI node connection colors */
+  --color-slot-clip: #ffd500;
+  --color-slot-clip-vision: #a8dadc;
+  --color-slot-clip-vision-output: #ad7452;
+  --color-slot-conditioning: #ffa931;
+  --color-slot-control-net: #6ee7b7;
+  --color-slot-image: #64b5f6;
+  --color-slot-latent: #ff9cf9;
+  --color-slot-mask: #81c784;
+  --color-slot-model: #b39ddb;
+  --color-slot-style-model: #c2ffae;
+  --color-slot-vae: #ff6e6e;
+  --color-slot-noise: #b0b0b0;
+  --color-slot-guider: #66ffff;
+  --color-slot-sampler: #ecb4b4;
+  --color-slot-sigmas: #cdffcd;
+
+  /* LiteGraph Canvas Colors */
+  --color-canvas-bg: #2e2e2e;
+  --color-canvas-grid: #444444;
+  --color-node-bg: #333333;
+  --color-node-header: #353535;
+  --color-node-text: #aaaaaa;
+  --color-node-text-bright: #eeeeee;
+  --color-link-default: #9a9a9a;
+  --color-link-active: #aaffaa;
 
   /* shadcn animations */
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -115,30 +177,32 @@
   /* Base colors - Light mode */
   --fg-color: #1a1a1a;
   --bg-color: #ffffff;
-  --comfy-menu-bg: #353535;
+  --comfy-menu-bg: var(--color-node-header);
   --input-text: #333;
-  --border-color: #d1d5db;
+  --border-color: var(--color-neutral-300);
 
-  /* Semantic tokens - Light mode - improved contrast */
+  /* Semantic tokens - Light mode - using ComfyUI palette */
   --base-foreground: #111827;
   --base-background: #ffffff;
-  --muted-foreground: #6b7280;
-  --secondary-background: #f3f4f6;
-  --secondary-background-hover: #e5e7eb;
-  --primary-background: var(--color-azure-600);
-  --primary-background-hover: var(--color-azure-400);
-  --border-default: #d1d5db;
-  --border-subtle: #e5e7eb;
+  --muted-foreground: var(--color-neutral-500);
+  --secondary-background: var(--color-neutral-100);
+  --secondary-background-hover: var(--color-neutral-200);
+  --primary-background: var(--color-comfy-blue-600);
+  --primary-background-hover: var(--color-comfy-blue-500);
+  --border-default: var(--color-neutral-300);
+  --border-subtle: var(--color-neutral-200);
 
   /* Interface colors - Light mode */
   --interface-panel-surface: #ffffff;
-  --interface-stroke: #e5e7eb;
+  --interface-stroke: var(--color-neutral-200);
   --button-surface: #ffffff;
-  --button-hover-surface: #f3f4f6;
+  --button-hover-surface: var(--color-neutral-100);
+  --button-active-surface: var(--color-neutral-200);
+  --button-active-foreground: var(--base-foreground);
 
   /* Node colors - Light mode */
-  --node-widget-bg: #e5e7eb;
-  --node-header-bg: #f3f4f6;
+  --node-widget-bg: var(--color-neutral-200);
+  --node-header-bg: var(--color-neutral-100);
 
   /* shadcn semantic mappings - reuse existing tokens */
   --background: var(--base-background);
@@ -166,29 +230,36 @@
 /* ===================== Dark Theme ===================== */
 .dark,
 .dark-theme {
-  --fg-color: #f9fafb;
-  --bg-color: #09090b;
+  --fg-color: var(--color-neutral-50);
+  --bg-color: var(--color-neutral-950);
 
-  /* Semantic tokens - Dark mode - explicit values for better reliability */
-  --base-foreground: #f9fafb;
-  --base-background: #09090b;
-  --muted-foreground: #a1a1aa;
-  --secondary-background: #27272a;
-  --secondary-background-hover: #3f3f46;
-  --primary-background: #0b8ce9;
-  --primary-background-hover: #31b9f4;
-  --border-default: #3f3f46;
-  --border-subtle: #27272a;
+  /* Semantic tokens - Dark mode - using ComfyUI palette */
+  --base-foreground: var(--color-neutral-50);
+  --base-background: var(--color-neutral-950);
+  --muted-foreground: var(--color-neutral-400);
+  --secondary-background: var(--color-neutral-800);
+  --secondary-background-hover: var(--color-neutral-700);
+  --primary-background: var(--color-comfy-blue-600);
+  --primary-background-hover: var(--color-comfy-blue-500);
+  --border-default: var(--color-neutral-700);
+  --border-subtle: var(--color-neutral-800);
 
-  /* Interface colors - Dark mode */
-  --interface-panel-surface: #18181b;
-  --interface-stroke: #27272a;
-  --button-surface: #27272a;
-  --button-hover-surface: #3f3f46;
+  /* Interface colors - Dark mode - matching ComfyUI panels */
+  --interface-panel-surface: var(--color-neutral-900);
+  --interface-stroke: var(--color-neutral-800);
+  --button-surface: var(--color-neutral-800);
+  --button-hover-surface: var(--color-neutral-700);
+  --button-active-surface: var(--color-neutral-700);
+  --button-active-foreground: var(--color-neutral-50);
 
-  /* Node colors - Dark mode */
-  --node-widget-bg: #27272a;
-  --node-header-bg: #1f1f23;
+  /* Node colors - Dark mode - matching LiteGraph */
+  --node-widget-bg: var(--color-neutral-800);
+  --node-header-bg: var(--color-node-header);
+  --comfy-menu-bg: var(--color-node-header);
+
+  /* Canvas colors - for workflow editor */
+  --canvas-background: var(--color-canvas-bg);
+  --canvas-grid: var(--color-canvas-grid);
 
   /* shadcn semantic mappings - dark mode overrides */
   --background: var(--base-background);
@@ -206,6 +277,7 @@
 
 /* ===================== Tailwind Theme Inline ===================== */
 @theme inline {
+  /* Semantic color utilities */
   --color-base-foreground: var(--base-foreground);
   --color-base-background: var(--base-background);
   --color-muted-foreground: var(--muted-foreground);
@@ -219,6 +291,12 @@
   --color-interface-stroke: var(--interface-stroke);
   --color-button-surface: var(--button-surface);
   --color-button-hover-surface: var(--button-hover-surface);
+  --color-button-active-surface: var(--button-active-surface);
+  --color-button-active-foreground: var(--button-active-foreground);
+
+  /* Canvas/workflow editor colors */
+  --color-canvas-background: var(--canvas-background, #2e2e2e);
+  --color-canvas-grid: var(--canvas-grid, #444444);
 
   /* shadcn color utilities */
   --color-background: var(--background);

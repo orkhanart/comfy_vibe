@@ -12,7 +12,7 @@ interface MenuItem {
 const route = useRoute()
 
 const menuItems: MenuItem[] = [
-  { label: 'Home', icon: 'clock', route: '/workspace' },
+  { label: 'Dashboard', icon: 'th-large', route: '/workspace' },
   { label: 'Workflows', icon: 'sitemap', route: '/workspace/workflows' },
   { label: 'Assets', icon: 'images', route: '/workspace/assets' },
   { label: 'Models', icon: 'box', route: '/workspace/models' },
@@ -47,8 +47,8 @@ function isActive(itemRoute?: string): boolean {
             :class="[
               'flex items-center gap-3 rounded-md px-2 py-1.5 text-sm transition-colors',
               isActive(item.route)
-                ? 'bg-zinc-900 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900'
-                : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-foreground'
+                ? 'bg-button-active-surface font-medium text-button-active-foreground'
+                : 'text-muted-foreground hover:bg-button-hover-surface hover:text-foreground'
             ]"
           >
             <Icon :name="item.icon" size="md" />
@@ -58,8 +58,8 @@ function isActive(itemRoute?: string): boolean {
               :class="[
                 'rounded-full px-1.5 py-0.5 text-xs font-medium',
                 isActive(item.route)
-                  ? 'bg-white/20 text-white dark:bg-zinc-900/20 dark:text-zinc-900'
-                  : 'bg-zinc-200 text-zinc-500 dark:bg-zinc-700 dark:text-foreground'
+                  ? 'bg-button-hover-surface text-button-active-foreground'
+                  : 'bg-secondary-background text-muted-foreground'
               ]"
             >
               {{ item.badge }}
@@ -76,8 +76,8 @@ function isActive(itemRoute?: string): boolean {
         :class="[
           'flex items-center gap-3 rounded-md px-2 py-1.5 text-sm transition-colors',
           isActive(trashItem.route)
-            ? 'bg-zinc-900 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900'
-            : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-foreground'
+            ? 'bg-button-active-surface font-medium text-button-active-foreground'
+            : 'text-muted-foreground hover:bg-button-hover-surface hover:text-foreground'
         ]"
       >
         <Icon :name="trashItem.icon" size="md" />

@@ -12,7 +12,7 @@ const props = defineProps<{
   viewMode: 'list' | 'grid'
   searchQuery: string
   activeFilter: string
-  activeSection: 'my-library' | 'projects' | 'templates'
+  activeSection: 'shared' | 'projects'
   sidebarWidth: number
   currentProjectId: string | null
   filterModelType: 'all' | 'checkpoint' | 'lora' | 'vae' | 'controlnet'
@@ -31,8 +31,8 @@ function createShortcutData(e: DragEvent, data: {
   icon: string
   thumbnail?: string
   itemId?: string
-  section?: 'my-library' | 'projects' | 'templates'
-  filter?: 'All' | 'Workflows' | 'Models' | 'Assets'
+  section?: 'shared' | 'projects'
+  filter?: 'All' | 'Workflows' | 'Assets'
 }): void {
   if (e.dataTransfer) {
     const jsonData = JSON.stringify(data)
@@ -87,7 +87,7 @@ function handleFolderDragStart(e: DragEvent, folder: { id: string; name: string;
     label: `${folder.name}`,
     icon: folder.icon,
     section: props.activeSection,
-    filter: folder.name as 'Workflows' | 'Models' | 'Assets',
+    filter: folder.name as 'Workflows' | 'Assets',
   })
 }
 
@@ -115,7 +115,6 @@ const systemFolders = computed(() => {
 
   return [
     { id: 'workflows', name: 'Workflows', icon: 'sitemap', type: 'folder' },
-    { id: 'models', name: 'Models', icon: 'box', type: 'folder' },
     { id: 'assets', name: 'Assets', icon: 'image', type: 'folder' },
   ]
 })
@@ -125,7 +124,6 @@ const activeType = computed(() => {
   const filterMap: Record<string, string> = {
     'All': 'all',
     'Workflows': 'workflows',
-    'Models': 'models',
     'Assets': 'assets',
   }
   return filterMap[props.activeFilter] || 'all'
@@ -133,12 +131,7 @@ const activeType = computed(() => {
 
 // Get current folder ID based on section + type
 const currentFolderId = computed(() => {
-  const prefix = props.activeSection === 'my-library' ? 'my' :
-                 props.activeSection === 'projects' ? 'proj' : 'tpl'
-
-  if (props.activeSection === 'templates') {
-    return 'tpl-official'
-  }
+  const prefix = props.activeSection === 'shared' ? 'shared' : 'proj'
 
   // If filter is 'All', we need to show all types
   if (activeType.value === 'all') {
@@ -150,18 +143,12 @@ const currentFolderId = computed(() => {
 
 // Get items for current folder
 const currentItems = computed(() => {
-  const prefix = props.activeSection === 'my-library' ? 'my' :
-                 props.activeSection === 'projects' ? 'proj' : 'tpl'
-
-  if (props.activeSection === 'templates') {
-    return libraryStore.items.filter(item => item.parentId === 'tpl-official')
-  }
+  const prefix = props.activeSection === 'shared' ? 'shared' : 'proj'
 
   // If filter is 'All', show all items from all type folders in this section
   if (activeType.value === 'all') {
     return libraryStore.items.filter(item =>
       item.parentId === `${prefix}-workflows` ||
-      item.parentId === `${prefix}-models` ||
       item.parentId === `${prefix}-assets`
     )
   }

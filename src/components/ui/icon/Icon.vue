@@ -16,6 +16,7 @@ import {
   Bookmark,
   BookOpen,
   Box,
+  Briefcase,
   Calendar,
   Check,
   CheckCircle,
@@ -104,6 +105,7 @@ import {
   Users,
   Video,
   Volume2,
+  Workflow,
   X,
   Zap,
   type LucideIcon
@@ -180,6 +182,7 @@ const iconMap: Record<string, LucideIcon> = {
   'folder-plus': FolderPlus,
   'inbox': Inbox,
   'archive': Archive,
+  'briefcase': Briefcase,
 
   // UI Elements
   'th-large': LayoutGrid,
@@ -197,6 +200,7 @@ const iconMap: Record<string, LucideIcon> = {
   // Objects
   'box': Box,
   'sitemap': Network,
+  'workflow': Workflow,
   'objects-column': LayoutGrid,
   'code': Code,
   'cog': Settings,

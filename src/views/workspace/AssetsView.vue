@@ -11,10 +11,9 @@ import {
   FolderContextMenu,
   CreateFolderDialog,
   ResourceListView,
-  PageBreadcrumb,
 } from '@/components/workspace'
 import { MOCK_ASSETS, getAssetIcon, type Asset } from '@/data/workspaceMockData'
-import { useFolders } from '@/composables/common/useFolders'
+import { useFolders, DRAG_MIME_TYPE, type DragItem } from '@/composables/common/useFolders'
 
 // Folder functionality
 const {
@@ -27,6 +26,8 @@ const {
   deleteFolder,
   getItemCount,
   getSubfolderCount,
+  moveItemToFolder,
+  moveFolderToFolder,
 } = useFolders('assets')
 
 // Create folder dialog
@@ -157,31 +158,100 @@ function closeFileInfo() {
 function openAsset(assetId: string) {
   console.log('Open asset:', assetId)
 }
+
+// Drag and drop
+const isDragOverView = ref(false)
+
+function handleFolderDrop(targetFolderId: string, dragItem: DragItem) {
+  if (dragItem.type === 'folder') {
+    moveFolderToFolder(dragItem.id, targetFolderId)
+  } else if (dragItem.type === 'asset') {
+    moveItemToFolder(assets.value, dragItem.id, targetFolderId)
+  }
+}
+
+function handleBreadcrumbDrop(targetFolderId: string | null, dragItem: DragItem) {
+  if (dragItem.type === 'folder') {
+    moveFolderToFolder(dragItem.id, targetFolderId)
+  } else if (dragItem.type === 'asset') {
+    moveItemToFolder(assets.value, dragItem.id, targetFolderId)
+  }
+}
+
+function handleViewDragEnter(e: DragEvent) {
+  if (e.dataTransfer?.types.includes(DRAG_MIME_TYPE)) {
+    isDragOverView.value = true
+  }
+}
+
+function handleViewDragOver(e: DragEvent) {
+  e.preventDefault()
+  if (e.dataTransfer?.types.includes(DRAG_MIME_TYPE)) {
+    e.dataTransfer.dropEffect = 'move'
+  }
+}
+
+function handleViewDragLeave(e: DragEvent) {
+  const relatedTarget = e.relatedTarget as HTMLElement | null
+  const currentTarget = e.currentTarget as HTMLElement
+  if (!currentTarget.contains(relatedTarget)) {
+    isDragOverView.value = false
+  }
+}
+
+function handleViewDrop(e: DragEvent) {
+  e.preventDefault()
+  isDragOverView.value = false
+
+  if (!e.dataTransfer) return
+
+  const data = e.dataTransfer.getData(DRAG_MIME_TYPE)
+  if (!data) return
+
+  try {
+    const dragItem: DragItem = JSON.parse(data)
+
+    // Don't do anything if already in this folder
+    if (dragItem.folderId === currentFolderId.value) return
+
+    // Move to current folder
+    if (dragItem.type === 'folder') {
+      moveFolderToFolder(dragItem.id, currentFolderId.value)
+    } else if (dragItem.type === 'asset') {
+      moveItemToFolder(assets.value, dragItem.id, currentFolderId.value)
+    }
+  } catch {
+    // Invalid JSON, ignore
+  }
+}
 </script>
 
 <template>
   <div class="flex h-full">
-    <div class="flex-1 overflow-auto p-4 transition-all duration-300 ease-out" @click="closeMenu(); closeFileInfo()">
-      <PageBreadcrumb label="Assets" icon="images" />
-
-      <!-- Header Actions -->
-      <div class="mb-4 flex items-center justify-end">
-        <div class="flex items-center gap-2">
-          <button class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">
+    <div
+      class="flex-1 overflow-auto p-4 transition-all duration-300 ease-out"
+      @click="closeMenu(); closeFileInfo()"
+      @dragenter="handleViewDragEnter"
+      @dragover="handleViewDragOver"
+      @dragleave="handleViewDragLeave"
+      @drop="handleViewDrop"
+    >
+      <!-- Header with Breadcrumb and Actions -->
+      <div class="mb-4 flex items-center justify-between">
+        <FolderBreadcrumbs
+          :path="breadcrumbPath"
+          root-label="Assets"
+          root-icon="images"
+          @navigate="navigateToFolder"
+          @drop="handleBreadcrumbDrop"
+        />
+        <div class="flex items-center gap-1.5">
+          <button class="inline-flex items-center gap-1.5 rounded-md bg-zinc-900 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200">
             <Icon name="upload" size="xs" />
             Upload
           </button>
         </div>
       </div>
-
-      <!-- Breadcrumbs -->
-      <FolderBreadcrumbs
-        v-if="currentFolderId"
-        :path="breadcrumbPath"
-        root-label="Assets"
-        class="mb-4"
-        @navigate="navigateToFolder"
-      />
 
       <!-- Resource List -->
       <ResourceListView
@@ -214,39 +284,29 @@ function openAsset(assetId: string) {
           </div>
         </template>
 
-        <!-- Folders Section -->
-        <template #folders>
-          <div v-if="foldersAtCurrentLevel.length > 0" class="mb-6">
-            <h3 class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">Folders</h3>
-            <div class="grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));">
-              <div v-for="folder in foldersAtCurrentLevel" :key="folder.id" class="relative">
-                <FolderCard
-                  :folder="folder"
-                  :item-count="getItemCount(folder.id, assets)"
-                  :subfolder-count="getSubfolderCount(folder.id)"
-                  @open="handleFolderOpen"
-                  @open-menu="handleOpenFolderMenu"
-                />
-                <FolderContextMenu
-                  v-if="openFolderMenuId === folder.id"
-                  :folder-id="folder.id"
-                  class="absolute right-0 top-full z-50"
-                  @open="handleFolderOpen"
-                  @rename="closeFolderMenu"
-                  @delete="handleFolderDelete"
-                  @close="closeFolderMenu"
-                />
-              </div>
-            </div>
-          </div>
-          <!-- Assets Section Header -->
-          <h3 v-if="foldersAtCurrentLevel.length > 0 && filteredAssets.length > 0" class="mb-3 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Assets
-          </h3>
-        </template>
-
         <template #grid>
-          <div v-for="asset in filteredAssets" :key="asset.id" class="relative">
+          <!-- Folders -->
+          <div v-for="folder in foldersAtCurrentLevel" :key="'folder-' + folder.id" class="relative">
+            <FolderCard
+              :folder="folder"
+              :item-count="getItemCount(folder.id, assets)"
+              :subfolder-count="getSubfolderCount(folder.id)"
+              @open="handleFolderOpen"
+              @open-menu="handleOpenFolderMenu"
+              @drop="handleFolderDrop"
+            />
+            <FolderContextMenu
+              v-if="openFolderMenuId === folder.id"
+              :folder-id="folder.id"
+              class="absolute right-0 top-full z-50"
+              @open="handleFolderOpen"
+              @rename="closeFolderMenu"
+              @delete="handleFolderDelete"
+              @close="closeFolderMenu"
+            />
+          </div>
+          <!-- Assets -->
+          <div v-for="asset in filteredAssets" :key="'asset-' + asset.id" class="relative">
             <AssetCard :asset="asset" @open="openAsset" @toggle-favorite="toggleFavorite" @menu="handleOpenMenu" />
             <AssetContextMenu
               v-if="openMenuId === asset.id"
