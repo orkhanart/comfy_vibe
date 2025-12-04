@@ -3,7 +3,7 @@ import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import CanvasLogoMenu from './CanvasLogoMenu.vue'
-import CanvasTabs from './CanvasTabs.vue'
+import ModeTabs from './ModeTabs.vue'
 import CanvasShareDialog from './CanvasShareDialog.vue'
 import { useUiStore } from '@/stores/uiStore'
 
@@ -25,14 +25,14 @@ function handleTabSelect(tabId: string): void {
   uiStore.selectWorkflowTab(tabId)
   // Navigate to the correct mode if different from current
   if (mode === 'linear') {
-    router.push({ name: 'linear' })
+    router.push({ name: 'linear-mode' })
   }
-  // Already in node mode, no navigation needed
+  // Already in workflow editor, no navigation needed
 }
 
 function handleNewWorkflow(): void {
-  // Create new workflow in current mode (node)
-  uiStore.createWorkflowTab('node')
+  // Create new workflow in current mode (workflow editor)
+  uiStore.createWorkflowTab('workflow')
 }
 </script>
 
@@ -67,7 +67,7 @@ function handleNewWorkflow(): void {
     <div class="mx-1 h-5 w-px bg-border" />
 
     <!-- Tabs Section -->
-    <CanvasTabs
+    <ModeTabs
       :tabs="uiStore.workflowTabs"
       :active-tab-id="uiStore.activeWorkflowTabId"
       @select="handleTabSelect"
@@ -83,11 +83,11 @@ function handleNewWorkflow(): void {
           class="flex h-6 items-center gap-1 rounded px-2 text-xs font-medium bg-background text-foreground shadow-sm"
         >
           <Icon name="sitemap" size="xs" />
-          Node
+          Workflow
         </button>
         <button
           class="flex h-6 items-center gap-1 rounded px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-          @click="router.push({ name: 'linear' })"
+          @click="router.push({ name: 'linear-mode' })"
         >
           <Icon name="sliders-h" size="xs" />
           Linear

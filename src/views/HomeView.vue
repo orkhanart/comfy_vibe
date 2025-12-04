@@ -53,7 +53,7 @@ async function connectToServer() {
             :disabled="isConnecting"
             @click="
               comfyStore.isConnected
-                ? $router.push('/nodemode/default/untitled')
+                ? $router.push('/workflow-editor')
                 : connectToServer()
             "
           >

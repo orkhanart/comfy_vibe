@@ -134,7 +134,7 @@ function closeFileInfo() {
 
 // Navigation
 function openWorkflow() {
-  router.push('/node')
+  router.push('/workflow-editor')
 }
 
 // Drag and drop

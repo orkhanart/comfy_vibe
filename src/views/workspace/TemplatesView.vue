@@ -112,7 +112,7 @@ const displayedTemplates = computed(() => {
 })
 
 function openTemplate(templateId: string): void {
-  router.push('/node')
+  router.push('/workflow-editor')
 }
 </script>
 

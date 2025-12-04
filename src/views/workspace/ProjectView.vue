@@ -141,7 +141,7 @@ function toggleWorkflowFavorite(workflowId: string) {
 }
 
 function openWorkflow() {
-  router.push('/node')
+  router.push('/workflow-editor')
 }
 
 // =====================

@@ -14,11 +14,6 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./views/HomeView.vue')
   },
   {
-    path: '/node',
-    name: 'node',
-    component: () => import('./views/CanvasView.vue')
-  },
-  {
     path: '/workspace',
     component: () => import('./views/WorkspaceView.vue'),
     props: true,
@@ -101,15 +96,15 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
-    path: '/nodemode/:workflowId?',
-    name: 'node-editor',
-    component: () => import('./views/CanvasView.vue'),
+    path: '/workflow-editor/:workflowId?',
+    name: 'workflow-editor',
+    component: () => import('./views/WorkflowEditorView.vue'),
     props: true
   },
   {
-    path: '/linear/:workflowId?',
-    name: 'linear',
-    component: () => import('./views/linear/LinearView.vue'),
+    path: '/linear-mode/:workflowId?',
+    name: 'linear-mode',
+    component: () => import('./views/linear-mode/LinearView.vue'),
     props: true
   },
 ]

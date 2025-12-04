@@ -54,7 +54,7 @@ const openSubMenuId = ref<string | null>(null)
           @click="emit('openNodeMode', workflowId)"
         >
           <Icon name="sitemap" size="sm" />
-          Node Mode
+          Workflow Editor
         </button>
         <button
           class="flex w-full items-center gap-2 px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-700"

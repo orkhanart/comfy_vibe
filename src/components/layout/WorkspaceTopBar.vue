@@ -2,8 +2,8 @@
 import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import CanvasLogoMenu from '@/components/canvas/CanvasLogoMenu.vue'
-import CanvasTabs from '@/components/canvas/CanvasTabs.vue'
+import CanvasLogoMenu from '@/components/workflow-editor/CanvasLogoMenu.vue'
+import ModeTabs from '@/components/workflow-editor/ModeTabs.vue'
 import { useUiStore } from '@/stores/uiStore'
 
 const router = useRouter()
@@ -23,16 +23,16 @@ function handleTabSelect(tabId: string): void {
   uiStore.selectWorkflowTab(tabId)
   // Navigate to the correct mode
   if (mode === 'linear') {
-    router.push({ name: 'linear' })
+    router.push({ name: 'linear-mode' })
   } else {
-    router.push({ name: 'node-editor' })
+    router.push({ name: 'workflow-editor' })
   }
 }
 
 function handleNewWorkflow(): void {
-  // Create new workflow in node mode by default from workspace
-  uiStore.createWorkflowTab('node')
-  router.push({ name: 'node-editor' })
+  // Create new workflow in workflow editor by default from workspace
+  uiStore.createWorkflowTab('workflow')
+  router.push({ name: 'workflow-editor' })
 }
 </script>
 
@@ -67,7 +67,7 @@ function handleNewWorkflow(): void {
     <div class="mx-1 h-5 w-px bg-border" />
 
     <!-- Tabs Section -->
-    <CanvasTabs
+    <ModeTabs
       :tabs="uiStore.workflowTabs"
       :active-tab-id="''"
       @select="handleTabSelect"

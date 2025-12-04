@@ -80,19 +80,19 @@ const favorites = ref<FavoriteItem[]>([
 
 function openFavorite(item: FavoriteItem) {
   if (item.type === 'workflow' || item.type === 'template') {
-    router.push('/node')
+    router.push('/workflow-editor')
   }
 }
 
 function openRecentItem(item: RecentItem) {
   if (item.type === 'workflow' || item.type === 'template') {
-    router.push('/node')
+    router.push('/workflow-editor')
   }
 }
 
 function openSharedFile(item: SharedFile) {
   if (item.type === 'workflow') {
-    router.push('/node')
+    router.push('/workflow-editor')
   }
 }
 
@@ -147,7 +147,7 @@ function getIconClass(type: string): string {
           <!-- New Workflow Card -->
           <button
             class="group flex items-center gap-4 rounded-xl bg-white p-4 text-left transition-all hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-            @click="uiStore.createWorkflowTab('node'); router.push('/node')"
+            @click="uiStore.createWorkflowTab('workflow'); router.push('/workflow-editor')"
           >
             <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-zinc-500 transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-700 dark:text-zinc-400 dark:group-hover:bg-zinc-700 dark:group-hover:text-zinc-200">
               <Icon name="plus" size="lg" />
@@ -203,7 +203,7 @@ function getIconClass(type: string): string {
               v-for="template in starterTemplates"
               :key="template.id"
               class="group cursor-pointer"
-              @click="router.push('/node')"
+              @click="router.push('/workflow-editor')"
             >
               <!-- Thumbnail -->
               <div class="relative aspect-square overflow-hidden rounded-xl bg-zinc-100 transition-all duration-200 group-hover:scale-[1.02] group-hover:shadow-xl dark:bg-zinc-800">
@@ -230,7 +230,7 @@ function getIconClass(type: string): string {
                     <button
                       class="flex h-7 w-7 items-center justify-center rounded-md bg-zinc-900/70 text-white opacity-0 backdrop-blur-sm transition-all hover:bg-zinc-900/90 group-hover:opacity-100"
                       title="Use template"
-                      @click.stop="router.push('/node')"
+                      @click.stop="router.push('/workflow-editor')"
                     >
                       <Icon name="play" size="sm" />
                     </button>
@@ -362,7 +362,7 @@ function getIconClass(type: string): string {
             <p class="mt-1 text-xs text-muted-foreground">Files you open will appear here</p>
             <button
               class="mt-4 rounded-md bg-button-active-surface px-4 py-2 text-sm font-medium text-button-active-foreground transition-colors hover:bg-button-hover-surface"
-              @click="uiStore.createWorkflowTab('node'); router.push('/node')"
+              @click="uiStore.createWorkflowTab('workflow'); router.push('/workflow-editor')"
             >
               Create your first workflow
             </button>

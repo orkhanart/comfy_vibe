@@ -134,7 +134,7 @@ async function runWorkflow() {
     </div>
 
     <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto bg-black/20">
+    <div class="flex-1 overflow-y-auto bg-muted/50">
       <div class="flex flex-col gap-5 p-4">
         <!-- Image Upload -->
         <div class="flex flex-col gap-2">

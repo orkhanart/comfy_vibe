@@ -15,7 +15,7 @@ const route = useRoute()
 const router = useRouter()
 function openItem(item: { id: string; type: string }) {
   if (item.type === 'workflow' || item.type === 'template') {
-    router.push('/node')
+    router.push('/workflow-editor')
   }
 }
 

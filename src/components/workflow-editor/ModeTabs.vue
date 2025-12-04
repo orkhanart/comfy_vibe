@@ -2,7 +2,7 @@
 import { Icon } from '@/components/ui/icon'
 import type { WorkflowMode } from '@/stores/uiStore'
 
-export interface CanvasTab {
+export interface ModeTab {
   id: string
   name: string
   mode: WorkflowMode
@@ -11,7 +11,7 @@ export interface CanvasTab {
 }
 
 const props = defineProps<{
-  tabs: CanvasTab[]
+  tabs: ModeTab[]
   activeTabId: string
 }>()
 
@@ -27,7 +27,7 @@ function handleClose(tabId: string, event: MouseEvent): void {
 }
 
 function getModeIcon(mode: WorkflowMode): string {
-  return mode === 'node' ? 'sitemap' : 'sliders-h'
+  return mode === 'workflow' ? 'sitemap' : 'sliders-h'
 }
 </script>
 

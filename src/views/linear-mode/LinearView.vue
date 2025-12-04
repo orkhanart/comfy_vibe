@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import LinearTopBar from '@/components/linear/LinearTopBar.vue'
-import LinearSidebar from '@/components/linear/LinearSidebar.vue'
-import LinearParametersPanel from '@/components/linear/LinearParametersPanel.vue'
-import LinearHistoryPanel from '@/components/linear/LinearHistoryPanel.vue'
-import type { RunParams } from '@/components/linear/LinearParametersPanel.vue'
+import LinearTopBar from '@/components/linear-mode/LinearTopBar.vue'
+import LinearSidebar from '@/components/linear-mode/LinearSidebar.vue'
+import LinearParametersPanel from '@/components/linear-mode/LinearParametersPanel.vue'
+import LinearHistoryPanel from '@/components/linear-mode/LinearHistoryPanel.vue'
+import type { RunParams } from '@/components/linear-mode/LinearParametersPanel.vue'
 
 function handleRun(params: RunParams): void {
   console.log('Run workflow:', params)

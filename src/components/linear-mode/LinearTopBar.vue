@@ -3,7 +3,7 @@ import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/uiStore'
-import CanvasTabs from '@/components/canvas/CanvasTabs.vue'
+import ModeTabs from '@/components/workflow-editor/ModeTabs.vue'
 
 const router = useRouter()
 const uiStore = useUiStore()
@@ -42,8 +42,8 @@ function handleTabSelect(tabId: string): void {
   const mode = uiStore.getWorkflowMode(tabId)
   uiStore.selectWorkflowTab(tabId)
   // Navigate to the correct mode if different from current
-  if (mode === 'node') {
-    router.push({ name: 'node-editor' })
+  if (mode === 'workflow') {
+    router.push({ name: 'workflow-editor' })
   }
   // Already in linear mode, no navigation needed
 }
@@ -153,7 +153,7 @@ function handleNewWorkflow(): void {
     <div class="mx-1 h-5 w-px bg-border" />
 
     <!-- Tabs Section -->
-    <CanvasTabs
+    <ModeTabs
       :tabs="uiStore.workflowTabs"
       :active-tab-id="uiStore.activeWorkflowTabId"
       @select="handleTabSelect"
@@ -167,10 +167,10 @@ function handleNewWorkflow(): void {
       <div class="flex h-7 items-center rounded-md bg-muted p-0.5">
         <button
           class="flex h-6 items-center gap-1 rounded px-2 text-xs font-medium text-muted-foreground hover:text-foreground"
-          @click="router.push({ name: 'node-editor' })"
+          @click="router.push({ name: 'workflow-editor' })"
         >
           <Icon name="sitemap" size="xs" />
-          Node
+          Workflow
         </button>
         <button
           class="flex h-6 items-center gap-1 rounded px-2 text-xs font-medium bg-background text-foreground shadow-sm"

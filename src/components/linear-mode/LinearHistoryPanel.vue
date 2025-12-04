@@ -302,9 +302,9 @@ function openMediaViewer(gen: GenerationItem, index: number = 0): void {
 </script>
 
 <template>
-  <main class="flex h-full flex-1 flex-col" style="background-color: var(--color-canvas-bg)">
+  <main class="flex h-full flex-1 flex-col bg-muted">
     <!-- Header -->
-    <div class="flex h-10 items-center justify-between border-b border-border bg-black/20 px-4">
+    <div class="flex h-10 items-center justify-between border-b border-border bg-background/50 px-4">
       <span class="text-sm font-medium text-foreground">Queue</span>
       <div class="flex items-center gap-2">
         <button

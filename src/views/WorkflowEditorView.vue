@@ -5,11 +5,11 @@ import { Background } from '@vue-flow/background'
 import '@vue-flow/core/dist/style.css'
 import '@vue-flow/core/dist/theme-default.css'
 
-import CanvasTabBar from '@/components/canvas/CanvasTabBar.vue'
-import CanvasLeftSidebar from '@/components/canvas/CanvasLeftSidebar.vue'
-import CanvasRightToolbar from '@/components/canvas/CanvasRightToolbar.vue'
-import CanvasRunControls from '@/components/canvas/CanvasRunControls.vue'
-import NodePropertiesPanel from '@/components/canvas/NodePropertiesPanel.vue'
+import CanvasTabBar from '@/components/workflow-editor/CanvasTabBar.vue'
+import CanvasLeftSidebar from '@/components/workflow-editor/CanvasLeftSidebar.vue'
+import CanvasRightToolbar from '@/components/workflow-editor/CanvasRightToolbar.vue'
+import CanvasRunControls from '@/components/workflow-editor/CanvasRunControls.vue'
+import NodePropertiesPanel from '@/components/workflow-editor/NodePropertiesPanel.vue'
 import { FlowNode } from '@/components/nodes'
 import { NodesExtendedModal, ModelsExtendedModal, LibraryExtendedModal } from '@/components/common'
 import { useWorkspaceStore } from '@/stores/workspaceStore'
@@ -21,11 +21,11 @@ const showNodesModal = ref(false)
 const showModelsModal = ref(false)
 const showLibraryModal = ref(false)
 
-import type { CanvasRouteParams } from '@/types/canvas'
+import type { WorkflowEditorRouteParams } from '@/types/workflowEditor'
 import type { FlowNodeData, NodeState } from '@/types/node'
 import type { Node } from '@vue-flow/core'
 
-const props = defineProps<CanvasRouteParams>()
+const props = defineProps<WorkflowEditorRouteParams>()
 
 const workspaceStore = useWorkspaceStore()
 const uiStore = useUiStore()
@@ -39,8 +39,8 @@ const nodeTypes = {
 }
 
 onMounted(() => {
-  workspaceStore.setCurrentIds(props.workspaceId, props.projectId, props.canvasId)
-  workspaceStore.openCanvas(props.canvasId, props.canvasId, props.projectId)
+  workspaceStore.setCurrentIds(props.workspaceId, props.projectId, props.workflowId)
+  workspaceStore.openWorkflow(props.workflowId, props.workflowId, props.projectId)
 })
 
 // Vue Flow

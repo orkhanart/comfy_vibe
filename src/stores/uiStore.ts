@@ -247,10 +247,10 @@ export interface SidebarShortcut {
 }
 
 // ============================================================================
-// WORKFLOW TABS (shared between Node Mode and Linear Mode)
+// WORKFLOW TABS (shared between Workflow Editor and Linear Mode)
 // ============================================================================
 
-export type WorkflowMode = 'node' | 'linear'
+export type WorkflowMode = 'workflow' | 'linear'
 
 export interface WorkflowTab {
   id: string
@@ -268,11 +268,11 @@ export const useUiStore = defineStore('ui', () => {
   const storedTheme = typeof window !== 'undefined' ? localStorage.getItem('ui-theme') as ThemeMode : null
   const themeMode = ref<ThemeMode>(storedTheme || 'dark')
 
-  // Workflow tabs (shared between Node Mode and Linear Mode)
+  // Workflow tabs (shared between Workflow Editor and Linear Mode)
   const workflowTabs = ref<WorkflowTab[]>([
-    { id: 'workflow-1', name: 'Main Workflow', mode: 'node', isActive: true },
+    { id: 'workflow-1', name: 'Main Workflow', mode: 'workflow', isActive: true },
     { id: 'workflow-2', name: 'Upscale Pipeline', mode: 'linear', isActive: false, isDirty: true },
-    { id: 'workflow-3', name: 'ControlNet Test', mode: 'node', isActive: false },
+    { id: 'workflow-3', name: 'ControlNet Test', mode: 'workflow', isActive: false },
   ])
   const activeWorkflowTabId = ref('workflow-1')
 
@@ -281,11 +281,11 @@ export const useUiStore = defineStore('ui', () => {
   })
 
   const activeWorkflowMode = computed(() => {
-    return workflowTabs.value.find(t => t.id === activeWorkflowTabId.value)?.mode || 'node'
+    return workflowTabs.value.find(t => t.id === activeWorkflowTabId.value)?.mode || 'workflow'
   })
 
   function getWorkflowMode(tabId: string): WorkflowMode {
-    return workflowTabs.value.find(t => t.id === tabId)?.mode || 'node'
+    return workflowTabs.value.find(t => t.id === tabId)?.mode || 'workflow'
   }
 
   // Sidebar tab state (left sidebar)
@@ -395,7 +395,7 @@ export const useUiStore = defineStore('ui', () => {
     }
   }
 
-  function createWorkflowTab(mode: WorkflowMode = 'node'): void {
+  function createWorkflowTab(mode: WorkflowMode = 'workflow'): void {
     const newId = `workflow-${Date.now()}`
     workflowTabs.value.push({
       id: newId,
