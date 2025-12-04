@@ -375,7 +375,7 @@ function openMediaViewer(gen: GenerationItem, index: number = 0): void {
             <div
               v-for="(img, idx) in gen.outputs"
               :key="idx"
-              class="group/img relative aspect-square w-24 cursor-pointer overflow-hidden rounded-lg bg-muted"
+              class="group/img relative aspect-square w-[400px] cursor-pointer overflow-hidden rounded-lg bg-muted"
               @click="openMediaViewer(gen, idx)"
             >
               <img
@@ -383,20 +383,20 @@ function openMediaViewer(gen: GenerationItem, index: number = 0): void {
                 alt="Generated image"
                 class="h-full w-full object-cover transition-transform group-hover/img:scale-105"
               />
-              <div class="absolute inset-0 flex items-center justify-center gap-1.5 bg-black/50 opacity-0 transition-opacity group-hover/img:opacity-100">
+              <div class="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover/img:opacity-100">
                 <button
                   v-tooltip.top="'View fullscreen'"
-                  class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
+                  class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
                   @click.stop="openMediaViewer(gen, idx)"
                 >
-                  <Icon name="maximize" size="sm" />
+                  <Icon name="maximize" size="md" />
                 </button>
                 <button
                   v-tooltip.top="'Download'"
-                  class="flex h-7 w-7 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
+                  class="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
                   @click.stop="handleDownload(gen, idx)"
                 >
-                  <Icon name="download" size="sm" />
+                  <Icon name="download" size="md" />
                 </button>
               </div>
             </div>
@@ -405,7 +405,7 @@ function openMediaViewer(gen: GenerationItem, index: number = 0): void {
           <!-- VIDEO: Single video display -->
           <div
             v-else-if="gen.type === 'video' && gen.outputs.length > 0"
-            class="group/vid relative mb-2 aspect-square w-24 cursor-pointer overflow-hidden rounded-lg bg-muted"
+            class="group/vid relative mb-2 aspect-square w-[400px] cursor-pointer overflow-hidden rounded-lg bg-muted"
             @click="openMediaViewer(gen, 0)"
           >
             <img
@@ -415,29 +415,29 @@ function openMediaViewer(gen: GenerationItem, index: number = 0): void {
             />
             <!-- Play button overlay -->
             <div class="absolute inset-0 flex items-center justify-center">
-              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm">
-                <Icon name="play" size="md" />
+              <div class="flex h-14 w-14 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm">
+                <Icon name="play" size="lg" />
               </div>
             </div>
             <!-- Duration badge -->
-            <div class="absolute bottom-1.5 left-1.5 rounded bg-black/70 px-1.5 py-0.5 text-[9px] font-medium text-white backdrop-blur-sm">
+            <div class="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
               {{ formatDuration(gen.duration || 0) }}
             </div>
             <!-- Hover actions -->
-            <div class="absolute right-1.5 top-1.5 flex gap-1 opacity-0 transition-opacity group-hover/vid:opacity-100">
+            <div class="absolute right-2 top-2 flex gap-1.5 opacity-0 transition-opacity group-hover/vid:opacity-100">
               <button
                 v-tooltip.top="'View fullscreen'"
-                class="flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
+                class="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
                 @click.stop="openMediaViewer(gen, 0)"
               >
-                <Icon name="maximize" size="xs" />
+                <Icon name="maximize" size="sm" />
               </button>
               <button
                 v-tooltip.top="'Download'"
-                class="flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
+                class="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
                 @click.stop="handleDownload(gen, 0)"
               >
-                <Icon name="download" size="xs" />
+                <Icon name="download" size="sm" />
               </button>
             </div>
           </div>
@@ -445,7 +445,7 @@ function openMediaViewer(gen: GenerationItem, index: number = 0): void {
           <!-- 3D: Model preview -->
           <div
             v-else-if="gen.type === '3d' && gen.outputs.length > 0"
-            class="group/3d relative mb-2 aspect-square w-24 cursor-pointer overflow-hidden rounded-lg bg-muted"
+            class="group/3d relative mb-2 aspect-square w-[400px] cursor-pointer overflow-hidden rounded-lg bg-muted"
             @click="openMediaViewer(gen, 0)"
           >
             <img
@@ -454,25 +454,25 @@ function openMediaViewer(gen: GenerationItem, index: number = 0): void {
               class="h-full w-full object-cover"
             />
             <!-- 3D indicator -->
-            <div class="absolute left-1.5 top-1.5 flex items-center gap-1 rounded bg-black/70 px-1.5 py-0.5 text-[9px] font-medium text-white backdrop-blur-sm">
-              <Icon name="cube" size="xs" />
+            <div class="absolute left-2 top-2 flex items-center gap-1 rounded bg-black/70 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+              <Icon name="cube" size="sm" />
               <span>3D</span>
             </div>
             <!-- Hover actions -->
-            <div class="absolute right-1.5 top-1.5 flex gap-1 opacity-0 transition-opacity group-hover/3d:opacity-100">
+            <div class="absolute right-2 top-2 flex gap-1.5 opacity-0 transition-opacity group-hover/3d:opacity-100">
               <button
                 v-tooltip.top="'View fullscreen'"
-                class="flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
+                class="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
                 @click.stop="openMediaViewer(gen, 0)"
               >
-                <Icon name="maximize" size="xs" />
+                <Icon name="maximize" size="sm" />
               </button>
               <button
                 v-tooltip.top="'Download GLB'"
-                class="flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
+                class="flex h-8 w-8 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80"
                 @click.stop="handleDownload(gen, 0)"
               >
-                <Icon name="download" size="xs" />
+                <Icon name="download" size="sm" />
               </button>
             </div>
           </div>
@@ -480,16 +480,16 @@ function openMediaViewer(gen: GenerationItem, index: number = 0): void {
           <!-- IMAGE: Generating placeholder -->
           <div
             v-else-if="gen.type === 'image' && gen.status === 'generating'"
-            class="mb-2 flex flex-wrap gap-1.5"
+            class="mb-2 flex flex-wrap gap-2"
           >
             <div
               v-for="i in gen.batchSize"
               :key="i"
-              class="flex aspect-square w-24 items-center justify-center overflow-hidden rounded-lg bg-muted"
+              class="flex aspect-square w-[400px] items-center justify-center overflow-hidden rounded-lg bg-muted"
             >
               <div class="flex flex-col items-center">
-                <Icon name="spinner" size="sm" class="animate-spin text-primary" />
-                <span class="mt-1 text-[10px] text-muted-foreground">{{ gen.progress }}%</span>
+                <Icon name="spinner" size="lg" class="animate-spin text-primary" />
+                <span class="mt-2 text-sm text-muted-foreground">{{ gen.progress }}%</span>
               </div>
             </div>
           </div>
@@ -497,24 +497,24 @@ function openMediaViewer(gen: GenerationItem, index: number = 0): void {
           <!-- VIDEO: Generating placeholder -->
           <div
             v-else-if="gen.type === 'video' && gen.status === 'generating'"
-            class="mb-2 flex aspect-square w-24 items-center justify-center overflow-hidden rounded-lg bg-muted"
+            class="mb-2 flex aspect-square w-[400px] items-center justify-center overflow-hidden rounded-lg bg-muted"
           >
             <div class="flex flex-col items-center">
-              <Icon name="video" size="md" class="mb-1 text-blue-400" />
-              <Icon name="spinner" size="sm" class="animate-spin text-primary" />
-              <span class="mt-1 text-[10px] text-muted-foreground">{{ gen.progress }}%</span>
+              <Icon name="video" size="xl" class="mb-2 text-blue-400" />
+              <Icon name="spinner" size="lg" class="animate-spin text-primary" />
+              <span class="mt-2 text-sm text-muted-foreground">{{ gen.progress }}%</span>
             </div>
           </div>
 
           <!-- 3D: Generating placeholder -->
           <div
             v-else-if="gen.type === '3d' && gen.status === 'generating'"
-            class="mb-2 flex aspect-square w-24 items-center justify-center overflow-hidden rounded-lg bg-muted"
+            class="mb-2 flex aspect-square w-[400px] items-center justify-center overflow-hidden rounded-lg bg-muted"
           >
             <div class="flex flex-col items-center">
-              <Icon name="cube" size="md" class="mb-1 text-amber-400" />
-              <Icon name="spinner" size="sm" class="animate-spin text-primary" />
-              <span class="mt-1 text-[10px] text-muted-foreground">{{ gen.progress }}%</span>
+              <Icon name="cube" size="xl" class="mb-2 text-amber-400" />
+              <Icon name="spinner" size="lg" class="animate-spin text-primary" />
+              <span class="mt-2 text-sm text-muted-foreground">{{ gen.progress }}%</span>
             </div>
           </div>
 
