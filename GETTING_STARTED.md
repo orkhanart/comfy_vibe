@@ -2,7 +2,68 @@
 
 Quick guide for teammates to start prototyping on this project.
 
-## Setup
+---
+
+## Clone & Branch Setup
+
+Each team member has their own `main` and `stage` branches.
+
+### For Alex (comfydesigner)
+```bash
+git clone https://github.com/orkhanart/comfy_vibe.git
+cd comfy_vibe
+git checkout alex/main
+pnpm install
+pnpm dev
+```
+
+Your branches:
+- `alex/main` - your main working branch
+- `alex/stage` - for staging/testing changes
+
+### For Pablo (PabloWiedemann)
+```bash
+git clone https://github.com/orkhanart/comfy_vibe.git
+cd comfy_vibe
+git checkout pablo/main
+pnpm install
+pnpm dev
+```
+
+Your branches:
+- `pablo/main` - your main working branch
+- `pablo/stage` - for staging/testing changes
+
+### Branch Workflow
+1. Work on your `[name]/main` branch
+2. Push changes to your branch
+3. When ready for review, create PR to `main`
+
+### Deploy to Vercel
+
+Each branch automatically gets a preview URL when pushed. To set up your own Vercel deployment:
+
+1. Go to [vercel.com](https://vercel.com) and sign in with GitHub
+2. Click "Add New Project"
+3. Import the `orkhanart/comfy_vibe` repository
+4. Configure:
+   - **Framework Preset**: Vite
+   - **Root Directory**: ./
+   - **Build Command**: `pnpm build`
+   - **Output Directory**: `dist`
+   - **Install Command**: `pnpm install`
+5. Under "Git" settings, set your branch (`alex/main` or `pablo/main`) as the production branch
+6. Deploy
+
+Your preview URLs:
+- `alex/main` → `comfy-vibe-alex.vercel.app` (or similar)
+- `pablo/main` → `comfy-vibe-pablo.vercel.app` (or similar)
+
+Every push to your branch will auto-deploy.
+
+---
+
+## Commands
 
 ```bash
 pnpm install      # Install dependencies
