@@ -7,6 +7,7 @@ import {
   TemplateCard,
   WorkspaceCard,
   FolderCard,
+  PageBreadcrumb,
 } from '@/components/workspace'
 import {
   MOCK_WORKFLOWS,
@@ -37,15 +38,8 @@ function handleAction(action: string, id?: string) {
 </script>
 
 <template>
-  <div class="p-6">
-    <div class="mb-8">
-      <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-foreground">
-        Card Designs
-      </h1>
-      <p class="mt-1 text-sm text-muted-foreground">
-        All card component designs in one place for comparison and adjustment
-      </p>
-    </div>
+  <div class="p-4">
+    <PageBreadcrumb label="Card Designs" icon="th-large" />
 
     <!-- Workflow Card -->
     <section class="mb-12">

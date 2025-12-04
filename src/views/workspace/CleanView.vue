@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
+import { PageBreadcrumb } from '@/components/workspace'
 import { ref } from 'vue'
 
 const viewMode = ref<'grid' | 'list'>('grid')
@@ -7,16 +8,8 @@ const searchQuery = ref('')
 </script>
 
 <template>
-  <div class="p-6">
-    <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-foreground">
-        Empty State Templates
-      </h1>
-      <p class="mt-1 text-sm text-muted-foreground">
-        Reference designs for empty states across different page layouts
-      </p>
-    </div>
+  <div class="p-4">
+    <PageBreadcrumb label="Empty States" icon="file" />
 
     <!-- Workflows Empty State -->
     <section class="mb-12">

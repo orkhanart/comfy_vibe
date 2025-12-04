@@ -18,23 +18,18 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="mb-6 flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-foreground">
-        {{ props.title }}
-      </h1>
-      <p v-if="props.subtitle" class="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
-        {{ props.subtitle }}
-      </p>
-    </div>
+  <div class="flex items-center justify-between border-b border-border px-3 py-2">
+    <span class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+      {{ props.title }}
+    </span>
     <!-- Action Button -->
-    <button
-      v-if="props.actionLabel"
-      class="inline-flex items-center gap-2 rounded-md bg-card px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-muted dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
-      @click="emit('action')"
-    >
-      <Icon :name="props.actionIcon" size="xs" />
-      {{ props.actionLabel }}
-    </button>
+    <div v-if="props.actionLabel" class="flex items-center gap-0.5">
+      <button
+        class="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        @click="emit('action')"
+      >
+        <Icon :name="props.actionIcon" size="sm" />
+      </button>
+    </div>
   </div>
 </template>

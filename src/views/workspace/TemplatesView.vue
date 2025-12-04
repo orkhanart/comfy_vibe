@@ -3,11 +3,11 @@ import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  WorkspaceViewHeader,
   WorkspaceSearchInput,
   WorkspaceViewToggle,
   WorkspaceSortSelect,
   TemplateCard,
+  PageBreadcrumb,
 } from '@/components/workspace'
 import {
   MOCK_TEMPLATES,
@@ -82,11 +82,8 @@ function openTemplate(templateId: string): void {
 </script>
 
 <template>
-  <div class="p-6">
-    <WorkspaceViewHeader
-      title="Templates"
-      :subtitle="`${templates.length} templates available`"
-    />
+  <div class="p-4">
+    <PageBreadcrumb label="Templates" icon="th-large" />
 
     <!-- Search & Filters -->
     <div class="mb-3 flex flex-wrap items-center gap-3">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
+import { PageBreadcrumb } from '@/components/workspace'
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -36,16 +37,8 @@ const sections = computed(() => {
 </script>
 
 <template>
-  <div class="p-6">
-    <!-- Header -->
-    <div class="mb-6">
-      <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-foreground">
-        Settings
-      </h1>
-      <p class="mt-1 text-sm text-muted-foreground dark:text-muted-foreground">
-        Manage your {{ isTeam ? 'team' : 'workspace' }} settings
-      </p>
-    </div>
+  <div class="p-4">
+    <PageBreadcrumb label="Settings" icon="cog" />
 
     <!-- Tab Navigation -->
     <div class="mb-6 border-b border-zinc-200 dark:border-border">

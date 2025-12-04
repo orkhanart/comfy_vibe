@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
+import { PageBreadcrumb } from '@/components/workspace'
 import { ref } from 'vue'
-import WorkspaceViewHeader from '@/components/workspace/WorkspaceViewHeader.vue'
 
 interface TrashItem {
   id: string
@@ -64,11 +64,8 @@ function getTypeLabel(type: string): string {
 </script>
 
 <template>
-  <div class="p-6">
-    <WorkspaceViewHeader
-      title="Trash"
-      subtitle="Items are permanently deleted after 30 days"
-    />
+  <div class="p-4">
+    <PageBreadcrumb label="Trash" icon="trash" />
 
     <!-- Actions Bar -->
     <div v-if="trashItems.length > 0" class="mb-4 flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-border dark:bg-card">

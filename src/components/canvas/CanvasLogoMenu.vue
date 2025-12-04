@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUiStore } from '@/stores/uiStore'
 
@@ -13,15 +14,11 @@ const emit = defineEmits<{
 
 const router = useRouter()
 const uiStore = useUiStore()
+const showAccountMenu = ref(false)
 
 function goToWorkspace(): void {
   emit('close')
   router.push({ name: 'workspace-dashboard', params: { workspaceId: 'default' } })
-}
-
-function goToProjects(): void {
-  emit('close')
-  router.push({ name: 'workspace-projects', params: { workspaceId: 'default' } })
 }
 
 function goToSettings(): void {
@@ -36,6 +33,10 @@ function signOut(): void {
 
 function toggleTheme(): void {
   uiStore.toggleTheme()
+}
+
+function toggleAccountMenu(): void {
+  showAccountMenu.value = !showAccountMenu.value
 }
 </script>
 
@@ -65,21 +66,12 @@ function toggleTheme(): void {
 
     <div class="mx-2 my-1 h-px bg-border" />
 
-    <!-- Workspace Section -->
-    <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Workspace</div>
+    <!-- Navigate Section -->
+    <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Navigate</div>
     <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent" @click="goToWorkspace">
       <Icon name="home" size="sm" class="w-4 text-muted-foreground" />
-      <span>Dashboard</span>
+      <span>Workspace</span>
     </button>
-    <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent" @click="goToProjects">
-      <Icon name="folder" size="sm" class="w-4 text-muted-foreground" />
-      <span>Projects</span>
-    </button>
-
-    <div class="mx-2 my-1 h-px bg-border" />
-
-    <!-- Account Section -->
-    <div class="px-3 pb-1 pt-1.5 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Account</div>
     <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent" @click="goToSettings">
       <Icon name="cog" size="sm" class="w-4 text-muted-foreground" />
       <span>Settings</span>
@@ -97,13 +89,67 @@ function toggleTheme(): void {
         />
       </div>
     </button>
+    <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent" @click="uiStore.toggleQuickstart()">
+      <Icon name="th-large" size="sm" class="w-4 text-muted-foreground" />
+      <span class="flex-1">Show Quickstart</span>
+      <div
+        class="h-5 w-9 rounded-full p-0.5 transition-colors"
+        :class="uiStore.showQuickstart ? 'bg-primary' : 'bg-muted'"
+      >
+        <div
+          class="h-4 w-4 rounded-full bg-white shadow-sm transition-transform"
+          :class="uiStore.showQuickstart ? 'translate-x-4' : 'translate-x-0'"
+        />
+      </div>
+    </button>
 
     <div class="mx-2 my-1 h-px bg-border" />
 
-    <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-destructive transition-colors hover:bg-destructive/10" @click="signOut">
-      <Icon name="sign-out" size="sm" class="w-4 text-destructive" />
-      <span>Sign out</span>
-    </button>
+    <!-- User Profile (at bottom) -->
+    <div class="relative">
+      <button
+        class="flex w-full items-center gap-3 rounded-md px-3 py-2.5 transition-colors hover:bg-accent"
+        @click="toggleAccountMenu"
+      >
+        <div class="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <Icon name="user" size="sm" />
+        </div>
+        <div class="flex-1 min-w-0 text-left">
+          <p class="truncate text-sm font-medium text-foreground">John Doe</p>
+          <p class="truncate text-xs text-muted-foreground">john@example.com</p>
+        </div>
+        <Icon
+          name="chevron-up"
+          size="xs"
+          class="text-muted-foreground transition-transform"
+          :class="showAccountMenu ? 'rotate-180' : ''"
+        />
+      </button>
+
+      <!-- Account Submenu -->
+      <div v-if="showAccountMenu" class="mt-1 rounded-md bg-accent/50 p-1">
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent">
+          <Icon name="plus" size="sm" class="w-4 text-muted-foreground" />
+          <span>New Workspace</span>
+        </button>
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent">
+          <Icon name="users" size="sm" class="w-4 text-muted-foreground" />
+          <span>Create Team</span>
+        </button>
+        <div class="mx-2 my-1 h-px bg-border" />
+        <button class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-foreground transition-colors hover:bg-accent">
+          <Icon name="exchange-alt" size="sm" class="w-4 text-muted-foreground" />
+          <span>Switch Account</span>
+        </button>
+        <button
+          class="flex w-full items-center gap-2.5 rounded-md px-3 py-2 text-left text-[13px] text-destructive transition-colors hover:bg-destructive/10"
+          @click="signOut"
+        >
+          <Icon name="sign-out" size="sm" class="w-4 text-destructive" />
+          <span>Sign out</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Backdrop -->

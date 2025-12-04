@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LinearTopBar from '@/components/linear/LinearTopBar.vue'
+import LinearSidebar from '@/components/linear/LinearSidebar.vue'
 import LinearParametersPanel from '@/components/linear/LinearParametersPanel.vue'
 import LinearHistoryPanel from '@/components/linear/LinearHistoryPanel.vue'
 import type { RunParams } from '@/components/linear/LinearParametersPanel.vue'
@@ -16,7 +17,10 @@ function handleRun(params: RunParams): void {
 
     <!-- Main Content -->
     <div class="flex flex-1 overflow-hidden">
-      <!-- Left: History/Output Panel -->
+      <!-- Left Sidebar: Assets, Workflows, Templates -->
+      <LinearSidebar />
+
+      <!-- Center: History/Output Panel -->
       <LinearHistoryPanel />
 
       <!-- Right: Parameters Panel -->

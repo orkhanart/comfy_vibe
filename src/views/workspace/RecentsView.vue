@@ -3,12 +3,12 @@ import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
-  WorkspaceViewHeader,
   WorkspaceSearchInput,
   WorkspaceViewToggle,
   WorkspaceSortSelect,
   WorkspaceFilterSelect,
   WorkspaceCard,
+  PageBreadcrumb,
 } from '@/components/workspace'
 
 const route = useRoute()
@@ -117,11 +117,8 @@ function getIconClass(type: string): string {
 </script>
 
 <template>
-  <div class="p-6">
-    <WorkspaceViewHeader
-      title="Recents"
-      subtitle="Recently accessed items"
-    />
+  <div class="p-4">
+    <PageBreadcrumb label="Recents" icon="clock" />
 
     <!-- Search & Actions Toolbar -->
     <div class="mb-4 flex items-center gap-3">

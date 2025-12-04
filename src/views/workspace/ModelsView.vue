@@ -11,6 +11,7 @@ import {
   FolderContextMenu,
   CreateFolderDialog,
   ResourceListView,
+  PageBreadcrumb,
 } from '@/components/workspace'
 import {
   MOCK_MODELS,
@@ -147,13 +148,11 @@ function closeModelInfo() {
 
 <template>
   <div class="flex h-full">
-    <div class="flex-1 overflow-auto p-6 transition-all duration-300 ease-out" @click="closeModelInfo()">
-      <!-- Header -->
-      <div class="mb-6 flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-foreground">Models</h1>
-          <p class="mt-1 text-sm text-muted-foreground">{{ models.length }} models installed</p>
-        </div>
+    <div class="flex-1 overflow-auto p-4 transition-all duration-300 ease-out" @click="closeModelInfo()">
+      <PageBreadcrumb label="Models" icon="box" />
+
+      <!-- Header Actions -->
+      <div class="mb-4 flex items-center justify-end">
         <div class="flex items-center gap-2">
           <button
             class="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"

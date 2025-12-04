@@ -11,6 +11,7 @@ import {
   FolderContextMenu,
   CreateFolderDialog,
   ResourceListView,
+  PageBreadcrumb,
 } from '@/components/workspace'
 import { MOCK_WORKFLOWS, type Workflow } from '@/data/workspaceMockData'
 import { useFolders } from '@/composables/common/useFolders'
@@ -137,13 +138,11 @@ function openWorkflow() {
 </script>
 
 <template>
-  <div class="p-6" @click="closeMenu">
-    <!-- Header -->
-    <div class="mb-6 flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-foreground">Workflows</h1>
-        <p class="mt-1 text-sm text-muted-foreground">{{ workflows.length }} saved workflows</p>
-      </div>
+  <div class="p-4" @click="closeMenu">
+    <PageBreadcrumb label="Workflows" icon="sitemap" />
+
+    <!-- Header Actions -->
+    <div class="mb-4 flex items-center justify-end">
       <div class="flex items-center gap-2">
         <button
           class="inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-border dark:bg-muted dark:text-foreground dark:hover:bg-accent"

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 
-export type SidebarTabId = 'nodes' | 'models' | 'library' | null
+export type SidebarTabId = 'nodes' | 'models' | 'library' | 'queue' | null
 
 export interface SidebarTab {
   id: Exclude<SidebarTabId, null>
@@ -210,6 +210,7 @@ export const SIDEBAR_TABS: SidebarTab[] = [
   { id: 'nodes', label: 'Nodes', icon: 'sitemap', tooltip: 'Node Library' },
   { id: 'models', label: 'Models', icon: 'box', tooltip: 'Model Library' },
   { id: 'library', label: 'Asset Library', icon: 'library', tooltip: 'Asset Library' },
+  { id: 'queue', label: 'Queue', icon: 'list', tooltip: 'Queue' },
 ]
 
 export type ThemeMode = 'light' | 'dark' | 'system'
@@ -290,6 +291,10 @@ export const useUiStore = defineStore('ui', () => {
   // Sidebar shortcuts - load from localStorage
   const storedShortcuts = typeof window !== 'undefined' ? localStorage.getItem('sidebar-shortcuts') : null
   const sidebarShortcuts = ref<SidebarShortcut[]>(storedShortcuts ? JSON.parse(storedShortcuts) : [])
+
+  // Show quickstart section on home - load from localStorage (default: hidden)
+  const storedShowQuickstart = typeof window !== 'undefined' ? localStorage.getItem('show-quickstart') : null
+  const showQuickstart = ref<boolean>(storedShowQuickstart === 'true')
 
   // Sidebar panel is expanded when a tab is active
   const sidebarPanelExpanded = computed(() => activeSidebarTab.value !== null)
@@ -401,6 +406,12 @@ export const useUiStore = defineStore('ui', () => {
 
   // Initialize theme on store creation
   applyTheme(themeMode.value)
+
+  // Quickstart section toggle
+  function toggleQuickstart(): void {
+    showQuickstart.value = !showQuickstart.value
+    localStorage.setItem('show-quickstart', String(showQuickstart.value))
+  }
 
   // Sidebar shortcut functions
   function addSidebarShortcut(shortcut: SidebarShortcut): void {
@@ -542,5 +553,8 @@ export const useUiStore = defineStore('ui', () => {
     removeSidebarShortcut,
     reorderSidebarShortcuts,
     openShortcut,
+    // Quickstart
+    showQuickstart,
+    toggleQuickstart,
   }
 })

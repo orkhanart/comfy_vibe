@@ -1,4 +1,5 @@
 export { default as WorkspaceViewHeader } from './WorkspaceViewHeader.vue'
+export { default as PageBreadcrumb } from './PageBreadcrumb.vue'
 export { default as WorkspaceEmptyState } from './WorkspaceEmptyState.vue'
 export { default as WorkspaceViewToggle } from './WorkspaceViewToggle.vue'
 export { default as WorkspaceSearchInput } from './WorkspaceSearchInput.vue'
