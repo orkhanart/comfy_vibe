@@ -13,6 +13,7 @@ const route = useRoute()
 
 const menuItems: MenuItem[] = [
   { label: 'Dashboard', icon: 'th-large', route: '/workspace' },
+  { label: 'Projects', icon: 'folder', route: '/workspace/projects' },
   { label: 'Workflows', icon: 'sitemap', route: '/workspace/workflows' },
   { label: 'Assets', icon: 'images', route: '/workspace/assets' },
   { label: 'Models', icon: 'box', route: '/workspace/models' },
