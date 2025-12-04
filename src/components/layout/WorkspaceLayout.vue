@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import WorkspaceSidebar from './WorkspaceSidebar.vue'
+import WorkspaceTopBar from './WorkspaceTopBar.vue'
 </script>
 
 <template>
-  <div class="flex h-screen bg-white dark:bg-background">
-    <WorkspaceSidebar />
-    <main class="flex-1 overflow-auto bg-zinc-50/50 dark:bg-card/50">
-      <slot />
-    </main>
+  <div class="flex h-screen flex-col bg-white dark:bg-background">
+    <!-- Top Navigation Bar -->
+    <WorkspaceTopBar />
+
+    <!-- Main Content with Sidebar -->
+    <div class="flex flex-1 overflow-hidden">
+      <WorkspaceSidebar />
+      <main class="flex-1 overflow-auto bg-zinc-50/50 dark:bg-card/50">
+        <slot />
+      </main>
+    </div>
   </div>
 </template>
