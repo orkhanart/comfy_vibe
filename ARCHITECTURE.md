@@ -89,13 +89,15 @@ Node editor components:
 
 ```
 workflow-editor/
-├── CanvasTabBar.vue       # Workflow tabs at top
-├── CanvasLeftSidebar.vue  # Library/nodes/templates
-├── CanvasRightToolbar.vue # Properties panel
+├── WorkflowEditorTabBar.vue       # Workflow tabs at top
+├── WorkflowEditorLeftSidebar.vue  # Library/nodes/templates
+├── WorkflowEditorRightToolbar.vue # Zoom/fit toolbar
+├── WorkflowEditorRunControls.vue  # Run/queue controls
+├── WorkflowEditorLogoMenu.vue     # Logo dropdown menu
+├── WorkflowEditorShareDialog.vue  # Share dialog
 ├── NodePropertiesPanel.vue
 ├── LibrarySidebar.vue
-├── WorkflowsSidebar.vue
-└── CanvasShareDialog.vue
+└── WorkflowsSidebar.vue
 ```
 
 ### Linear Mode (`src/components/linear-mode/`)

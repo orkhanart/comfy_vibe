@@ -5,10 +5,10 @@ import { Background } from '@vue-flow/background'
 import '@vue-flow/core/dist/style.css'
 import '@vue-flow/core/dist/theme-default.css'
 
-import CanvasTabBar from '@/components/workflow-editor/CanvasTabBar.vue'
-import CanvasLeftSidebar from '@/components/workflow-editor/CanvasLeftSidebar.vue'
-import CanvasRightToolbar from '@/components/workflow-editor/CanvasRightToolbar.vue'
-import CanvasRunControls from '@/components/workflow-editor/CanvasRunControls.vue'
+import WorkflowEditorTabBar from '@/components/workflow-editor/WorkflowEditorTabBar.vue'
+import WorkflowEditorLeftSidebar from '@/components/workflow-editor/WorkflowEditorLeftSidebar.vue'
+import WorkflowEditorRightToolbar from '@/components/workflow-editor/WorkflowEditorRightToolbar.vue'
+import WorkflowEditorRunControls from '@/components/workflow-editor/WorkflowEditorRunControls.vue'
 import NodePropertiesPanel from '@/components/workflow-editor/NodePropertiesPanel.vue'
 import { FlowNode } from '@/components/nodes'
 import { NodesExtendedModal, ModelsExtendedModal, LibraryExtendedModal } from '@/components/common'
@@ -105,12 +105,12 @@ function handleExtendModels(): void {
 <template>
   <div class="flex h-screen flex-col bg-background">
     <!-- Tab Bar -->
-    <CanvasTabBar />
+    <WorkflowEditorTabBar />
 
     <!-- Main content area -->
     <div class="flex flex-1 overflow-hidden">
       <!-- Left sidebar -->
-      <CanvasLeftSidebar
+      <WorkflowEditorLeftSidebar
         @extend-library="handleExtendLibrary"
         @extend-nodes="handleExtendNodes"
         @extend-models="handleExtendModels"
@@ -132,7 +132,7 @@ function handleExtendModels(): void {
         </VueFlow>
 
         <!-- Right toolbar -->
-        <CanvasRightToolbar
+        <WorkflowEditorRightToolbar
           orientation="horizontal"
           @fit-view="fitView({ padding: 0.3 })"
           @zoom-in="zoomIn()"
@@ -149,7 +149,7 @@ function handleExtendModels(): void {
         </div>
 
         <!-- Run Controls (top-right) -->
-        <CanvasRunControls />
+        <WorkflowEditorRunControls />
       </main>
 
       <!-- Right sidebar - Node Properties -->

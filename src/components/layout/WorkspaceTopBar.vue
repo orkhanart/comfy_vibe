@@ -2,7 +2,7 @@
 import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import CanvasLogoMenu from '@/components/workflow-editor/CanvasLogoMenu.vue'
+import WorkflowEditorLogoMenu from '@/components/workflow-editor/WorkflowEditorLogoMenu.vue'
 import ModeTabs from '@/components/workflow-editor/ModeTabs.vue'
 import { useUiStore } from '@/stores/uiStore'
 
@@ -48,7 +48,7 @@ function handleNewWorkflow(): void {
         <Icon name="chevron-down" size="xs" class="opacity-70" />
       </button>
 
-      <CanvasLogoMenu :show="showMenu" @close="showMenu = false" />
+      <WorkflowEditorLogoMenu :show="showMenu" @close="showMenu = false" />
     </div>
 
     <!-- Divider -->

@@ -2,9 +2,9 @@
 import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import CanvasLogoMenu from './CanvasLogoMenu.vue'
+import WorkflowEditorLogoMenu from './WorkflowEditorLogoMenu.vue'
 import ModeTabs from './ModeTabs.vue'
-import CanvasShareDialog from './CanvasShareDialog.vue'
+import WorkflowEditorShareDialog from './WorkflowEditorShareDialog.vue'
 import { useUiStore } from '@/stores/uiStore'
 
 const router = useRouter()
@@ -48,7 +48,7 @@ function handleNewWorkflow(): void {
         <Icon name="chevron-down" size="xs" class="opacity-70" />
       </button>
 
-      <CanvasLogoMenu :show="showMenu" @close="showMenu = false" />
+      <WorkflowEditorLogoMenu :show="showMenu" @close="showMenu = false" />
     </div>
 
     <!-- Divider -->
@@ -107,7 +107,7 @@ function handleNewWorkflow(): void {
     </div>
 
     <!-- Share Dialog -->
-    <CanvasShareDialog
+    <WorkflowEditorShareDialog
       v-model:visible="showShareDialog"
       :workflow-name="uiStore.activeWorkflowName"
     />
