@@ -41,10 +41,10 @@ function handleNewWorkflow(): void {
     <!-- Logo Section -->
     <div class="relative">
       <button
-        class="flex items-center gap-1.5 rounded-md px-2 py-1.5 text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+        class="flex items-center gap-1 rounded-md px-2 py-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
         @click="handleLogoClick"
       >
-        <img src="/comfy-logo-white.svg" alt="ComfyUI" class="h-4" />
+        <img :src="uiStore.themeMode === 'dark' ? '/assets/images/comfy-logo-mono.svg' : '/assets/images/comfy-logo-single.svg'" alt="Comfy" class="h-5 w-5" />
         <Icon name="chevron-down" size="xs" class="opacity-70" />
       </button>
 
@@ -69,7 +69,7 @@ function handleNewWorkflow(): void {
     <!-- Tabs Section -->
     <CanvasTabs
       :tabs="uiStore.workflowTabs"
-      :active-tab-id="uiStore.activeWorkflowTabId"
+      :active-tab-id="''"
       @select="handleTabSelect"
       @close="uiStore.closeWorkflowTab"
       @new="handleNewWorkflow"

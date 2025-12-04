@@ -9,9 +9,6 @@ import type { Template } from '@/data/workspaceMockData'
 const router = useRouter()
 const uiStore = useUiStore()
 
-// Quickstart collapsed state
-const quickstartCollapsed = ref(false)
-
 type ActiveTab = 'recent' | 'shared-files' | 'favorites'
 const activeTab = ref<ActiveTab>('recent')
 
@@ -133,21 +130,20 @@ function getIconClass(type: string): string {
 <template>
   <div class="flex h-full flex-col overflow-y-auto">
     <!-- Quickstart Section -->
-    <div class="border-b border-zinc-200 px-4 py-4 dark:border-border">
+    <div v-if="uiStore.showQuickstart" class="border-b border-zinc-200 px-4 py-4 dark:border-border">
       <div class="mb-4 flex items-center justify-between">
         <h2 class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Get started</h2>
         <button
-          class="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-          @click="quickstartCollapsed = !quickstartCollapsed"
+          class="flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          @click="uiStore.toggleQuickstart()"
         >
-          <span>{{ quickstartCollapsed ? 'Show' : 'Hide' }}</span>
-          <Icon :name="quickstartCollapsed ? 'chevron-down' : 'chevron-up'" size="xs" />
+          <Icon name="times" size="sm" />
         </button>
       </div>
 
-      <div v-if="!quickstartCollapsed" class="space-y-6">
+      <div class="space-y-6">
         <!-- Quick Actions Grid -->
-        <div class="grid grid-cols-4 gap-4">
+        <div class="grid grid-cols-3 gap-4">
           <!-- New Workflow Card -->
           <button
             class="group flex items-center gap-4 rounded-xl bg-white p-4 text-left transition-all hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800"
@@ -159,19 +155,6 @@ function getIconClass(type: string): string {
             <div class="min-w-0">
               <h3 class="text-sm font-medium text-zinc-900 dark:text-foreground">New Workflow</h3>
               <p class="mt-0.5 text-xs text-muted-foreground">Start from scratch</p>
-            </div>
-          </button>
-
-          <!-- New Project Card -->
-          <button
-            class="group flex items-center gap-4 rounded-xl bg-white p-4 text-left transition-all hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800"
-          >
-            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-zinc-500 transition-colors group-hover:bg-zinc-200 group-hover:text-zinc-700 dark:text-zinc-400 dark:group-hover:bg-zinc-700 dark:group-hover:text-zinc-200">
-              <Icon name="folder-plus" size="lg" />
-            </div>
-            <div class="min-w-0">
-              <h3 class="text-sm font-medium text-zinc-900 dark:text-foreground">New Project</h3>
-              <p class="mt-0.5 text-xs text-muted-foreground">Organize your work</p>
             </div>
           </button>
 
@@ -309,15 +292,15 @@ function getIconClass(type: string): string {
           </div>
 
           <!-- Action Bar -->
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5">
             <!-- Search -->
             <div class="relative">
-              <Icon name="search" size="sm" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Icon name="search" size="xs" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search..."
-                class="w-48 rounded-md border border-zinc-200 bg-white py-1.5 pl-8 pr-3 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-400 dark:border-border dark:bg-muted dark:text-foreground dark:placeholder-zinc-500"
+                class="h-7 w-48 rounded-md border border-zinc-200 bg-white pl-7 pr-3 text-xs text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-400 dark:border-border dark:bg-muted dark:text-foreground dark:placeholder-zinc-500"
               />
             </div>
 
@@ -325,7 +308,7 @@ function getIconClass(type: string): string {
             <div class="relative">
               <select
                 v-model="sortBy"
-                class="appearance-none rounded-md border border-zinc-200 bg-white py-1.5 pl-2.5 pr-7 text-sm text-zinc-700 outline-none transition-colors hover:border-zinc-300 dark:border-border dark:bg-muted dark:text-foreground"
+                class="h-7 appearance-none rounded-md border border-zinc-200 bg-white pl-2.5 pr-7 text-xs text-zinc-700 outline-none transition-colors hover:border-zinc-300 dark:border-border dark:bg-muted dark:text-foreground"
               >
                 <option v-for="option in sortOptions" :key="option.value" :value="option.value">
                   {{ option.label }}
@@ -335,18 +318,18 @@ function getIconClass(type: string): string {
             </div>
 
             <!-- View Toggle -->
-            <div class="flex rounded-md border border-border">
+            <div class="flex h-7 rounded-md border border-border">
               <button
-                :class="['px-2 py-1.5 text-sm transition-colors', viewMode === 'grid' ? 'bg-button-active-surface text-button-active-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-button-hover-surface']"
+                :class="['flex items-center justify-center w-7 transition-colors', viewMode === 'grid' ? 'bg-button-active-surface text-button-active-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-button-hover-surface']"
                 @click="viewMode = 'grid'"
               >
-                <Icon name="th-large" size="sm" />
+                <Icon name="th-large" size="xs" />
               </button>
               <button
-                :class="['px-2 py-1.5 text-sm transition-colors', viewMode === 'list' ? 'bg-button-active-surface text-button-active-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-button-hover-surface']"
+                :class="['flex items-center justify-center w-7 transition-colors', viewMode === 'list' ? 'bg-button-active-surface text-button-active-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-button-hover-surface']"
                 @click="viewMode = 'list'"
               >
-                <Icon name="list" size="sm" />
+                <Icon name="list" size="xs" />
               </button>
             </div>
           </div>
