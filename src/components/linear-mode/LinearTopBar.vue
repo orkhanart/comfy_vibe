@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUiStore } from '@/stores/uiStore'
+import { useRouter, useRoute } from 'vue-router'
+import { useUiStore, type AdminTabType, ADMIN_TAB_CONFIG } from '@/stores/uiStore'
 import ModeTabs from '@/components/workflow-editor/ModeTabs.vue'
 
 const router = useRouter()
+const route = useRoute()
 const uiStore = useUiStore()
 
 const showMenu = ref(false)
@@ -26,7 +27,12 @@ function goToProjects(): void {
 
 function goToSettings(): void {
   showMenu.value = false
-  router.push({ name: 'workspace-settings', params: { workspaceId: 'default' } })
+  openAdminPage('settings')
+}
+
+function openAdminPage(type: AdminTabType): void {
+  const tab = uiStore.openAdminTab(type)
+  router.push(tab.route)
 }
 
 function signOut(): void {
@@ -51,6 +57,29 @@ function handleTabSelect(tabId: string): void {
 function handleNewWorkflow(): void {
   // Create new workflow in current mode (linear)
   uiStore.createWorkflowTab('linear')
+}
+
+// Admin tab functions
+function handleAdminTabClick(tabId: string): void {
+  const tab = uiStore.adminTabs.find(t => t.id === tabId)
+  if (tab) {
+    uiStore.selectAdminTab(tabId)
+    router.push(tab.route)
+  }
+}
+
+function handleCloseAdminTab(tabId: string, event: MouseEvent): void {
+  event.stopPropagation()
+  const wasActive = uiStore.activeAdminTabId === tabId
+  uiStore.closeAdminTab(tabId)
+
+  // If closing active tab and no more admin tabs, stay on linear mode
+  if (wasActive && uiStore.adminTabs.length === 0) {
+    // Stay on current view
+  } else if (wasActive && uiStore.activeAdminTab) {
+    // Navigate to the new active admin tab
+    router.push(uiStore.activeAdminTab.route)
+  }
 }
 </script>
 
@@ -148,6 +177,36 @@ function handleNewWorkflow(): void {
     >
       <Icon name="home" size="md" />
     </button>
+
+    <!-- Admin Tabs (Settings, Billing, etc.) -->
+    <template v-if="uiStore.adminTabs.length > 0">
+      <!-- Divider -->
+      <div class="mx-1 h-5 w-px bg-border" />
+
+      <!-- Admin Tab Buttons -->
+      <div class="flex items-center gap-0.5">
+        <button
+          v-for="tab in uiStore.adminTabs"
+          :key="tab.id"
+          class="group flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs transition-colors"
+          :class="[
+            tab.id === uiStore.activeAdminTabId
+              ? 'bg-accent text-accent-foreground'
+              : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+          ]"
+          @click="handleAdminTabClick(tab.id)"
+        >
+          <Icon :name="tab.icon" size="xs" class="shrink-0 opacity-60" />
+          <span class="max-w-[120px] truncate">{{ tab.name }}</span>
+          <span
+            class="flex h-4 w-4 items-center justify-center rounded text-muted-foreground opacity-0 transition-all hover:bg-accent hover:text-foreground group-hover:opacity-100"
+            @click="handleCloseAdminTab(tab.id, $event)"
+          >
+            <Icon name="times" size="xs" />
+          </span>
+        </button>
+      </div>
+    </template>
 
     <!-- Divider -->
     <div class="mx-1 h-5 w-px bg-border" />

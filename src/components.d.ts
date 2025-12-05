@@ -7,6 +7,8 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AdminLayout: typeof import('./components/layout/AdminLayout.vue')['default']
+    AdminSidebar: typeof import('./components/layout/AdminSidebar.vue')['default']
     AssetCard: typeof import('./components/workspace/AssetCard.vue')['default']
     AssetContextMenu: typeof import('./components/workspace/AssetContextMenu.vue')['default']
     AssetFileInfoSidebar: typeof import('./components/workspace/AssetFileInfoSidebar.vue')['default']
@@ -47,6 +49,14 @@ declare module 'vue' {
     LibraryWorkflowsSection: typeof import('./components/sidebar/LibraryWorkflowsSection.vue')['default']
     LinearHistoryPanel: typeof import('./components/linear-mode/LinearHistoryPanel.vue')['default']
     LinearMediaViewerModal: typeof import('./components/linear-mode/LinearMediaViewerModal.vue')['default']
+    LinearMobileAssetsTab: typeof import('./components/linear-mode/mobile/LinearMobileAssetsTab.vue')['default']
+    LinearMobileQueueTab: typeof import('./components/linear-mode/mobile/LinearMobileQueueTab.vue')['default']
+    LinearMobileRunTab: typeof import('./components/linear-mode/mobile/LinearMobileRunTab.vue')['default']
+    LinearMobileTabBar: typeof import('./components/linear-mode/mobile/LinearMobileTabBar.vue')['default']
+    LinearMobileTemplatesTab: typeof import('./components/linear-mode/mobile/LinearMobileTemplatesTab.vue')['default']
+    LinearMobileTopBar: typeof import('./components/linear-mode/mobile/LinearMobileTopBar.vue')['default']
+    LinearMobileView: typeof import('./components/linear-mode/mobile/LinearMobileView.vue')['default']
+    LinearMobileWorkflowsTab: typeof import('./components/linear-mode/mobile/LinearMobileWorkflowsTab.vue')['default']
     LinearNodeItem: typeof import('./components/linear-mode/LinearNodeItem.vue')['default']
     LinearParametersPanel: typeof import('./components/linear-mode/LinearParametersPanel.vue')['default']
     LinearSidebar: typeof import('./components/linear-mode/LinearSidebar.vue')['default']
@@ -107,6 +117,8 @@ declare module 'vue' {
     WorkflowEditorTabBar: typeof import('./components/workflow-editor/WorkflowEditorTabBar.vue')['default']
     WorkflowFileInfoSidebar: typeof import('./components/workspace/WorkflowFileInfoSidebar.vue')['default']
     WorkflowsSidebar: typeof import('./components/workflow-editor/WorkflowsSidebar.vue')['default']
+    WorkspaceAdminLayout: typeof import('./components/layout/WorkspaceAdminLayout.vue')['default']
+    WorkspaceAdminSidebar: typeof import('./components/layout/WorkspaceAdminSidebar.vue')['default']
     WorkspaceCard: typeof import('./components/workspace/WorkspaceCard.vue')['default']
     WorkspaceEmptyState: typeof import('./components/workspace/WorkspaceEmptyState.vue')['default']
     WorkspaceFilterSelect: typeof import('./components/workspace/WorkspaceFilterSelect.vue')['default']

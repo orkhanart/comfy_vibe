@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import WorkflowEditorLogoMenu from './WorkflowEditorLogoMenu.vue'
 import WorkflowEditorShareDialog from './WorkflowEditorShareDialog.vue'
-import { useUiStore } from '@/stores/uiStore'
+import { useUiStore, type AdminTabType, ADMIN_TAB_CONFIG } from '@/stores/uiStore'
 import {
   Popover,
   PopoverContent,
@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/popover'
 
 const router = useRouter()
+const route = useRoute()
 const uiStore = useUiStore()
 const showShareDialog = ref(false)
 const showMenu = ref(false)
@@ -127,6 +128,29 @@ function handleCreateSubgraph(): void {
   selectedSubgraph.value = newSubgraph.id
   showSubgraphsDropdown.value = false
 }
+
+// Admin tab functions
+function handleAdminTabClick(tabId: string): void {
+  const tab = uiStore.adminTabs.find(t => t.id === tabId)
+  if (tab) {
+    uiStore.selectAdminTab(tabId)
+    router.push(tab.route)
+  }
+}
+
+function handleCloseAdminTab(tabId: string, event: MouseEvent): void {
+  event.stopPropagation()
+  const wasActive = uiStore.activeAdminTabId === tabId
+  uiStore.closeAdminTab(tabId)
+
+  // If closing active tab and no more admin tabs, go back to workflow
+  if (wasActive && uiStore.adminTabs.length === 0) {
+    // Stay on current workflow view
+  } else if (wasActive && uiStore.activeAdminTab) {
+    // Navigate to the new active admin tab
+    router.push(uiStore.activeAdminTab.route)
+  }
+}
 </script>
 
 <template>
@@ -155,6 +179,36 @@ function handleCreateSubgraph(): void {
     >
       <Icon name="home" size="md" />
     </button>
+
+    <!-- Admin Tabs (Settings, Billing, etc.) -->
+    <template v-if="uiStore.adminTabs.length > 0">
+      <!-- Divider -->
+      <div class="mx-1 h-5 w-px bg-border" />
+
+      <!-- Admin Tab Buttons -->
+      <div class="flex items-center gap-0.5">
+        <button
+          v-for="tab in uiStore.adminTabs"
+          :key="tab.id"
+          class="group flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1.5 text-xs transition-colors"
+          :class="[
+            tab.id === uiStore.activeAdminTabId
+              ? 'bg-accent text-accent-foreground'
+              : 'text-muted-foreground hover:bg-accent/50 hover:text-foreground'
+          ]"
+          @click="handleAdminTabClick(tab.id)"
+        >
+          <Icon :name="tab.icon" size="xs" class="shrink-0 opacity-60" />
+          <span class="max-w-[120px] truncate">{{ tab.name }}</span>
+          <span
+            class="flex h-4 w-4 items-center justify-center rounded text-muted-foreground opacity-0 transition-all hover:bg-accent hover:text-foreground group-hover:opacity-100"
+            @click="handleCloseAdminTab(tab.id, $event)"
+          >
+            <Icon name="times" size="xs" />
+          </span>
+        </button>
+      </div>
+    </template>
 
     <!-- Divider -->
     <div class="mx-1 h-5 w-px bg-border" />

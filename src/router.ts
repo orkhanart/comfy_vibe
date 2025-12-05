@@ -79,11 +79,6 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./views/workspace/TrashView.vue')
       },
       {
-        path: 'settings',
-        name: 'workspace-settings',
-        component: () => import('./views/workspace/SettingsView.vue')
-      },
-      {
         path: 'card-designs',
         name: 'workspace-card-designs',
         component: () => import('./views/workspace/CardDesignsView.vue')
@@ -97,6 +92,37 @@ const routes: RouteRecordRaw[] = [
         path: 'projects/:projectId',
         name: 'workspace-project',
         component: () => import('./views/workspace/ProjectView.vue')
+      },
+    ]
+  },
+  {
+    path: '/workspace/manage',
+    component: () => import('./views/WorkspaceAdminView.vue'),
+    children: [
+      {
+        path: '',
+        name: 'workspace-manage-dashboard',
+        component: () => import('./views/workspace-admin/WorkspaceDashboardView.vue')
+      },
+      {
+        path: 'people',
+        name: 'workspace-manage-people',
+        component: () => import('./views/workspace-admin/WorkspacePeopleView.vue')
+      },
+      {
+        path: 'billing',
+        name: 'workspace-manage-billing',
+        component: () => import('./views/workspace-admin/WorkspaceBillingView.vue')
+      },
+      {
+        path: 'content',
+        name: 'workspace-manage-content',
+        component: () => import('./views/workspace-admin/WorkspaceContentView.vue')
+      },
+      {
+        path: 'settings',
+        name: 'workspace-manage-settings',
+        component: () => import('./views/workspace-admin/WorkspaceSettingsView.vue')
       },
     ]
   },

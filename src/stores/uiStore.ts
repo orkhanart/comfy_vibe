@@ -261,6 +261,28 @@ export interface WorkflowTab {
 }
 
 // ============================================================================
+// ADMIN TABS (workspace settings, billing, etc.)
+// ============================================================================
+
+export type AdminTabType = 'settings' | 'people' | 'billing' | 'content' | 'dashboard'
+
+export interface AdminTab {
+  id: string
+  type: AdminTabType
+  name: string
+  icon: string
+  route: string
+}
+
+export const ADMIN_TAB_CONFIG: Record<AdminTabType, { name: string; icon: string; route: string }> = {
+  dashboard: { name: 'Manage Workspace', icon: 'th-large', route: '/workspace/manage' },
+  people: { name: 'People', icon: 'users', route: '/workspace/manage/people' },
+  billing: { name: 'Billing', icon: 'receipt', route: '/workspace/manage/billing' },
+  content: { name: 'Content', icon: 'folder', route: '/workspace/manage/content' },
+  settings: { name: 'Settings', icon: 'cog', route: '/workspace/manage/settings' },
+}
+
+// ============================================================================
 // SUBGRAPHS (reusable workflow components)
 // ============================================================================
 
@@ -314,6 +336,10 @@ export const useUiStore = defineStore('ui', () => {
     { id: 'workflow-3', name: 'ControlNet Test', mode: 'workflow', isActive: false },
   ])
   const activeWorkflowTabId = ref('workflow-1')
+
+  // Admin tabs (workspace manage pages shown as tabs)
+  const adminTabs = ref<AdminTab[]>([])
+  const activeAdminTabId = ref<string | null>(null)
 
   // Subgraphs (reusable workflow components)
   const subgraphs = ref<Subgraph[]>([
@@ -501,6 +527,58 @@ export const useUiStore = defineStore('ui', () => {
     })
     selectWorkflowTab(newId)
   }
+
+  // Admin tab functions
+  function openAdminTab(type: AdminTabType): AdminTab {
+    // Check if tab already exists
+    const existingTab = adminTabs.value.find(t => t.type === type)
+    if (existingTab) {
+      activeAdminTabId.value = existingTab.id
+      return existingTab
+    }
+
+    // Create new tab
+    const config = ADMIN_TAB_CONFIG[type]
+    const newTab: AdminTab = {
+      id: `admin-${type}-${Date.now()}`,
+      type,
+      name: config.name,
+      icon: config.icon,
+      route: config.route,
+    }
+    adminTabs.value.push(newTab)
+    activeAdminTabId.value = newTab.id
+    return newTab
+  }
+
+  function closeAdminTab(tabId: string): void {
+    const index = adminTabs.value.findIndex(t => t.id === tabId)
+    if (index > -1) {
+      adminTabs.value.splice(index, 1)
+      if (tabId === activeAdminTabId.value) {
+        // Select another admin tab or clear
+        if (adminTabs.value.length > 0) {
+          const newIndex = Math.min(index, adminTabs.value.length - 1)
+          activeAdminTabId.value = adminTabs.value[newIndex]!.id
+        } else {
+          activeAdminTabId.value = null
+        }
+      }
+    }
+  }
+
+  function selectAdminTab(tabId: string): void {
+    activeAdminTabId.value = tabId
+  }
+
+  function clearAdminTabs(): void {
+    adminTabs.value = []
+    activeAdminTabId.value = null
+  }
+
+  const activeAdminTab = computed(() => {
+    return adminTabs.value.find(t => t.id === activeAdminTabId.value) || null
+  })
 
   // Subgraph functions
   function selectSubgraph(subgraphId: string): void {
@@ -713,6 +791,14 @@ export const useUiStore = defineStore('ui', () => {
     selectWorkflowTab,
     closeWorkflowTab,
     createWorkflowTab,
+    // Admin tab functions
+    adminTabs,
+    activeAdminTabId,
+    activeAdminTab,
+    openAdminTab,
+    closeAdminTab,
+    selectAdminTab,
+    clearAdminTabs,
     // Subgraph functions
     subgraphs,
     activeSubgraphId,

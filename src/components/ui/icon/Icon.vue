@@ -10,6 +10,7 @@ import {
   ArrowRight,
   ArrowUp,
   ArrowUpDown,
+  BarChart3,
   Bell,
   Bolt,
   Bold,
@@ -31,6 +32,8 @@ import {
   Code,
   Cog,
   Copy,
+  CreditCard,
+  Cpu,
   Download,
   Edit,
   Ellipsis,
@@ -46,7 +49,9 @@ import {
   FolderOpen,
   FolderPlus,
   Grid,
+  HardDrive,
   Heart,
+  History,
   Home,
   Image,
   Images,
@@ -79,6 +84,7 @@ import {
   Play,
   Plus,
   Power,
+  Receipt,
   RefreshCw,
   Save,
   Search,
@@ -105,6 +111,7 @@ import {
   Users,
   Video,
   Volume2,
+  Wallet,
   Workflow,
   X,
   Zap,
@@ -254,6 +261,15 @@ const iconMap: Record<string, LucideIcon> = {
   'bold': Bold,
   'thumbtack': Pin,
   'bookmark': Bookmark,
+
+  // Billing & Finance
+  'credit-card': CreditCard,
+  'wallet': Wallet,
+  'receipt': Receipt,
+  'chart-bar': BarChart3,
+  'history': History,
+  'cpu': Cpu,
+  'hard-drive': HardDrive,
 }
 
 const iconComponent = computed(() => {
