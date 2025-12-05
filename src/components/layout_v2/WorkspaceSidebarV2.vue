@@ -12,6 +12,14 @@ interface MenuItem {
   badge?: number
 }
 
+interface Project {
+  id: string
+  label: string
+  icon: string
+  route: string
+  subItems: MenuItem[]
+}
+
 const route = useRoute()
 const router = useRouter()
 const workspaceStore = useWorkspaceStore()
@@ -40,20 +48,83 @@ const overviewItems: MenuItem[] = [
   { label: 'Tutorials', icon: 'book', route: '/workspace_v2/tutorials' },
 ]
 
-// Private section
-const privateItems: MenuItem[] = [
-  { label: 'Projects', icon: 'folder', route: '/workspace_v2/projects' },
-  { label: 'Workflows', icon: 'sitemap', route: '/workspace_v2/workflows' },
-  { label: 'Assets', icon: 'images', route: '/workspace_v2/assets' },
-  { label: 'Models', icon: 'box', route: '/workspace_v2/models' },
-]
+// Private projects (with expandable subfolders)
+const privateProjects = ref<Project[]>([
+  {
+    id: 'private-1',
+    label: 'My First Project',
+    icon: 'folder',
+    route: '/workspace_v2/projects/private-1',
+    subItems: [
+      { label: 'Assets', icon: 'images', route: '/workspace_v2/projects/private-1/assets' },
+      { label: 'Workflows', icon: 'sitemap', route: '/workspace_v2/projects/private-1/workflows' },
+      { label: 'Models', icon: 'box', route: '/workspace_v2/projects/private-1/models' },
+    ]
+  },
+  {
+    id: 'private-2',
+    label: 'Personal Work',
+    icon: 'folder',
+    route: '/workspace_v2/projects/private-2',
+    subItems: [
+      { label: 'Assets', icon: 'images', route: '/workspace_v2/projects/private-2/assets' },
+      { label: 'Workflows', icon: 'sitemap', route: '/workspace_v2/projects/private-2/workflows' },
+      { label: 'Models', icon: 'box', route: '/workspace_v2/projects/private-2/models' },
+    ]
+  },
+])
 
 // Team workspace projects (mock data)
-const teamProjects: MenuItem[] = [
-  { label: 'Product Shots', icon: 'folder', route: '/workspace_v2/projects/1' },
-  { label: 'Brand Assets', icon: 'folder', route: '/workspace_v2/projects/2' },
-  { label: 'Marketing Campaign', icon: 'folder', route: '/workspace_v2/projects/3' },
-]
+const teamProjects = ref<Project[]>([
+  {
+    id: '1',
+    label: 'Product Shots',
+    icon: 'folder',
+    route: '/workspace_v2/projects/1',
+    subItems: [
+      { label: 'Assets', icon: 'images', route: '/workspace_v2/projects/1/assets' },
+      { label: 'Workflows', icon: 'sitemap', route: '/workspace_v2/projects/1/workflows' },
+      { label: 'Models', icon: 'box', route: '/workspace_v2/projects/1/models' },
+    ]
+  },
+  {
+    id: '2',
+    label: 'Brand Assets',
+    icon: 'folder',
+    route: '/workspace_v2/projects/2',
+    subItems: [
+      { label: 'Assets', icon: 'images', route: '/workspace_v2/projects/2/assets' },
+      { label: 'Workflows', icon: 'sitemap', route: '/workspace_v2/projects/2/workflows' },
+      { label: 'Models', icon: 'box', route: '/workspace_v2/projects/2/models' },
+    ]
+  },
+  {
+    id: '3',
+    label: 'Marketing Campaign',
+    icon: 'folder',
+    route: '/workspace_v2/projects/3',
+    subItems: [
+      { label: 'Assets', icon: 'images', route: '/workspace_v2/projects/3/assets' },
+      { label: 'Workflows', icon: 'sitemap', route: '/workspace_v2/projects/3/workflows' },
+      { label: 'Models', icon: 'box', route: '/workspace_v2/projects/3/models' },
+    ]
+  },
+])
+
+// Track expanded projects
+const expandedProjects = ref<Set<string>>(new Set())
+
+function toggleProject(projectId: string): void {
+  if (expandedProjects.value.has(projectId)) {
+    expandedProjects.value.delete(projectId)
+  } else {
+    expandedProjects.value.add(projectId)
+  }
+}
+
+function isProjectExpanded(projectId: string): boolean {
+  return expandedProjects.value.has(projectId)
+}
 
 // Shared with me items (mock data)
 const sharedItems: MenuItem[] = [
@@ -281,19 +352,46 @@ function cancelCreateWorkspace(): void {
           Private
         </div>
         <ul class="flex flex-col gap-0.5">
-          <li v-for="item in privateItems" :key="item.label">
-            <RouterLink
-              :to="item.route ?? '#'"
+          <li v-for="project in privateProjects" :key="project.id">
+            <!-- Project Header with Toggle -->
+            <button
               :class="[
-                'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 transition-colors',
-                isActive(item.route)
+                'flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 transition-colors',
+                isActive(project.route)
                   ? 'bg-button-active-surface font-medium text-button-active-foreground'
                   : 'text-muted-foreground hover:bg-button-hover-surface hover:text-foreground'
               ]"
+              @click="toggleProject(project.id)"
             >
-              <Icon :name="item.icon" size="md" />
-              <span class="flex-1 text-sm">{{ item.label }}</span>
-            </RouterLink>
+              <Icon :name="project.icon" size="md" />
+              <span class="flex-1 text-left text-sm">{{ project.label }}</span>
+              <Icon
+                name="chevron-right"
+                size="xs"
+                class="shrink-0 transition-transform"
+                :class="isProjectExpanded(project.id) ? 'rotate-90' : ''"
+              />
+            </button>
+            <!-- Sub Items (Tree) -->
+            <ul
+              v-if="isProjectExpanded(project.id)"
+              class="ml-4 mt-0.5 flex flex-col gap-0.5 border-l border-border pl-2"
+            >
+              <li v-for="subItem in project.subItems" :key="subItem.label">
+                <RouterLink
+                  :to="subItem.route ?? '#'"
+                  :class="[
+                    'flex items-center gap-2 rounded-md px-2 py-1 transition-colors',
+                    isActive(subItem.route)
+                      ? 'bg-button-active-surface font-medium text-button-active-foreground'
+                      : 'text-muted-foreground hover:bg-button-hover-surface hover:text-foreground'
+                  ]"
+                >
+                  <Icon :name="subItem.icon" size="sm" />
+                  <span class="text-xs">{{ subItem.label }}</span>
+                </RouterLink>
+              </li>
+            </ul>
           </li>
         </ul>
       </div>
@@ -304,19 +402,46 @@ function cancelCreateWorkspace(): void {
           Workspace
         </div>
         <ul class="flex flex-col gap-0.5">
-          <li v-for="item in teamProjects" :key="item.label">
-            <RouterLink
-              :to="item.route ?? '#'"
+          <li v-for="project in teamProjects" :key="project.id">
+            <!-- Project Header with Toggle -->
+            <button
               :class="[
-                'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 transition-colors',
-                isActive(item.route)
+                'flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 transition-colors',
+                isActive(project.route)
                   ? 'bg-button-active-surface font-medium text-button-active-foreground'
                   : 'text-muted-foreground hover:bg-button-hover-surface hover:text-foreground'
               ]"
+              @click="toggleProject(project.id)"
             >
-              <Icon :name="item.icon" size="md" />
-              <span class="flex-1 text-sm">{{ item.label }}</span>
-            </RouterLink>
+              <Icon :name="project.icon" size="md" />
+              <span class="flex-1 text-left text-sm">{{ project.label }}</span>
+              <Icon
+                name="chevron-right"
+                size="xs"
+                class="shrink-0 transition-transform"
+                :class="isProjectExpanded(project.id) ? 'rotate-90' : ''"
+              />
+            </button>
+            <!-- Sub Items (Tree) -->
+            <ul
+              v-if="isProjectExpanded(project.id)"
+              class="ml-4 mt-0.5 flex flex-col gap-0.5 border-l border-border pl-2"
+            >
+              <li v-for="subItem in project.subItems" :key="subItem.label">
+                <RouterLink
+                  :to="subItem.route ?? '#'"
+                  :class="[
+                    'flex items-center gap-2 rounded-md px-2 py-1 transition-colors',
+                    isActive(subItem.route)
+                      ? 'bg-button-active-surface font-medium text-button-active-foreground'
+                      : 'text-muted-foreground hover:bg-button-hover-surface hover:text-foreground'
+                  ]"
+                >
+                  <Icon :name="subItem.icon" size="sm" />
+                  <span class="text-xs">{{ subItem.label }}</span>
+                </RouterLink>
+              </li>
+            </ul>
           </li>
         </ul>
       </div>

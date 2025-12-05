@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Icon } from '@/components/ui/icon'
-import { WorkspaceCard } from '@/components/workspace'
+import { PageBreadcrumb } from '@/components/workspace'
 
 interface Tutorial {
   id: string
@@ -93,55 +93,57 @@ function openTutorial(tutorial: Tutorial): void {
 </script>
 
 <template>
-  <div class="flex h-full flex-col overflow-y-auto p-4">
-    <!-- Header with Tabs and Actions -->
-    <div class="mb-4 flex items-center justify-between gap-4">
-      <!-- Category Tabs -->
-      <div class="flex gap-1.5">
+  <div class="h-full overflow-y-auto p-4">
+    <!-- Header with Breadcrumb -->
+    <div class="mb-4 flex min-h-[30px] items-center justify-between">
+      <PageBreadcrumb label="Tutorials" icon="book" />
+    </div>
+
+    <!-- Search Row -->
+    <div class="mb-4 flex items-center gap-2">
+      <!-- Search -->
+      <div class="relative flex-1">
+        <Icon name="search" size="sm" class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search tutorials..."
+          class="w-full rounded-lg border border-zinc-200 bg-white py-2 pl-9 pr-4 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-400 dark:border-border dark:bg-muted dark:text-foreground dark:placeholder-zinc-500"
+        />
+      </div>
+
+      <!-- View Toggle -->
+      <div class="flex h-9 rounded-lg border border-border">
         <button
-          v-for="cat in categories"
-          :key="cat.id"
-          :class="[
-            'rounded-md px-3 py-1.5 text-xs font-medium transition-all',
-            activeCategory === cat.id
-              ? 'bg-button-active-surface text-button-active-foreground'
-              : 'bg-button-surface text-muted-foreground hover:bg-button-hover-surface hover:text-foreground'
-          ]"
-          @click="activeCategory = cat.id"
+          :class="['flex items-center justify-center w-9 transition-colors rounded-l-lg', viewMode === 'grid' ? 'bg-button-active-surface text-button-active-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-button-hover-surface']"
+          @click="viewMode = 'grid'"
         >
-          {{ cat.label }}
+          <Icon name="th-large" size="sm" />
+        </button>
+        <button
+          :class="['flex items-center justify-center w-9 transition-colors rounded-r-lg', viewMode === 'list' ? 'bg-button-active-surface text-button-active-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-button-hover-surface']"
+          @click="viewMode = 'list'"
+        >
+          <Icon name="list" size="sm" />
         </button>
       </div>
+    </div>
 
-      <!-- Action Bar -->
-      <div class="flex items-center gap-1.5">
-        <!-- Search -->
-        <div class="relative">
-          <Icon name="search" size="xs" class="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Search tutorials..."
-            class="h-7 w-48 rounded-md border border-zinc-200 bg-white pl-7 pr-3 text-xs text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-zinc-400 dark:border-border dark:bg-muted dark:text-foreground dark:placeholder-zinc-500"
-          />
-        </div>
-
-        <!-- View Toggle -->
-        <div class="flex h-7 rounded-md border border-border">
-          <button
-            :class="['flex items-center justify-center w-7 transition-colors', viewMode === 'grid' ? 'bg-button-active-surface text-button-active-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-button-hover-surface']"
-            @click="viewMode = 'grid'"
-          >
-            <Icon name="th-large" size="xs" />
-          </button>
-          <button
-            :class="['flex items-center justify-center w-7 transition-colors', viewMode === 'list' ? 'bg-button-active-surface text-button-active-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-button-hover-surface']"
-            @click="viewMode = 'list'"
-          >
-            <Icon name="list" size="xs" />
-          </button>
-        </div>
-      </div>
+    <!-- Category Tabs -->
+    <div class="mb-6 flex gap-1.5">
+      <button
+        v-for="cat in categories"
+        :key="cat.id"
+        :class="[
+          'rounded-lg px-3 py-1.5 text-sm font-medium transition-all',
+          activeCategory === cat.id
+            ? 'bg-button-active-surface text-button-active-foreground'
+            : 'bg-button-surface text-muted-foreground hover:bg-button-hover-surface hover:text-foreground'
+        ]"
+        @click="activeCategory = cat.id"
+      >
+        {{ cat.label }}
+      </button>
     </div>
 
     <!-- Tutorials Grid -->
