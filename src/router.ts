@@ -96,6 +96,93 @@ const routes: RouteRecordRaw[] = [
     ]
   },
   {
+    path: '/workspace_v2',
+    component: () => import('./views/WorkspaceViewV2.vue'),
+    props: true,
+    children: [
+      {
+        path: '',
+        name: 'workspace-v2-dashboard',
+        component: () => import('./views/workspace_v2/DashboardView.vue')
+      },
+      {
+        path: 'workflows',
+        name: 'workspace-v2-workflows',
+        component: () => import('./views/workspace_v2/WorkflowsView.vue')
+      },
+      {
+        path: 'workflows/folder/:folderId',
+        name: 'workspace-v2-workflows-folder',
+        component: () => import('./views/workspace_v2/WorkflowsView.vue')
+      },
+      {
+        path: 'assets',
+        name: 'workspace-v2-assets',
+        component: () => import('./views/workspace_v2/AssetsView.vue')
+      },
+      {
+        path: 'assets/folder/:folderId',
+        name: 'workspace-v2-assets-folder',
+        component: () => import('./views/workspace_v2/AssetsView.vue')
+      },
+      {
+        path: 'models',
+        name: 'workspace-v2-models',
+        component: () => import('./views/workspace_v2/ModelsView.vue')
+      },
+      {
+        path: 'models/folder/:folderId',
+        name: 'workspace-v2-models-folder',
+        component: () => import('./views/workspace_v2/ModelsView.vue')
+      },
+      {
+        path: 'recents',
+        name: 'workspace-v2-recents',
+        component: () => import('./views/workspace_v2/RecentsView.vue')
+      },
+      {
+        path: 'templates',
+        name: 'workspace-v2-templates',
+        component: () => import('./views/workspace_v2/TemplatesView.vue')
+      },
+      {
+        path: 'tutorials',
+        name: 'workspace-v2-tutorials',
+        component: () => import('./views/workspace_v2/TutorialsView.vue')
+      },
+      {
+        path: 'projects',
+        name: 'workspace-v2-projects',
+        component: () => import('./views/workspace_v2/ProjectsView.vue')
+      },
+      {
+        path: 'nodes',
+        name: 'workspace-v2-nodes',
+        component: () => import('./views/workspace_v2/NodesView.vue')
+      },
+      {
+        path: 'trash',
+        name: 'workspace-v2-trash',
+        component: () => import('./views/workspace_v2/TrashView.vue')
+      },
+      {
+        path: 'card-designs',
+        name: 'workspace-v2-card-designs',
+        component: () => import('./views/workspace_v2/CardDesignsView.vue')
+      },
+      {
+        path: 'clean',
+        name: 'workspace-v2-clean',
+        component: () => import('./views/workspace_v2/CleanView.vue')
+      },
+      {
+        path: 'projects/:projectId',
+        name: 'workspace-v2-project',
+        component: () => import('./views/workspace_v2/ProjectView.vue')
+      },
+    ]
+  },
+  {
     path: '/workspace/manage',
     component: () => import('./views/WorkspaceAdminView.vue'),
     children: [

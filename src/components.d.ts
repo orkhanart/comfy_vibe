@@ -123,10 +123,13 @@ declare module 'vue' {
     WorkspaceEmptyState: typeof import('./components/workspace/WorkspaceEmptyState.vue')['default']
     WorkspaceFilterSelect: typeof import('./components/workspace/WorkspaceFilterSelect.vue')['default']
     WorkspaceLayout: typeof import('./components/layout/WorkspaceLayout.vue')['default']
+    WorkspaceLayoutV2: typeof import('./components/layout_v2/WorkspaceLayoutV2.vue')['default']
     WorkspaceSearchInput: typeof import('./components/workspace/WorkspaceSearchInput.vue')['default']
     WorkspaceSidebar: typeof import('./components/layout/WorkspaceSidebar.vue')['default']
+    WorkspaceSidebarV2: typeof import('./components/layout_v2/WorkspaceSidebarV2.vue')['default']
     WorkspaceSortSelect: typeof import('./components/workspace/WorkspaceSortSelect.vue')['default']
     WorkspaceTopBar: typeof import('./components/layout/WorkspaceTopBar.vue')['default']
+    WorkspaceTopBarV2: typeof import('./components/layout_v2/WorkspaceTopBarV2.vue')['default']
     WorkspaceViewHeader: typeof import('./components/workspace/WorkspaceViewHeader.vue')['default']
     WorkspaceViewToggle: typeof import('./components/workspace/WorkspaceViewToggle.vue')['default']
   }
