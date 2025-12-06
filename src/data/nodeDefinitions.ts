@@ -200,6 +200,111 @@ export const SAVE_IMAGE: NodeDefinition = {
   headerColor: '#0d47a1',
 }
 
+export const SUBGRAPH: NodeDefinition = {
+  type: 'Subgraph',
+  displayName: 'Subgraph',
+  category: { name: 'subgraph', color: '#78909C' },
+  description: 'A reusable group of nodes',
+  inputs: [
+    { name: 'input_1', type: '*', label: 'Input 1' },
+    { name: 'input_2', type: '*', label: 'Input 2' },
+  ],
+  outputs: [
+    { name: 'output_1', type: '*', label: 'Output 1' },
+  ],
+  widgets: [],
+  headerColor: '#546E7A',
+  bodyColor: '#37474F',
+}
+
+export const SUBGRAPH_INPUT: NodeDefinition = {
+  type: 'SubgraphInput',
+  displayName: 'Subgraph Input',
+  category: { name: 'subgraph', color: '#4CAF50' },
+  description: 'Input node for subgraph - receives data from parent workflow',
+  inputs: [],
+  outputs: [
+    { name: 'output', type: 'IMAGE', label: 'Image' },
+  ],
+  widgets: [],
+  headerColor: '#2E7D32',
+  bodyColor: '#1B5E20',
+}
+
+export const SUBGRAPH_OUTPUT: NodeDefinition = {
+  type: 'SubgraphOutput',
+  displayName: 'Subgraph Output',
+  category: { name: 'subgraph', color: '#F44336' },
+  description: 'Output node for subgraph - sends data back to parent workflow',
+  inputs: [
+    { name: 'input', type: 'IMAGE', label: 'Image' },
+  ],
+  outputs: [],
+  widgets: [],
+  headerColor: '#C62828',
+  bodyColor: '#B71C1C',
+}
+
+export const IMAGE_UPSCALE: NodeDefinition = {
+  type: 'ImageUpscale',
+  displayName: 'Image Upscale',
+  category: { name: 'image', color: '#64b5f6' },
+  description: 'Upscale image using various methods',
+  inputs: [
+    { name: 'image', type: 'IMAGE', label: 'Image' },
+  ],
+  outputs: [
+    { name: 'IMAGE', type: 'IMAGE', label: 'Image' },
+  ],
+  widgets: [
+    {
+      name: 'upscale_method',
+      type: 'select',
+      label: 'Method',
+      value: 'nearest-exact',
+      options: {
+        choices: [
+          { label: 'nearest-exact', value: 'nearest-exact' },
+          { label: 'bilinear', value: 'bilinear' },
+          { label: 'bicubic', value: 'bicubic' },
+          { label: 'lanczos', value: 'lanczos' },
+        ],
+      },
+    },
+    {
+      name: 'scale_by',
+      type: 'slider',
+      label: 'Scale',
+      value: 2,
+      options: { min: 1, max: 8, step: 0.5, precision: 1 },
+    },
+  ],
+  headerColor: '#1565c0',
+}
+
+export const IMAGE_SHARPEN: NodeDefinition = {
+  type: 'ImageSharpen',
+  displayName: 'Image Sharpen',
+  category: { name: 'image', color: '#64b5f6' },
+  description: 'Sharpen image edges',
+  inputs: [
+    { name: 'image', type: 'IMAGE', label: 'Image' },
+  ],
+  outputs: [
+    { name: 'IMAGE', type: 'IMAGE', label: 'Image' },
+  ],
+  widgets: [
+    {
+      name: 'strength',
+      type: 'slider',
+      label: 'Strength',
+      value: 1.0,
+      options: { min: 0, max: 5, step: 0.1, precision: 1 },
+    },
+  ],
+  headerColor: '#1565c0',
+}
+
 export const NODE_DEFINITIONS: Record<string, NodeDefinition> = {
   LoadCheckpoint: LOAD_CHECKPOINT,
   CLIPTextEncode: CLIP_TEXT_ENCODE,
@@ -207,4 +312,9 @@ export const NODE_DEFINITIONS: Record<string, NodeDefinition> = {
   EmptyLatentImage: EMPTY_LATENT_IMAGE,
   VAEDecode: VAE_DECODE,
   SaveImage: SAVE_IMAGE,
+  Subgraph: SUBGRAPH,
+  SubgraphInput: SUBGRAPH_INPUT,
+  SubgraphOutput: SUBGRAPH_OUTPUT,
+  ImageUpscale: IMAGE_UPSCALE,
+  ImageSharpen: IMAGE_SHARPEN,
 }

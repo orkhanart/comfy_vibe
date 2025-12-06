@@ -2,6 +2,11 @@
 import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { WORKFLOWS_DATA, createSharedWorkflowsData, TEAM_MEMBERS_DATA } from '@/data/sidebarMockData'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/components/ui/popover'
 
 const props = defineProps<{
   viewMode: 'list' | 'grid'
@@ -18,6 +23,25 @@ const allWorkflows = computed(() => {
   const sharedWithType = sharedWorkflows.map(w => ({ ...w, type: 'shared' as const }))
   return [...privateWithType, ...sharedWithType]
 })
+
+// Context menu items
+const contextMenuItems = [
+  { id: 'open-editor', label: 'Open in Editor', icon: 'sitemap' },
+  { id: 'open-linear', label: 'Open in Linear Mode', icon: 'play' },
+  { id: 'divider-1', divider: true },
+  { id: 'duplicate', label: 'Duplicate', icon: 'copy' },
+  { id: 'rename', label: 'Rename', icon: 'pen' },
+  { id: 'move', label: 'Move to...', icon: 'folder' },
+  { id: 'divider-2', divider: true },
+  { id: 'share', label: 'Share', icon: 'share-alt' },
+  { id: 'info', label: 'File Info', icon: 'info-circle' },
+  { id: 'divider-3', divider: true },
+  { id: 'delete', label: 'Delete', icon: 'trash', danger: true },
+]
+
+function handleContextAction(actionId: string, workflowId: string) {
+  console.log('Action:', actionId, 'Workflow:', workflowId)
+}
 </script>
 
 <template>
@@ -111,12 +135,43 @@ const allWorkflows = computed(() => {
               </div>
             </div>
             <!-- Actions -->
-            <button
-              v-tooltip.left="{ value: 'Add to Canvas', showDelay: 50 }"
-              class="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-blue-600 text-white opacity-0 transition-all hover:bg-blue-500 group-hover:opacity-100"
-            >
-              <Icon name="plus" size="xs" />
-            </button>
+            <div class="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+              <button
+                v-tooltip.top="{ value: 'Open in Editor', showDelay: 50 }"
+                class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <Icon name="sitemap" size="xs" />
+              </button>
+              <button
+                v-tooltip.top="{ value: 'Open in Linear Mode', showDelay: 50 }"
+                class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <Icon name="play" size="xs" />
+              </button>
+              <Popover>
+                <PopoverTrigger as-child>
+                  <button
+                    class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  >
+                    <Icon name="ellipsis-v" size="xs" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="end" :side-offset="4" class="w-44 p-1">
+                  <template v-for="item in contextMenuItems" :key="item.id">
+                    <div v-if="item.divider" class="my-1 h-px bg-border" />
+                    <button
+                      v-else
+                      class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors"
+                      :class="item.danger ? 'text-red-500 hover:bg-red-500/10' : 'text-foreground hover:bg-accent'"
+                      @click="handleContextAction(item.id, workflow.type === 'shared' ? workflow.id : workflow.name)"
+                    >
+                      <Icon :name="item.icon" size="xs" :class="item.danger ? 'text-red-500' : 'text-muted-foreground'" />
+                      {{ item.label }}
+                    </button>
+                  </template>
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
         </div>
 
@@ -169,12 +224,43 @@ const allWorkflows = computed(() => {
                   </template>
                 </div>
               </div>
-              <button
-                v-tooltip.left="{ value: 'Add to Canvas', showDelay: 50 }"
-                class="ml-2 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-blue-600 text-white transition-all hover:bg-blue-500"
-              >
-                <Icon name="plus" size="xs" />
-              </button>
+              <div class="ml-2 flex shrink-0 items-center gap-0.5">
+                <button
+                  v-tooltip.top="{ value: 'Open in Editor', showDelay: 50 }"
+                  class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  <Icon name="sitemap" size="xs" />
+                </button>
+                <button
+                  v-tooltip.top="{ value: 'Open in Linear Mode', showDelay: 50 }"
+                  class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  <Icon name="play" size="xs" />
+                </button>
+                <Popover>
+                  <PopoverTrigger as-child>
+                    <button
+                      class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                    >
+                      <Icon name="ellipsis-v" size="xs" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" :side-offset="4" class="w-44 p-1">
+                    <template v-for="item in contextMenuItems" :key="item.id">
+                      <div v-if="item.divider" class="my-1 h-px bg-border" />
+                      <button
+                        v-else
+                        class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors"
+                        :class="item.danger ? 'text-red-500 hover:bg-red-500/10' : 'text-foreground hover:bg-accent'"
+                        @click="handleContextAction(item.id, workflow.type === 'shared' ? workflow.id : workflow.name)"
+                      >
+                        <Icon :name="item.icon" size="xs" :class="item.danger ? 'text-red-500' : 'text-muted-foreground'" />
+                        {{ item.label }}
+                      </button>
+                    </template>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </div>
         </div>
@@ -209,12 +295,43 @@ const allWorkflows = computed(() => {
               </div>
             </div>
             <!-- Actions -->
-            <button
-              v-tooltip.left="{ value: 'Add to Canvas', showDelay: 50 }"
-              class="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-blue-600 text-white opacity-0 transition-all hover:bg-blue-500 group-hover:opacity-100"
-            >
-              <Icon name="plus" size="xs" />
-            </button>
+            <div class="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+              <button
+                v-tooltip.top="{ value: 'Open in Editor', showDelay: 50 }"
+                class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <Icon name="sitemap" size="xs" />
+              </button>
+              <button
+                v-tooltip.top="{ value: 'Open in Linear Mode', showDelay: 50 }"
+                class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <Icon name="play" size="xs" />
+              </button>
+              <Popover>
+                <PopoverTrigger as-child>
+                  <button
+                    class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  >
+                    <Icon name="ellipsis-v" size="xs" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="end" :side-offset="4" class="w-44 p-1">
+                  <template v-for="item in contextMenuItems" :key="item.id">
+                    <div v-if="item.divider" class="my-1 h-px bg-border" />
+                    <button
+                      v-else
+                      class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors"
+                      :class="item.danger ? 'text-red-500 hover:bg-red-500/10' : 'text-foreground hover:bg-accent'"
+                      @click="handleContextAction(item.id, workflow.id)"
+                    >
+                      <Icon :name="item.icon" size="xs" :class="item.danger ? 'text-red-500' : 'text-muted-foreground'" />
+                      {{ item.label }}
+                    </button>
+                  </template>
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
         </div>
 
@@ -256,12 +373,43 @@ const allWorkflows = computed(() => {
                   <span>{{ workflow.updatedAt }}</span>
                 </div>
               </div>
-              <button
-                v-tooltip.left="{ value: 'Add to Canvas', showDelay: 50 }"
-                class="ml-2 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-blue-600 text-white transition-all hover:bg-blue-500"
-              >
-                <Icon name="plus" size="xs" />
-              </button>
+              <div class="ml-2 flex shrink-0 items-center gap-0.5">
+                <button
+                  v-tooltip.top="{ value: 'Open in Editor', showDelay: 50 }"
+                  class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  <Icon name="sitemap" size="xs" />
+                </button>
+                <button
+                  v-tooltip.top="{ value: 'Open in Linear Mode', showDelay: 50 }"
+                  class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  <Icon name="play" size="xs" />
+                </button>
+                <Popover>
+                  <PopoverTrigger as-child>
+                    <button
+                      class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                    >
+                      <Icon name="ellipsis-v" size="xs" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" :side-offset="4" class="w-44 p-1">
+                    <template v-for="item in contextMenuItems" :key="item.id">
+                      <div v-if="item.divider" class="my-1 h-px bg-border" />
+                      <button
+                        v-else
+                        class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors"
+                        :class="item.danger ? 'text-red-500 hover:bg-red-500/10' : 'text-foreground hover:bg-accent'"
+                        @click="handleContextAction(item.id, workflow.id)"
+                      >
+                        <Icon :name="item.icon" size="xs" :class="item.danger ? 'text-red-500' : 'text-muted-foreground'" />
+                        {{ item.label }}
+                      </button>
+                    </template>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </div>
         </div>
@@ -305,12 +453,43 @@ const allWorkflows = computed(() => {
               </div>
             </div>
             <!-- Actions -->
-            <button
-              v-tooltip.left="{ value: 'Add to Canvas', showDelay: 50 }"
-              class="flex h-6 w-6 shrink-0 items-center justify-center rounded bg-blue-600 text-white opacity-0 transition-all hover:bg-blue-500 group-hover:opacity-100"
-            >
-              <Icon name="plus" size="xs" />
-            </button>
+            <div class="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+              <button
+                v-tooltip.top="{ value: 'Open in Editor', showDelay: 50 }"
+                class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <Icon name="sitemap" size="xs" />
+              </button>
+              <button
+                v-tooltip.top="{ value: 'Open in Linear Mode', showDelay: 50 }"
+                class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <Icon name="play" size="xs" />
+              </button>
+              <Popover>
+                <PopoverTrigger as-child>
+                  <button
+                    class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  >
+                    <Icon name="ellipsis-v" size="xs" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="end" :side-offset="4" class="w-44 p-1">
+                  <template v-for="item in contextMenuItems" :key="item.id">
+                    <div v-if="item.divider" class="my-1 h-px bg-border" />
+                    <button
+                      v-else
+                      class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors"
+                      :class="item.danger ? 'text-red-500 hover:bg-red-500/10' : 'text-foreground hover:bg-accent'"
+                      @click="handleContextAction(item.id, workflow.name)"
+                    >
+                      <Icon :name="item.icon" size="xs" :class="item.danger ? 'text-red-500' : 'text-muted-foreground'" />
+                      {{ item.label }}
+                    </button>
+                  </template>
+                </PopoverContent>
+              </Popover>
+            </div>
           </div>
         </div>
 
@@ -351,12 +530,43 @@ const allWorkflows = computed(() => {
                 <div class="truncate text-xs font-medium text-foreground">{{ workflow.name }}</div>
                 <div class="mt-0.5 text-[10px] text-muted-foreground">{{ workflow.date }}</div>
               </div>
-              <button
-                v-tooltip.left="{ value: 'Add to Canvas', showDelay: 50 }"
-                class="ml-2 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-blue-600 text-white transition-all hover:bg-blue-500"
-              >
-                <Icon name="plus" size="xs" />
-              </button>
+              <div class="ml-2 flex shrink-0 items-center gap-0.5">
+                <button
+                  v-tooltip.top="{ value: 'Open in Editor', showDelay: 50 }"
+                  class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  <Icon name="sitemap" size="xs" />
+                </button>
+                <button
+                  v-tooltip.top="{ value: 'Open in Linear Mode', showDelay: 50 }"
+                  class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                >
+                  <Icon name="play" size="xs" />
+                </button>
+                <Popover>
+                  <PopoverTrigger as-child>
+                    <button
+                      class="flex h-6 w-6 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                    >
+                      <Icon name="ellipsis-v" size="xs" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" :side-offset="4" class="w-44 p-1">
+                    <template v-for="item in contextMenuItems" :key="item.id">
+                      <div v-if="item.divider" class="my-1 h-px bg-border" />
+                      <button
+                        v-else
+                        class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors"
+                        :class="item.danger ? 'text-red-500 hover:bg-red-500/10' : 'text-foreground hover:bg-accent'"
+                        @click="handleContextAction(item.id, workflow.name)"
+                      >
+                        <Icon :name="item.icon" size="xs" :class="item.danger ? 'text-red-500' : 'text-muted-foreground'" />
+                        {{ item.label }}
+                      </button>
+                    </template>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </div>
         </div>

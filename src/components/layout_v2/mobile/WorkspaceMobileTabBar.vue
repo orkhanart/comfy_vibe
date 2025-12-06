@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
 
-export type MobileTab = 'run' | 'queue' | 'assets' | 'workflows' | 'templates'
+export type MobileTab = 'home' | 'projects' | 'search' | 'account'
 
 interface TabConfig {
   id: MobileTab
@@ -10,14 +10,13 @@ interface TabConfig {
 }
 
 const TABS: TabConfig[] = [
-  { id: 'run', label: 'Run', icon: 'play' },
-  { id: 'queue', label: 'Queue', icon: 'list' },
-  { id: 'assets', label: 'Assets', icon: 'images' },
-  { id: 'workflows', label: 'Flows', icon: 'workflow' },
-  { id: 'templates', label: 'Temps', icon: 'th-large' },
+  { id: 'home', label: 'Home', icon: 'home' },
+  { id: 'projects', label: 'Projects', icon: 'folder' },
+  { id: 'search', label: 'Search', icon: 'search' },
+  { id: 'account', label: 'Account', icon: 'user' },
 ]
 
-const props = defineProps<{
+defineProps<{
   activeTab: MobileTab
 }>()
 

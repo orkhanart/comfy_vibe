@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
 import { Switch } from '@/components/ui/switch'
+import { Button } from '@/components/ui/button'
 import {
   Select,
   SelectContent,
@@ -8,7 +9,54 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from '@/components/ui/popover'
 import { ref, computed } from 'vue'
+
+// Workflow state
+interface Workflow {
+  id: string
+  name: string
+  description?: string
+  thumbnail?: string
+}
+
+const workflows = ref<Workflow[]>([
+  { id: '1', name: 'Text to Image', description: 'Generate images from text prompts' },
+  { id: '2', name: 'Image to Image', description: 'Transform existing images' },
+  { id: '3', name: 'Inpainting', description: 'Edit specific parts of images' },
+  { id: '4', name: 'Upscale', description: 'Enhance image resolution' },
+  { id: '5', name: 'ControlNet Pose', description: 'Control with pose detection' },
+])
+
+const selectedWorkflowId = ref('1')
+const showWorkflowDropdown = ref(false)
+const defaultWorkflow: Workflow = { id: '0', name: 'No Workflow', description: 'Select a workflow' }
+const selectedWorkflow = computed((): Workflow => {
+  return workflows.value.find(w => w.id === selectedWorkflowId.value) ?? workflows.value[0] ?? defaultWorkflow
+})
+
+function selectWorkflow(id: string) {
+  selectedWorkflowId.value = id
+}
+
+function handleImportWorkflow() {
+  // Trigger file input for workflow import
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.json'
+  input.onchange = (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (file) {
+      // Handle workflow import
+      console.log('Importing workflow:', file.name)
+    }
+  }
+  input.click()
+}
 
 // Form state
 const uploadedImage = ref<string | null>(null)
@@ -78,6 +126,83 @@ async function runWorkflow() {
 
 <template>
   <div class="flex h-full flex-col">
+    <!-- Workflow Sidebar Section -->
+    <div class="border-b border-border bg-muted/30 p-3">
+      <div class="flex items-center gap-2">
+        <!-- Workflow Dropdown -->
+        <Popover v-model:open="showWorkflowDropdown">
+          <PopoverTrigger as-child>
+            <button
+              class="flex flex-1 items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-left transition-colors hover:bg-muted/50"
+            >
+              <div class="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
+                <Icon name="workflow" size="sm" class="text-primary" />
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="truncate text-sm font-medium">{{ selectedWorkflow.name }}</span>
+                  <span
+                    v-if="isRunning"
+                    class="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-1.5 py-0.5 text-[10px] font-medium text-green-600"
+                  >
+                    <span class="size-1.5 animate-pulse rounded-full bg-green-500" />
+                    Running
+                  </span>
+                </div>
+                <span class="truncate text-xs text-muted-foreground">{{ selectedWorkflow.description }}</span>
+              </div>
+              <Icon name="chevron-down" size="sm" class="shrink-0 text-muted-foreground" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="start" :side-offset="4" class="w-[calc(100vw-24px)] max-w-[320px] p-1">
+            <div class="px-2 py-1.5 text-xs font-medium text-muted-foreground">Select Workflow</div>
+            <button
+              v-for="workflow in workflows"
+              :key="workflow.id"
+              class="flex w-full cursor-pointer items-center gap-2 rounded-md p-2 text-left transition-colors hover:bg-accent"
+              @click="selectWorkflow(workflow.id); showWorkflowDropdown = false"
+            >
+              <div class="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted">
+                <Icon name="workflow" size="sm" class="text-muted-foreground" />
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="truncate text-sm font-medium">{{ workflow.name }}</span>
+                  <Icon
+                    v-if="workflow.id === selectedWorkflowId"
+                    name="check"
+                    size="xs"
+                    class="text-primary"
+                  />
+                </div>
+                <span class="truncate text-xs text-muted-foreground">{{ workflow.description }}</span>
+              </div>
+            </button>
+            <div class="my-1 h-px bg-border" />
+            <button
+              class="flex w-full cursor-pointer items-center gap-2 rounded-md p-2 text-left transition-colors hover:bg-accent"
+              @click="handleImportWorkflow(); showWorkflowDropdown = false"
+            >
+              <div class="flex size-8 shrink-0 items-center justify-center rounded-md bg-muted">
+                <Icon name="upload" size="sm" class="text-muted-foreground" />
+              </div>
+              <span class="text-sm">Import Workflow</span>
+            </button>
+          </PopoverContent>
+        </Popover>
+
+        <!-- Import Button -->
+        <Button
+          variant="outline"
+          size="icon"
+          class="size-10 shrink-0"
+          @click="handleImportWorkflow"
+        >
+          <Icon name="upload" size="sm" />
+        </Button>
+      </div>
+    </div>
+
     <div class="flex-1 space-y-3 overflow-y-auto p-3">
       <!-- Image Upload -->
       <div

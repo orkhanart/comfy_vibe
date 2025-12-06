@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, markRaw } from 'vue'
+import { ref, computed, onMounted, markRaw, watch } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import '@vue-flow/core/dist/style.css'
@@ -14,7 +14,7 @@ import { FlowNode } from '@/components/nodes'
 import { NodesExtendedModal, ModelsExtendedModal, LibraryExtendedModal } from '@/components/common'
 import { useWorkspaceStore } from '@/stores/workspaceStore'
 import { useUiStore } from '@/stores/uiStore'
-import { DEMO_WORKFLOW_NODES, DEMO_WORKFLOW_EDGES } from '@/data/workflowMockData'
+import { DEMO_WORKFLOW_NODES, DEMO_WORKFLOW_EDGES, SUBGRAPH_DATA } from '@/data/workflowMockData'
 
 // Extended view modals
 const showNodesModal = ref(false)
@@ -44,7 +44,7 @@ onMounted(() => {
 })
 
 // Vue Flow
-const { onNodeClick, onPaneClick, fitView, zoomIn, zoomOut } = useVueFlow()
+const { onNodeClick, onNodeDoubleClick, onPaneClick, fitView, zoomIn, zoomOut } = useVueFlow()
 
 // Center the workflow on mount with 50% zoom
 onMounted(() => {
@@ -53,14 +53,52 @@ onMounted(() => {
   }, 100)
 })
 
-// Workflow data
+// Store main workflow data separately so we can restore it
+const mainWorkflowNodes = [...DEMO_WORKFLOW_NODES]
+const mainWorkflowEdges = [...DEMO_WORKFLOW_EDGES]
+
+// Workflow data - reactive to active subgraph
 const nodes = ref([...DEMO_WORKFLOW_NODES])
 const edges = ref([...DEMO_WORKFLOW_EDGES])
+
+// Watch for subgraph changes and switch canvas content
+watch(
+  () => uiStore.activeSubgraphId,
+  (newSubgraphId, oldSubgraphId) => {
+    if (newSubgraphId) {
+      // Entering a subgraph - load its internal nodes
+      const subgraphData = SUBGRAPH_DATA[newSubgraphId]
+      if (subgraphData) {
+        nodes.value = [...subgraphData.nodes]
+        edges.value = [...subgraphData.edges]
+        // Fit view to new content
+        setTimeout(() => fitView({ padding: 0.3, maxZoom: 1 }), 100)
+      }
+    } else {
+      // Exiting subgraph - restore main workflow
+      nodes.value = [...mainWorkflowNodes]
+      edges.value = [...mainWorkflowEdges]
+      // Fit view to main workflow
+      setTimeout(() => fitView({ padding: 0.3, maxZoom: 0.75 }), 100)
+    }
+    // Clear selection when switching
+    selectedNode.value = null
+  }
+)
 
 const selectedNode = ref<Node<FlowNodeData> | null>(null)
 
 onNodeClick(({ node }) => {
   selectedNode.value = node as Node<FlowNodeData>
+})
+
+onNodeDoubleClick(({ node }) => {
+  const flowNode = node as Node<FlowNodeData>
+  // Check if this is a subgraph node
+  if (flowNode.data.definition.type === 'Subgraph' && flowNode.data.subgraphId) {
+    uiStore.selectSubgraph(flowNode.data.subgraphId)
+    console.log('Entering subgraph:', flowNode.data.subgraphId)
+  }
 })
 
 onPaneClick(() => {

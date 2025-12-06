@@ -7,6 +7,11 @@ import {
   EMPTY_LATENT_IMAGE,
   VAE_DECODE,
   SAVE_IMAGE,
+  SUBGRAPH,
+  SUBGRAPH_INPUT,
+  SUBGRAPH_OUTPUT,
+  IMAGE_UPSCALE,
+  IMAGE_SHARPEN,
 } from '@/data/nodeDefinitions'
 
 // Helper to create FlowNodeData
@@ -73,9 +78,18 @@ export const DEMO_WORKFLOW_NODES: Node<FlowNodeData>[] = [
     data: createNodeData(VAE_DECODE),
   },
   {
-    id: 'save-image',
+    id: 'upscale-subgraph',
     type: 'flowNode',
     position: { x: 1300, y: 200 },
+    data: createNodeData(SUBGRAPH, {
+      title: 'Upscale Pipeline',
+      subgraphId: 'subgraph-upscale-1',
+    }),
+  },
+  {
+    id: 'save-image',
+    type: 'flowNode',
+    position: { x: 1550, y: 200 },
     data: createNodeData(SAVE_IMAGE),
   },
 ]
@@ -154,13 +168,177 @@ export const DEMO_WORKFLOW_EDGES: Edge[] = [
     targetHandle: 'input-1', // vae input
     style: { stroke: '#ef5350', strokeWidth: 2 },
   },
-  // VAE Decode -> Save Image
+  // VAE Decode -> Upscale Subgraph
   {
     id: 'e9',
     source: 'vae-decode',
     sourceHandle: 'output-0', // IMAGE output
+    target: 'upscale-subgraph',
+    targetHandle: 'input-0', // input_1
+    style: { stroke: '#64b5f6', strokeWidth: 2 },
+  },
+  // Upscale Subgraph -> Save Image
+  {
+    id: 'e10',
+    source: 'upscale-subgraph',
+    sourceHandle: 'output-0', // output_1
     target: 'save-image',
     targetHandle: 'input-0', // images input
+    style: { stroke: '#78909C', strokeWidth: 2 },
+  },
+]
+
+// ============================================
+// SUBGRAPH INTERNAL NODES (Upscale Pipeline)
+// ============================================
+
+export const SUBGRAPH_UPSCALE_NODES: Node<FlowNodeData>[] = [
+  {
+    id: 'subgraph-input',
+    type: 'flowNode',
+    position: { x: 50, y: 150 },
+    data: createNodeData(SUBGRAPH_INPUT, {
+      title: 'Image Input',
+    }),
+  },
+  {
+    id: 'image-upscale',
+    type: 'flowNode',
+    position: { x: 300, y: 100 },
+    data: createNodeData(IMAGE_UPSCALE, {
+      widgetValues: { upscale_method: 'lanczos', scale_by: 2 },
+    }),
+  },
+  {
+    id: 'sharpen-subgraph',
+    type: 'flowNode',
+    position: { x: 550, y: 150 },
+    data: createNodeData(SUBGRAPH, {
+      title: 'Sharpen Pipeline',
+      subgraphId: 'subgraph-sharpen-1',
+    }),
+  },
+  {
+    id: 'subgraph-output',
+    type: 'flowNode',
+    position: { x: 800, y: 150 },
+    data: createNodeData(SUBGRAPH_OUTPUT, {
+      title: 'Image Output',
+    }),
+  },
+]
+
+export const SUBGRAPH_UPSCALE_EDGES: Edge[] = [
+  // Input -> Upscale
+  {
+    id: 'sub-e1',
+    source: 'subgraph-input',
+    sourceHandle: 'output-0',
+    target: 'image-upscale',
+    targetHandle: 'input-0',
+    style: { stroke: '#64b5f6', strokeWidth: 2 },
+  },
+  // Upscale -> Sharpen Subgraph
+  {
+    id: 'sub-e2',
+    source: 'image-upscale',
+    sourceHandle: 'output-0',
+    target: 'sharpen-subgraph',
+    targetHandle: 'input-0',
+    style: { stroke: '#78909C', strokeWidth: 2 },
+  },
+  // Sharpen Subgraph -> Output
+  {
+    id: 'sub-e3',
+    source: 'sharpen-subgraph',
+    sourceHandle: 'output-0',
+    target: 'subgraph-output',
+    targetHandle: 'input-0',
+    style: { stroke: '#78909C', strokeWidth: 2 },
+  },
+]
+
+// ============================================
+// SUBGRAPH INTERNAL NODES (Sharpen Pipeline - nested inside Upscale)
+// ============================================
+
+export const SUBGRAPH_SHARPEN_NODES: Node<FlowNodeData>[] = [
+  {
+    id: 'sharpen-input',
+    type: 'flowNode',
+    position: { x: 50, y: 150 },
+    data: createNodeData(SUBGRAPH_INPUT, {
+      title: 'Image Input',
+    }),
+  },
+  {
+    id: 'sharpen-node-1',
+    type: 'flowNode',
+    position: { x: 300, y: 100 },
+    data: createNodeData(IMAGE_SHARPEN, {
+      title: 'Light Sharpen',
+      widgetValues: { strength: 0.5 },
+    }),
+  },
+  {
+    id: 'sharpen-node-2',
+    type: 'flowNode',
+    position: { x: 550, y: 150 },
+    data: createNodeData(IMAGE_SHARPEN, {
+      title: 'Detail Sharpen',
+      widgetValues: { strength: 1.2 },
+    }),
+  },
+  {
+    id: 'sharpen-output',
+    type: 'flowNode',
+    position: { x: 800, y: 150 },
+    data: createNodeData(SUBGRAPH_OUTPUT, {
+      title: 'Image Output',
+    }),
+  },
+]
+
+export const SUBGRAPH_SHARPEN_EDGES: Edge[] = [
+  // Input -> Light Sharpen
+  {
+    id: 'sharpen-e1',
+    source: 'sharpen-input',
+    sourceHandle: 'output-0',
+    target: 'sharpen-node-1',
+    targetHandle: 'input-0',
+    style: { stroke: '#64b5f6', strokeWidth: 2 },
+  },
+  // Light Sharpen -> Detail Sharpen
+  {
+    id: 'sharpen-e2',
+    source: 'sharpen-node-1',
+    sourceHandle: 'output-0',
+    target: 'sharpen-node-2',
+    targetHandle: 'input-0',
+    style: { stroke: '#64b5f6', strokeWidth: 2 },
+  },
+  // Detail Sharpen -> Output
+  {
+    id: 'sharpen-e3',
+    source: 'sharpen-node-2',
+    sourceHandle: 'output-0',
+    target: 'sharpen-output',
+    targetHandle: 'input-0',
     style: { stroke: '#64b5f6', strokeWidth: 2 },
   },
 ]
+
+// Map of subgraph IDs to their internal nodes, edges, and parent info
+export const SUBGRAPH_DATA: Record<string, { nodes: Node<FlowNodeData>[]; edges: Edge[]; parentId?: string }> = {
+  'subgraph-upscale-1': {
+    nodes: SUBGRAPH_UPSCALE_NODES,
+    edges: SUBGRAPH_UPSCALE_EDGES,
+    parentId: undefined, // Top-level subgraph (parent is main workflow)
+  },
+  'subgraph-sharpen-1': {
+    nodes: SUBGRAPH_SHARPEN_NODES,
+    edges: SUBGRAPH_SHARPEN_EDGES,
+    parentId: 'subgraph-upscale-1', // Nested inside Upscale Pipeline
+  },
+}

@@ -311,6 +311,7 @@ export interface Subgraph {
   name: string
   description?: string
   color?: string
+  parentId?: string // Parent subgraph ID for nested subgraphs (undefined = top-level)
   inputs: SubgraphInput[]
   outputs: SubgraphOutput[]
   widgets: SubgraphWidget[]
@@ -343,6 +344,42 @@ export const useUiStore = defineStore('ui', () => {
 
   // Subgraphs (reusable workflow components)
   const subgraphs = ref<Subgraph[]>([
+    {
+      id: 'subgraph-upscale-1',
+      name: 'Upscale Pipeline',
+      description: 'Upscales and enhances images',
+      color: '#78909C',
+      parentId: undefined, // Top-level subgraph
+      inputs: [
+        { id: 'input-1', name: 'image', type: 'IMAGE' },
+      ],
+      outputs: [
+        { id: 'output-1', name: 'upscaled_image', type: 'IMAGE' },
+      ],
+      widgets: [
+        { id: 'widget-1', name: 'scale', type: 'number', value: 2, config: { min: 1, max: 4, step: 1 } },
+      ],
+      createdAt: Date.now() - 43200000,
+      updatedAt: Date.now() - 1800000,
+    },
+    {
+      id: 'subgraph-sharpen-1',
+      name: 'Sharpen Pipeline',
+      description: 'Two-pass sharpening for enhanced details',
+      color: '#4CAF50',
+      parentId: 'subgraph-upscale-1', // Nested inside Upscale Pipeline
+      inputs: [
+        { id: 'input-1', name: 'image', type: 'IMAGE' },
+      ],
+      outputs: [
+        { id: 'output-1', name: 'sharpened_image', type: 'IMAGE' },
+      ],
+      widgets: [
+        { id: 'widget-1', name: 'strength', type: 'number', value: 1.0, config: { min: 0, max: 5, step: 0.1 } },
+      ],
+      createdAt: Date.now() - 21600000,
+      updatedAt: Date.now() - 900000,
+    },
     {
       id: 'subgraph-1',
       name: 'Image Upscaler',
@@ -582,8 +619,8 @@ export const useUiStore = defineStore('ui', () => {
 
   // Subgraph functions
   function selectSubgraph(subgraphId: string): void {
-    activeSubgraphId.value = subgraphId
-    console.log('[Subgraph] Selected:', subgraphId)
+    activeSubgraphId.value = subgraphId || null
+    console.log('[Subgraph] Selected:', subgraphId || 'none (exited)')
   }
 
   function createSubgraph(): Subgraph {
@@ -641,6 +678,24 @@ export const useUiStore = defineStore('ui', () => {
 
   const activeSubgraph = computed(() => {
     return subgraphs.value.find(s => s.id === activeSubgraphId.value) || null
+  })
+
+  // Get the full path of subgraphs from root to active (for breadcrumb navigation)
+  const subgraphPath = computed(() => {
+    const path: Subgraph[] = []
+    let currentId = activeSubgraphId.value
+
+    while (currentId) {
+      const subgraph = subgraphs.value.find(s => s.id === currentId)
+      if (subgraph) {
+        path.unshift(subgraph) // Add to beginning to maintain order
+        currentId = subgraph.parentId || null
+      } else {
+        break
+      }
+    }
+
+    return path
   })
 
   function applyTheme(mode: ThemeMode): void {
@@ -803,6 +858,7 @@ export const useUiStore = defineStore('ui', () => {
     subgraphs,
     activeSubgraphId,
     activeSubgraph,
+    subgraphPath,
     selectSubgraph,
     createSubgraph,
     updateSubgraph,

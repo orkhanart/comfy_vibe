@@ -93,6 +93,7 @@ export interface FlowNodeData {
   badges?: NodeBadge[]
   headerColor?: string
   bodyColor?: string
+  subgraphId?: string
 }
 
 // Slot type colors

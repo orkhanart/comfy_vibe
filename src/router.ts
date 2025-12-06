@@ -225,6 +225,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./views/linear-mode/LinearView.vue'),
     props: true
   },
+  {
+    path: '/linear-mode-v2/:workflowId?',
+    name: 'linear-mode-v2',
+    component: () => import('./views/linear-mode-v2/LinearViewV2.vue'),
+    props: true
+  },
 ]
 
 const router = createRouter({
