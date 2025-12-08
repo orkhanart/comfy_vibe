@@ -16,23 +16,24 @@ Implement a workflow sharing system that enables users to:
 - Share workflows with specific ComfyUI users or team members via direct invite
 - Share workflows via shareable links (requires login to access)
 - Allow recipients to view and fork (duplicate with attribution) workflows
-- **Control access mode: allow recipients to view in Workflow Mode (node editor), Linear Mode (simplified UI), or both**
 
-### 1.3 Goals
+
+### 1.3 Goals (P1)
 - Enable sharing workflows with other ComfyUI users and team members
-- Support both direct invite and link-based sharing
-- Provide View + Duplicate permissions (no collaborative editing)
-- Allow workflow builders to control which mode(s) recipients can access
-- Deliver in-app notifications for share events
+- Support link-based sharing
+- Provide workflow info preview
 
-### 1.4 Non-Goals (v1)
-- Real-time collaborative editing (Google Docs-style)
+
+### 1.4 Non-Goals (P2)
+- Support Direct invite via Email 
+- Real-time collaborative editing (Figma-style)
 - Edit permissions for shared workflows (view + duplicate only)
 - Version control/history for shared workflows
-- Comments/annotations on shared workflows
-- Email notifications (in-app only for v1)
+- Email notifications
+- Deliver in-app notifications for share events
 - Analytics/tracking on shares
-
+- Allow workflow builders to control which mode(s) recipients can access
+- Control access mode: allow recipients to view in Workflow Mode (node editor), Linear Mode (simplified UI), or both**
 ---
 
 ## 2. User Stories
@@ -40,9 +41,9 @@ Implement a workflow sharing system that enables users to:
 ### 2.1 Workflow Owner
 - **US-1:** As a workflow owner, I want to share my workflow with specific users so they can view and fork it.
 - **US-2:** As a workflow owner, I want to generate a shareable link so I can quickly share without entering emails.
-- **US-3:** As a workflow owner, I want to revoke access from users who no longer need it.
-- **US-4:** As a workflow owner, I want to see who has access to my workflow at any time.
-- **US-5:** As a workflow owner, I want to control whether recipients can access my workflow in Workflow Mode (node editor), Linear Mode (simplified UI), or both.
+- **US-3:** As a workflow owner, I want to see who has access to my workflow at any time.
+- **US-4:** As a workflow owner, I want to control whether recipients can access my workflow in Workflow Mode (node editor), Linear Mode (simplified UI), or both.
+
 
 ### 2.2 Share Recipient
 - **US-7:** As a share recipient, I want to receive an in-app notification when someone shares a workflow with me.
@@ -329,49 +330,24 @@ Workflow builders can control which mode(s) recipients are allowed to access:
 
 ---
 
-## 5. Security Considerations
-
-### 5.1 Access Control
-- All share operations require authentication
-- Share links require login to access (no anonymous viewing)
-- Workflow owner and workspace admins can manage shares
-- Permission checks on every workflow access
-
-### 5.2 Link Security
-- Share links use cryptographically secure random codes (32+ chars)
-- Links can be disabled/revoked instantly by owner or admin
-- Links only grant view + fork access (no edit)
-
-### 5.3 Data Privacy
-- Private workflows only accessible via direct share or link
-- Fork attribution preserves original author credit
-
----
-
-## 6. Decisions Made
+## 5. Decisions Made
 
 | Question | Decision |
 |----------|----------|
 | Who can access shared links? | Logged-in users only |
 | What permissions do recipients get? | View + Fork (no edit) |
 | How does forking work? | Creates private copy with "Forked from X by Y" attribution |
-| Analytics on shares? | None for v1 |
 | Who can manage shares? | Owner + Workspace admins |
-| Notification method? | In-app only (no email for v1) |
-| **Access mode control?** | **Owner chooses: Linear Mode only, Workflow Mode only, or Both** |
-| **Default access mode?** | **Linear Mode only (simplest for end users)** |
-| **Forked workflow access?** | **Full access to both modes (no restrictions for owner)** |
 
 ---
 
-## 7. Success Criteria
+## 6. Success Criteria
 
 | Criteria | Definition |
 |----------|------------|
 | Feature complete | All P0 items implemented and working |
 | Usable | Users can share via direct invite and link |
 | Fork works | Forked workflows show attribution correctly |
-| Notifications work | Users see share notifications in-app |
 
 ---
 
