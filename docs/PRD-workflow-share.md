@@ -22,7 +22,6 @@ Enable users to share workflows via shareable links. Recipients can preview, ope
 1. **Generate Share Link**
    - Create unique shareable link for any workflow
    - Copy link to clipboard
-   - Disable/revoke link anytime
 
 2. **Shared Workflow Page**
    - Preview workflow info (name, description, node count, thumbnail)
@@ -42,19 +41,32 @@ Enable users to share workflows via shareable links. Recipients can preview, ope
 
 ---
 
-## Phase 2: Enhanced Sharing
+## Phase 2: Link Management
+
+### Features
+
+1. **Manage Share Links**
+   - View active share links
+   - Disable/revoke link anytime
+   - Link expiration dates
+
+2. **"Shared with me" View**
+   - Section in library showing workflows shared with you
+   - Leave/remove shared workflows
+
+---
+
+## Phase 3: Direct Sharing
 
 ### Features
 
 1. **Direct User Invite**
    - Search and invite users by email/username
    - In-app notifications when shared with you
-   - "Shared with me" section in library
 
 2. **Access Management**
    - View who has access to your workflow
    - Remove user access
-   - Link expiration dates
 
 3. **Access Mode Control**
    - Control if recipients can access Linear Mode, Workflow Editor, or both
@@ -67,7 +79,8 @@ Enable users to share workflows via shareable links. Recipients can preview, ope
 | Phase | Criteria |
 |-------|----------|
 | Phase 1 | Users can share via link, recipients can preview and fork |
-| Phase 2 | Users can invite others directly, manage access, receive notifications |
+| Phase 2 | Users can manage links, see shared workflows in library |
+| Phase 3 | Users can invite others directly, manage access, receive notifications |
 
 ---
 
