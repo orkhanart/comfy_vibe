@@ -214,8 +214,34 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'billing',
-        name: 'workspace-manage-billing',
-        component: () => import('./views/workspace-admin/WorkspaceBillingView.vue')
+        component: () => import('./views/workspace-admin/WorkspaceBillingView.vue'),
+        children: [
+          {
+            path: '',
+            name: 'workspace-manage-billing',
+            redirect: 'usage'
+          },
+          {
+            path: 'usage',
+            name: 'workspace-manage-billing-usage',
+            component: () => import('./views/workspace-admin/billing/BillingUsageView.vue')
+          },
+          {
+            path: 'history',
+            name: 'workspace-manage-billing-history',
+            component: () => import('./views/workspace-admin/billing/BillingHistoryView.vue')
+          },
+          {
+            path: 'payment-methods',
+            name: 'workspace-manage-billing-payment',
+            component: () => import('./views/workspace-admin/billing/BillingPaymentView.vue')
+          },
+          {
+            path: 'plans',
+            name: 'workspace-manage-billing-plans',
+            component: () => import('./views/workspace-admin/billing/BillingPlansView.vue')
+          },
+        ]
       },
       {
         path: 'content',
