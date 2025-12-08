@@ -367,27 +367,45 @@ export const useShareStore = defineStore('share', () => {
   function accessSharedLink(code: string): SharedWorkflow | null {
     // Find the link by code
     const link = Object.values(shareLinks.value).find(l => l.code === code)
-    if (!link || !link.isActive) return null
 
-    // In real app, this would fetch the workflow from the API
-    // For now, return a mock workflow with a proper name
-    const workflowNames: Record<string, string> = {
-      'wf-1': 'SDXL Lightning Portrait',
-      'wf-2': 'Anime Style Transfer',
-      'wf-3': 'ControlNet Multi-Stack',
+    // If link exists and is active, use its data
+    if (link && link.isActive) {
+      const workflowNames: Record<string, string> = {
+        'wf-1': 'SDXL Lightning Portrait',
+        'wf-2': 'Anime Style Transfer',
+        'wf-3': 'ControlNet Multi-Stack',
+      }
+
+      return {
+        id: `share-link-${code}`,
+        workflowId: link.workflowId,
+        name: workflowNames[link.workflowId] || 'Untitled Workflow',
+        description: 'Workflow accessed via share link',
+        thumbnail: '/assets/card_images/workflow_01.webp',
+        nodeCount: 12,
+        accessMode: link.accessMode,
+        sharedBy: { id: 'user-2', name: 'Alice Chen', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice' },
+        sharedAt: Date.now(),
+      }
     }
 
-    return {
-      id: `share-link-${code}`,
-      workflowId: link.workflowId,
-      name: workflowNames[link.workflowId] || 'Untitled Workflow',
-      description: 'Workflow accessed via share link',
-      thumbnail: '/assets/card_images/workflow_01.webp',
-      nodeCount: 12,
-      accessMode: link.accessMode,
-      sharedBy: { id: 'user-2', name: 'Alice Chen', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice' },
-      sharedAt: Date.now(),
+    // For demo: accept any valid-looking share code (32 chars alphanumeric)
+    // In production, this would validate against the API
+    if (code && code.length >= 16 && /^[a-z0-9]+$/.test(code)) {
+      return {
+        id: `share-link-${code}`,
+        workflowId: 'shared-demo',
+        name: 'Shared Workflow',
+        description: 'Workflow accessed via share link',
+        thumbnail: '/assets/card_images/workflow_01.webp',
+        nodeCount: 12,
+        accessMode: 'both',
+        sharedBy: { id: 'user-2', name: 'Alice Chen', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice' },
+        sharedAt: Date.now(),
+      }
     }
+
+    return null
   }
 
   // ============================================
