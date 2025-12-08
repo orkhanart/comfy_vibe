@@ -193,8 +193,24 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'people',
-        name: 'workspace-manage-people',
-        component: () => import('./views/workspace-admin/WorkspacePeopleView.vue')
+        component: () => import('./views/workspace-admin/WorkspacePeopleView.vue'),
+        children: [
+          {
+            path: '',
+            name: 'workspace-manage-people',
+            redirect: 'members'
+          },
+          {
+            path: 'members',
+            name: 'workspace-manage-people-members',
+            component: () => import('./views/workspace-admin/people/PeopleMembersView.vue')
+          },
+          {
+            path: 'invites',
+            name: 'workspace-manage-people-invites',
+            component: () => import('./views/workspace-admin/people/PeopleInvitesView.vue')
+          },
+        ]
       },
       {
         path: 'billing',
