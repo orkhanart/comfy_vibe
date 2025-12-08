@@ -7,19 +7,19 @@ import { useUiStore, type AdminTabType } from '@/stores/uiStore'
 const route = useRoute()
 const uiStore = useUiStore()
 
-// Map routes to admin tab types
-const routeToTabType: Record<string, AdminTabType> = {
-  '/workspace/manage': 'dashboard',
-  '/workspace/manage/people': 'people',
-  '/workspace/manage/billing': 'billing',
-  '/workspace/manage/content': 'content',
-  '/workspace/manage/settings': 'settings',
-}
+// Map route prefixes to admin tab types
+const routePrefixToTabType: { prefix: string; type: AdminTabType }[] = [
+  { prefix: '/workspace/manage/people', type: 'people' },
+  { prefix: '/workspace/manage/billing', type: 'billing' },
+  { prefix: '/workspace/manage/content', type: 'content' },
+  { prefix: '/workspace/manage/settings', type: 'settings' },
+  { prefix: '/workspace/manage', type: 'dashboard' }, // Must be last (catch-all)
+]
 
 function syncTabWithRoute() {
-  const tabType = routeToTabType[route.path]
-  if (tabType) {
-    uiStore.openAdminTab(tabType)
+  const match = routePrefixToTabType.find(r => route.path.startsWith(r.prefix))
+  if (match) {
+    uiStore.openAdminTab(match.type)
   }
 }
 
