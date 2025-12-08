@@ -3,7 +3,7 @@ import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import WorkflowEditorLogoMenu from './WorkflowEditorLogoMenu.vue'
-import WorkflowEditorShareDialog from './WorkflowEditorShareDialog.vue'
+import { ShareDialog } from '@/components/common'
 import { useUiStore, type AdminTabType, ADMIN_TAB_CONFIG } from '@/stores/uiStore'
 import {
   Popover,
@@ -15,9 +15,19 @@ const router = useRouter()
 const route = useRoute()
 const uiStore = useUiStore()
 const showShareDialog = ref(false)
+const shareWorkflowId = ref<string | null>(null)
 const showMenu = ref(false)
 const showWorkflowsDropdown = ref(false)
 const activeContextMenu = ref<string | null>(null)
+
+// Computed properties for share dialog
+const shareDialogWorkflowId = computed(() => shareWorkflowId.value || uiStore.activeWorkflowTabId)
+const shareDialogWorkflowName = computed(() => {
+  if (shareWorkflowId.value) {
+    return workflows.value.find(w => w.id === shareWorkflowId.value)?.name || 'Workflow'
+  }
+  return uiStore.activeWorkflowName
+})
 
 // Mock data for workflows
 const workflows = ref([
@@ -118,6 +128,7 @@ function handleContextAction(action: string, itemId: string, itemType: 'project'
       // TODO: Implement move
       break
     case 'share':
+      shareWorkflowId.value = itemId
       showShareDialog.value = true
       break
   }
@@ -552,16 +563,18 @@ function handleCloseAdminTab(tabId: string, event: MouseEvent): void {
       <button
         v-tooltip.bottom="{ value: 'Share', showDelay: 50 }"
         class="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-        @click="showShareDialog = true"
+        @click="shareWorkflowId = null; showShareDialog = true"
       >
         <Icon name="share-alt" size="sm" />
       </button>
     </div>
 
     <!-- Share Dialog -->
-    <WorkflowEditorShareDialog
-      v-model:visible="showShareDialog"
-      :workflow-name="uiStore.activeWorkflowName"
+    <ShareDialog
+      v-model:open="showShareDialog"
+      item-type="workflow"
+      :item-name="shareDialogWorkflowName"
+      :item-id="shareDialogWorkflowId"
     />
   </div>
 </template>

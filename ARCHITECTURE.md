@@ -94,7 +94,6 @@ workflow-editor/
 ├── WorkflowEditorRightToolbar.vue # Zoom/fit toolbar
 ├── WorkflowEditorRunControls.vue  # Run/queue controls
 ├── WorkflowEditorLogoMenu.vue     # Logo dropdown menu
-├── WorkflowEditorShareDialog.vue  # Share dialog
 ├── NodePropertiesPanel.vue
 ├── LibrarySidebar.vue
 └── WorkflowsSidebar.vue

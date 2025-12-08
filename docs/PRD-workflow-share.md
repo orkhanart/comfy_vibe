@@ -42,8 +42,7 @@ Implement a workflow sharing system that enables users to:
 ### 2.1 Existing Components
 | Component | Location | Status |
 |-----------|----------|--------|
-| ShareDialog.vue | `src/components/common/` | UI Complete (mock) |
-| WorkflowEditorShareDialog.vue | `src/components/workflow-editor/` | UI Complete (mock) |
+| ShareDialog.vue | `src/components/common/` | UI Complete |
 | WorkflowCard.vue | `src/components/workspace/` | Has share emit |
 | WorkflowContextMenu.vue | `src/components/workspace/` | Has share action |
 | WorkspaceStore | `src/stores/workspaceStore.ts` | Member management exists |

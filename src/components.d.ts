@@ -120,7 +120,6 @@ declare module 'vue' {
     WorkflowEditorLogoMenu: typeof import('./components/workflow-editor/WorkflowEditorLogoMenu.vue')['default']
     WorkflowEditorRightToolbar: typeof import('./components/workflow-editor/WorkflowEditorRightToolbar.vue')['default']
     WorkflowEditorRunControls: typeof import('./components/workflow-editor/WorkflowEditorRunControls.vue')['default']
-    WorkflowEditorShareDialog: typeof import('./components/workflow-editor/WorkflowEditorShareDialog.vue')['default']
     WorkflowEditorTabBar: typeof import('./components/workflow-editor/WorkflowEditorTabBar.vue')['default']
     WorkflowEditorTopBarV2: typeof import('./components/workflow-editor-v2/WorkflowEditorTopBarV2.vue')['default']
     WorkflowFileInfoSidebar: typeof import('./components/workspace/WorkflowFileInfoSidebar.vue')['default']
