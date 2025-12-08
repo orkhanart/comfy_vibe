@@ -376,3 +376,184 @@ export function countItemsInFolder<T extends { folderId?: string | null }>(
 export function countSubfolders(folderId: string, type: Folder['type']): number {
   return MOCK_FOLDERS.filter(f => f.parentId === folderId && f.type === type).length
 }
+
+// ============================================
+// SHARING RELATED TYPES & DATA
+// ============================================
+
+import type { ShareAccessMode } from '@/types/workflowShare'
+
+/**
+ * Extended workflow with sharing info
+ */
+export interface WorkflowWithSharing extends Workflow {
+  ownerId: string
+  isShared?: boolean
+  shareCount?: number
+  accessMode?: ShareAccessMode
+  sharedBy?: {
+    id: string
+    name: string
+    avatar?: string
+  }
+  forkedFrom?: {
+    workflowId: string
+    workflowName: string
+    authorName: string
+  }
+}
+
+/**
+ * Mock shared workflows (workflows shared with current user)
+ */
+export const MOCK_SHARED_WORKFLOWS: WorkflowWithSharing[] = [
+  {
+    id: 'shared-wf-1',
+    name: 'Portrait Generator Pro',
+    description: 'High-quality portrait generation with face enhancement',
+    nodeCount: 18,
+    updatedAt: '2 days ago',
+    updatedTimestamp: Date.now() - 2 * 24 * 60 * 60 * 1000,
+    thumbnail: '/assets/card_images/workflow_01.webp',
+    favorite: false,
+    runtime: '~20s',
+    cost: '$0.04',
+    tags: ['Portrait', 'Face'],
+    ownerId: 'user-2',
+    isShared: true,
+    accessMode: 'linear',
+    sharedBy: {
+      id: 'user-2',
+      name: 'Alice Chen',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice',
+    },
+  },
+  {
+    id: 'shared-wf-2',
+    name: 'SDXL Turbo Pipeline',
+    description: 'Fast 4-step generation with SDXL Turbo',
+    nodeCount: 12,
+    updatedAt: '5 days ago',
+    updatedTimestamp: Date.now() - 5 * 24 * 60 * 60 * 1000,
+    thumbnail: '/assets/card_images/2690a78c-c210-4a52-8c37-3cb5bc4d9e71.webp',
+    favorite: true,
+    runtime: '~8s',
+    cost: '$0.02',
+    tags: ['SDXL', 'Turbo', 'Fast'],
+    ownerId: 'user-3',
+    isShared: true,
+    accessMode: 'both',
+    sharedBy: {
+      id: 'user-3',
+      name: 'Bob Wilson',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=bob',
+    },
+  },
+  {
+    id: 'shared-wf-3',
+    name: 'ControlNet Multi-Stack',
+    description: 'Advanced multi-ControlNet setup for precise control',
+    nodeCount: 24,
+    updatedAt: '1 week ago',
+    updatedTimestamp: Date.now() - 7 * 24 * 60 * 60 * 1000,
+    thumbnail: '/assets/card_images/bacb46ea-7e63-4f19-a253-daf41461e98f.webp',
+    favorite: false,
+    runtime: '~30s',
+    cost: '$0.06',
+    tags: ['ControlNet', 'Advanced'],
+    ownerId: 'user-4',
+    isShared: true,
+    accessMode: 'workflow',
+    sharedBy: {
+      id: 'user-4',
+      name: 'Carol Smith',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=carol',
+    },
+  },
+  {
+    id: 'shared-wf-4',
+    name: 'Anime Style Transfer',
+    description: 'Transform photos into anime style with IPAdapter',
+    nodeCount: 16,
+    updatedAt: '10 days ago',
+    updatedTimestamp: Date.now() - 10 * 24 * 60 * 60 * 1000,
+    thumbnail: '/assets/card_images/228616f4-12ad-426d-84fb-f20e488ba7ee.webp',
+    favorite: false,
+    runtime: '~15s',
+    cost: '$0.03',
+    tags: ['Anime', 'IPAdapter', 'Style'],
+    ownerId: 'user-5',
+    isShared: true,
+    accessMode: 'linear',
+    sharedBy: {
+      id: 'user-5',
+      name: 'David Lee',
+      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=david',
+    },
+  },
+]
+
+/**
+ * Mock forked workflows (workflows the user has forked)
+ */
+export const MOCK_FORKED_WORKFLOWS: WorkflowWithSharing[] = [
+  {
+    id: 'forked-wf-1',
+    name: 'My Portrait Generator',
+    description: 'Customized portrait generation based on Portrait Generator Pro',
+    nodeCount: 20,
+    updatedAt: '1 day ago',
+    updatedTimestamp: Date.now() - 24 * 60 * 60 * 1000,
+    thumbnail: '/assets/card_images/workflow_01.webp',
+    favorite: true,
+    runtime: '~22s',
+    cost: '$0.04',
+    tags: ['Portrait', 'Face', 'Custom'],
+    ownerId: 'user-1',
+    forkedFrom: {
+      workflowId: 'shared-wf-1',
+      workflowName: 'Portrait Generator Pro',
+      authorName: 'Alice Chen',
+    },
+  },
+]
+
+/**
+ * Mock users for share search
+ */
+export const MOCK_SHAREABLE_USERS = [
+  { id: 'user-2', name: 'Alice Chen', email: 'alice@example.com', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice' },
+  { id: 'user-3', name: 'Bob Wilson', email: 'bob@example.com', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=bob' },
+  { id: 'user-4', name: 'Carol Smith', email: 'carol@example.com', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=carol' },
+  { id: 'user-5', name: 'David Lee', email: 'david@example.com', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=david' },
+  { id: 'user-6', name: 'Emma Johnson', email: 'emma@example.com', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=emma' },
+  { id: 'user-7', name: 'Frank Brown', email: 'frank@example.com', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=frank' },
+  { id: 'user-8', name: 'Grace Kim', email: 'grace@example.com', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=grace' },
+  { id: 'user-9', name: 'Henry Davis', email: 'henry@example.com', avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=henry' },
+]
+
+/**
+ * Get all workflows including shared and forked
+ */
+export function getAllWorkflowsWithSharing(): WorkflowWithSharing[] {
+  const ownWorkflows: WorkflowWithSharing[] = MOCK_WORKFLOWS.map(wf => ({
+    ...wf,
+    ownerId: 'user-1',
+  }))
+
+  return [...ownWorkflows, ...MOCK_FORKED_WORKFLOWS]
+}
+
+/**
+ * Get workflows shared with current user
+ */
+export function getSharedWithMeWorkflows(): WorkflowWithSharing[] {
+  return MOCK_SHARED_WORKFLOWS
+}
+
+/**
+ * Get forked workflows
+ */
+export function getForkedWorkflows(): WorkflowWithSharing[] {
+  return MOCK_FORKED_WORKFLOWS
+}

@@ -22,6 +22,8 @@ const props = withDefaults(defineProps<{
   primaryActionIcon?: string
   showNewFolder?: boolean
   isEmpty?: boolean
+  hideFavoritesFilter?: boolean
+  hideCreateFolder?: boolean
 }>(), {
   searchPlaceholder: 'Search...',
   emptyIcon: 'folder',
@@ -29,6 +31,8 @@ const props = withDefaults(defineProps<{
   emptyDescription: 'Try a different search term',
   showNewFolder: true,
   isEmpty: false,
+  hideFavoritesFilter: false,
+  hideCreateFolder: false,
 })
 
 const searchQuery = defineModel<string>('searchQuery', { default: '' })
@@ -105,6 +109,7 @@ const emit = defineEmits<{
 
       <!-- Favorites Filter -->
       <button
+        v-if="!hideFavoritesFilter"
         :class="['flex h-9 w-9 items-center justify-center rounded-lg border transition-colors', showFavoritesOnly ? 'border-amber-500 bg-amber-50 text-amber-500 dark:border-amber-500 dark:bg-amber-500/10' : 'border-zinc-200 bg-white text-zinc-400 hover:border-zinc-300 hover:text-amber-500 dark:border-border dark:bg-muted']"
         @click="showFavoritesOnly = !showFavoritesOnly"
       >
@@ -113,7 +118,7 @@ const emit = defineEmits<{
 
       <!-- New Folder -->
       <button
-        v-if="showNewFolder"
+        v-if="showNewFolder && !hideCreateFolder"
         class="flex h-9 items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-border dark:bg-muted dark:text-foreground dark:hover:bg-accent"
         @click="emit('createFolder')"
       >

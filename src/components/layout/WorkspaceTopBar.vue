@@ -4,6 +4,7 @@ import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import WorkflowEditorLogoMenu from '@/components/workflow-editor/WorkflowEditorLogoMenu.vue'
 import ModeTabs from '@/components/workflow-editor/ModeTabs.vue'
+import { NotificationBell } from '@/components/common'
 import { useUiStore, type AdminTabType } from '@/stores/uiStore'
 import { useWorkspaceStore } from '@/stores/workspaceStore'
 import { getRoleLabel, getRoleBadgeColor } from '@/types/workspace'
@@ -329,6 +330,12 @@ function handleNewWorkflow(): void {
       @close="uiStore.closeWorkflowTab"
       @new="handleNewWorkflow"
     />
+
+    <!-- Spacer -->
+    <div class="flex-1" />
+
+    <!-- Notifications -->
+    <NotificationBell />
 
   </div>
 </template>

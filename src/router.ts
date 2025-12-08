@@ -231,6 +231,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./views/linear-mode-v2/LinearViewV2.vue'),
     props: true
   },
+  {
+    path: '/shared/:code',
+    name: 'shared-workflow',
+    component: () => import('./views/SharedWorkflowView.vue'),
+    props: true
+  },
 ]
 
 const router = createRouter({

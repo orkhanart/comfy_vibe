@@ -2,8 +2,10 @@
 import { Icon } from '@/components/ui/icon'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { FavoriteButton } from '@/components/common'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { DRAG_MIME_TYPE, type DragItem } from '@/composables/common/useFolders'
+import type { ShareAccessMode } from '@/types/workflowShare'
+import { ACCESS_MODE_LABELS, getAccessModeBadgeColor } from '@/types/workflowShare'
 
 export interface Workflow {
   id: string
@@ -22,9 +24,32 @@ export interface Workflow {
 
 interface Props {
   workflow: Workflow
+  /** Whether this workflow is shared (has recipients) */
+  isShared?: boolean
+  /** For received shares: who shared this with the current user */
+  sharedBy?: {
+    name: string
+    avatar?: string
+  }
+  /** Access mode for this workflow (if shared) */
+  accessMode?: ShareAccessMode
+  /** Fork attribution info */
+  forkedFrom?: {
+    workflowName: string
+    authorName: string
+  }
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  isShared: false,
+  sharedBy: undefined,
+  accessMode: undefined,
+  forkedFrom: undefined,
+})
+
+// Computed for showing sharing badges
+const showShareBadge = computed(() => props.isShared || props.sharedBy)
+const showAccessModeBadge = computed(() => props.accessMode !== undefined)
 
 const emit = defineEmits<{
   open: [id: string]
@@ -95,7 +120,7 @@ function handleDragEnd() {
       <div class="absolute inset-0 flex flex-col justify-between p-2">
         <!-- Top row -->
         <div class="flex items-start justify-between">
-          <!-- Tags -->
+          <!-- Tags + Share/Access badges -->
           <div class="flex flex-wrap gap-1">
             <span
               v-for="tag in workflow.tags.slice(0, 2)"
@@ -103,6 +128,22 @@ function handleDragEnd() {
               class="rounded bg-zinc-900/70 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm"
             >
               {{ tag }}
+            </span>
+            <!-- Shared badge -->
+            <span
+              v-if="showShareBadge"
+              class="inline-flex items-center gap-0.5 rounded bg-blue-500/80 px-1.5 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm"
+            >
+              <Icon name="users" size="xs" />
+              {{ sharedBy ? 'Shared' : 'Sharing' }}
+            </span>
+            <!-- Access mode badge -->
+            <span
+              v-if="showAccessModeBadge && accessMode"
+              class="rounded px-1.5 py-0.5 text-[10px] font-medium backdrop-blur-sm"
+              :class="getAccessModeBadgeColor(accessMode)"
+            >
+              {{ ACCESS_MODE_LABELS[accessMode] }}
             </span>
           </div>
           <!-- Favorite -->
@@ -138,14 +179,15 @@ function handleDragEnd() {
         </div>
       </div>
     </div>
-    <!-- Name & Menu -->
-    <div class="mt-2 flex items-center justify-between gap-1 px-1">
-      <h3
-        :title="workflow.name"
-        class="min-w-0 flex-1 truncate text-sm font-medium text-zinc-900 dark:text-foreground"
-      >
-        {{ workflow.name }}
-      </h3>
+    <!-- Name, Attribution & Menu -->
+    <div class="mt-2 px-1">
+      <div class="flex items-center justify-between gap-1">
+        <h3
+          :title="workflow.name"
+          class="min-w-0 flex-1 truncate text-sm font-medium text-zinc-900 dark:text-foreground"
+        >
+          {{ workflow.name }}
+        </h3>
       <Popover v-model:open="menuOpen">
         <PopoverTrigger as-child>
           <button
@@ -202,6 +244,32 @@ function handleDragEnd() {
           </button>
         </PopoverContent>
       </Popover>
+      </div>
+      <!-- Shared by / Fork attribution -->
+      <div
+        v-if="sharedBy || forkedFrom"
+        class="mt-0.5 flex items-center gap-1 text-xs text-zinc-500 dark:text-zinc-400"
+      >
+        <!-- Shared by info -->
+        <template v-if="sharedBy">
+          <span>Shared by</span>
+          <img
+            v-if="sharedBy.avatar"
+            :src="sharedBy.avatar"
+            :alt="sharedBy.name"
+            class="h-4 w-4 rounded-full object-cover"
+          />
+          <span class="font-medium text-zinc-600 dark:text-zinc-300">{{ sharedBy.name }}</span>
+        </template>
+        <!-- Fork attribution -->
+        <template v-else-if="forkedFrom">
+          <Icon name="git-branch" size="xs" />
+          <span class="truncate">
+            Forked from <span class="font-medium text-zinc-600 dark:text-zinc-300">{{ forkedFrom.workflowName }}</span>
+            by <span class="font-medium text-zinc-600 dark:text-zinc-300">{{ forkedFrom.authorName }}</span>
+          </span>
+        </template>
+      </div>
     </div>
   </div>
 </template>

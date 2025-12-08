@@ -45,6 +45,9 @@ const isInsideSubgraph = computed(() => !!uiStore.activeSubgraphId)
 // Subgraph context menu state
 const showSubgraphContextMenu = ref(false)
 
+// Workflow tab dropdown state
+const showWorkflowTabDropdown = ref(false)
+
 function handleLogoClick(): void {
   showMenu.value = !showMenu.value
 }
@@ -56,7 +59,12 @@ function handleHomeClick(): void {
 function handleWorkflowSelect(workflowId: string): void {
   selectedWorkflow.value = workflowId
   showWorkflowsDropdown.value = false
+  showWorkflowTabDropdown.value = false
   uiStore.selectWorkflowTab(workflowId)
+  // Exit any subgraph when switching workflows
+  if (uiStore.activeSubgraphId) {
+    uiStore.selectSubgraph('')
+  }
   console.log('Selected workflow:', workflowId)
 }
 
@@ -250,21 +258,66 @@ function handleCloseAdminTab(tabId: string, event: MouseEvent): void {
         v-if="tab.id === selectedWorkflow"
         class="flex items-center rounded-md bg-accent"
       >
-        <!-- Workflow name (clickable to exit all subgraphs when inside) -->
-        <div
-          class="group flex h-7 items-center gap-1.5 pl-2 pr-2 text-xs font-medium text-accent-foreground transition-colors"
-          :class="[isInsideSubgraph ? 'hover:bg-background/20 cursor-pointer' : 'rounded-md']"
-          @click="isInsideSubgraph && handleExitSubgraph()"
+        <!-- Workflow name with dropdown -->
+        <Popover v-model:open="showWorkflowTabDropdown">
+          <PopoverTrigger as-child>
+            <div
+              class="group flex h-7 items-center gap-1 pl-2 pr-1.5 text-xs font-medium text-accent-foreground transition-colors cursor-pointer"
+              :class="[isInsideSubgraph ? '' : 'rounded-md']"
+            >
+              <span class="max-w-[100px] truncate">{{ tab.name }}</span>
+              <Icon name="chevron-down" size="xs" class="opacity-50" />
+            </div>
+          </PopoverTrigger>
+          <PopoverContent align="start" :side-offset="4" class="w-[220px] p-1">
+            <div class="flex flex-col">
+              <!-- Workflow List -->
+              <div
+                v-for="workflow in workflows"
+                :key="workflow.id"
+                class="group flex items-center justify-between rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-accent cursor-pointer"
+                :class="{ 'bg-accent/50': workflow.id === selectedWorkflow }"
+                @click="handleWorkflowSelect(workflow.id)"
+              >
+                <div class="flex items-center gap-2 min-w-0">
+                  <Icon name="sitemap" size="sm" class="shrink-0 opacity-60" />
+                  <span class="truncate">{{ workflow.name }}</span>
+                </div>
+                <Icon v-if="workflow.id === selectedWorkflow" name="check" size="xs" class="shrink-0 text-primary" />
+              </div>
+
+              <!-- Divider -->
+              <div class="my-1 h-px bg-border" />
+
+              <!-- Action Buttons Row -->
+              <div class="flex items-center gap-1">
+                <button
+                  class="flex flex-1 items-center gap-1.5 rounded-md bg-muted px-3 py-1.5 text-sm text-foreground transition-colors hover:bg-muted/80"
+                  @click="handleCreateWorkflow"
+                >
+                  <Icon name="plus" size="xs" />
+                  <span>New Workflow</span>
+                </button>
+                <button
+                  v-tooltip.bottom="{ value: 'Import workflow', showDelay: 50 }"
+                  class="flex h-8 w-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                  @click="handleImportWorkflow"
+                >
+                  <Icon name="upload" size="sm" />
+                </button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        <!-- Close button (only when not inside subgraph) -->
+        <span
+          v-if="!isInsideSubgraph"
+          class="flex h-4 w-4 items-center justify-center rounded text-accent-foreground/50 hover:bg-background/50 hover:text-accent-foreground cursor-pointer mr-1.5"
+          @click.stop="handleCloseWorkflowTab(tab.id, $event)"
         >
-          <span class="max-w-[100px] truncate">{{ tab.name }}</span>
-          <span
-            v-if="!isInsideSubgraph"
-            class="flex h-4 w-4 items-center justify-center rounded text-accent-foreground/50 hover:bg-background/50 hover:text-accent-foreground cursor-pointer"
-            @click.stop="handleCloseWorkflowTab(tab.id, $event)"
-          >
-            <Icon name="times" size="xs" />
-          </span>
-        </div>
+          <Icon name="times" size="xs" />
+        </span>
 
         <!-- Subgraph breadcrumbs (shown when inside any subgraph) -->
         <template v-if="isInsideSubgraph">

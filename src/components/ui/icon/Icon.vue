@@ -48,6 +48,7 @@ import {
   Folder,
   FolderOpen,
   FolderPlus,
+  GitBranch,
   Grid,
   HardDrive,
   Heart,
@@ -240,9 +241,17 @@ const iconMap: Record<string, LucideIcon> = {
   'question-circle': AlertCircle,
   'exclamation-circle': AlertCircle,
   'exclamation-triangle': AlertTriangle,
+  'alert-circle': AlertCircle,
   'check-circle': CheckCircle,
   'times-circle': X,
   'verified': CheckCircle,
+  'x': X,
+
+  // Git
+  'git-branch': GitBranch,
+
+  // Objects extras
+  'cube': Box,
 
   // System
   'home': Home,

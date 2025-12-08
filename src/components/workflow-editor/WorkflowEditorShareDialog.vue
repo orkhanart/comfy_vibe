@@ -1,37 +1,24 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
-import { ref, computed } from 'vue'
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem
-} from '@/components/ui/select'
+import { ref, computed, watch } from 'vue'
+import { useShareStore } from '@/stores/shareStore'
+import type { ShareAccessMode, ShareableUser } from '@/types/workflowShare'
+import { ACCESS_MODE_LABELS, getAccessModeBadgeColor } from '@/types/workflowShare'
 
-interface SharedUser {
-  id: string
-  name: string
-  email: string
-  avatar?: string
-  initials: string
-  role: 'owner' | 'editor' | 'viewer'
-  color: string
-}
-
-const props = defineProps<{
+interface Props {
   visible: boolean
   workflowName?: string
-}>()
+  workflowId?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  workflowName: 'Workflow',
+  workflowId: 'workflow-editor-current',
+})
 
 const emit = defineEmits<{
   'update:visible': [value: boolean]
@@ -42,266 +29,229 @@ const dialogVisible = computed({
   set: (value) => emit('update:visible', value)
 })
 
-const inviteEmail = ref('')
-const inviteRole = ref<'editor' | 'viewer'>('editor')
+const shareStore = useShareStore()
+
+// State
+const searchQuery = ref('')
 const linkCopied = ref(false)
-const linkAccess = ref<'restricted' | 'anyone'>('restricted')
-const linkPermission = ref<'viewer' | 'editor'>('viewer')
+const accessMode = ref<ShareAccessMode>('linear')
+const searchResults = ref<ShareableUser[]>([])
 
-const roleOptions = [
-  { label: 'Can edit', value: 'editor' },
-  { label: 'Can view', value: 'viewer' }
-]
+// Get existing shares for this workflow
+const existingShares = computed(() => shareStore.getWorkflowShares(props.workflowId))
 
-const linkAccessOptions = [
-  { label: 'Restricted', value: 'restricted', description: 'Only people with access can open' },
-  { label: 'Anyone with the link', value: 'anyone', description: 'Anyone on the internet with the link can view' }
-]
+// Get existing share link for this workflow
+const shareLink = computed(() => shareStore.getShareLink(props.workflowId))
 
-const sharedUsers = ref<SharedUser[]>([
-  { id: '1', name: 'John Doe', email: 'john@example.com', initials: 'JD', role: 'owner', color: 'bg-blue-600' },
-  { id: '2', name: 'Sarah Wilson', email: 'sarah@example.com', initials: 'SW', role: 'editor', color: 'bg-purple-600' },
-  { id: '3', name: 'Mike Chen', email: 'mike@example.com', initials: 'MC', role: 'viewer', color: 'bg-green-600' }
-])
+// Access mode options
+const accessModes: ShareAccessMode[] = ['linear', 'workflow', 'both']
 
-const shareLink = computed(() => {
-  return `https://comfy.app/share/${props.workflowName?.toLowerCase().replace(/\s+/g, '-') || 'workflow'}`
+// Initialize state when dialog opens
+watch(() => props.visible, (isOpen) => {
+  if (isOpen) {
+    const settings = shareStore.getShareSettings(props.workflowId)
+    accessMode.value = settings.accessMode
+    searchQuery.value = ''
+    searchResults.value = []
+    linkCopied.value = false
+  }
 })
 
-function copyLink(): void {
-  navigator.clipboard.writeText(shareLink.value)
-  linkCopied.value = true
-  setTimeout(() => {
-    linkCopied.value = false
-  }, 2000)
+// Search users when query changes
+watch(searchQuery, (query) => {
+  if (query.length < 2) {
+    searchResults.value = []
+    return
+  }
+  const excludeIds = existingShares.value.map(s => s.sharedWith)
+  searchResults.value = shareStore.searchUsers(query, excludeIds)
+})
+
+// Update access mode for all shares when changed
+watch(accessMode, (newMode) => {
+  shareStore.updateWorkflowAccessMode(props.workflowId, newMode)
+})
+
+function addUser(user: ShareableUser) {
+  shareStore.shareWorkflow(props.workflowId, {
+    userIds: [user.id],
+    accessMode: accessMode.value,
+  })
+  searchQuery.value = ''
+  searchResults.value = []
 }
 
-function inviteUser(): void {
-  if (!inviteEmail.value) return
-
-  const newUser: SharedUser = {
-    id: Date.now().toString(),
-    name: inviteEmail.value.split('@')[0] || 'User',
-    email: inviteEmail.value,
-    initials: inviteEmail.value.substring(0, 2).toUpperCase(),
-    role: inviteRole.value,
-    color: ['bg-pink-600', 'bg-amber-600', 'bg-cyan-600', 'bg-indigo-600'][Math.floor(Math.random() * 4)] || 'bg-muted'
-  }
-
-  sharedUsers.value.push(newUser)
-  inviteEmail.value = ''
+function removeShare(shareId: string) {
+  shareStore.removeShare(props.workflowId, shareId)
 }
 
-function updateUserRole(userId: string, role: 'editor' | 'viewer'): void {
-  const user = sharedUsers.value.find(u => u.id === userId)
-  if (user && user.role !== 'owner') {
-    user.role = role
+function generateOrCopyLink() {
+  if (!shareLink.value) {
+    shareStore.createShareLink(props.workflowId, accessMode.value)
   }
+  copyLink()
 }
 
-function removeUser(userId: string): void {
-  const index = sharedUsers.value.findIndex(u => u.id === userId)
-  if (index > -1 && sharedUsers.value[index]?.role !== 'owner') {
-    sharedUsers.value.splice(index, 1)
+async function copyLink() {
+  const success = await shareStore.copyShareLink(props.workflowId)
+  if (success) {
+    linkCopied.value = true
+    setTimeout(() => {
+      linkCopied.value = false
+    }, 2000)
   }
 }
 
-function getRoleLabel(role: string): string {
-  switch (role) {
-    case 'owner': return 'Owner'
-    case 'editor': return 'Can edit'
-    case 'viewer': return 'Can view'
-    default: return role
-  }
+function getInitials(name: string): string {
+  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+}
+
+function formatShareLink(code: string): string {
+  return `${window.location.origin}/shared/${code}`
 }
 </script>
 
 <template>
   <Dialog v-model:open="dialogVisible">
-    <DialogContent class="max-w-[480px] gap-0 p-0">
-      <DialogHeader class="border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
-        <DialogTitle>Share "{{ workflowName || 'Workflow' }}"</DialogTitle>
-        <DialogDescription>Invite others to collaborate</DialogDescription>
-      </DialogHeader>
-
-      <div class="p-5">
-        <!-- Invite Section -->
-        <div class="mb-5">
-          <label class="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Invite people
-          </label>
-          <div class="flex gap-2">
-            <div class="relative flex-1">
-              <Icon name="envelope" size="sm" class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                v-model="inviteEmail"
-                placeholder="Enter email address"
-                class="pl-9"
-                @keyup.enter="inviteUser"
-              />
-            </div>
-            <Select v-model="inviteRole">
-              <SelectTrigger class="w-32">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-for="opt in roleOptions"
-                  :key="opt.value"
-                  :value="opt.value"
-                >
-                  {{ opt.label }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-            <button
-              class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-500 disabled:opacity-50"
-              :disabled="!inviteEmail"
-              @click="inviteUser"
-            >
-              Invite
-            </button>
-          </div>
-        </div>
-
-        <!-- People with access -->
-        <div class="mb-5">
-          <label class="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            People with access
-          </label>
-          <div class="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-zinc-200 dark:border-zinc-800">
-            <div
-              v-for="user in sharedUsers"
-              :key="user.id"
-              class="group flex items-center gap-3 px-3 py-2.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
-            >
-              <!-- Avatar -->
-              <div
-                :class="[
-                  'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-xs font-semibold text-white',
-                  user.color
-                ]"
-              >
-                {{ user.initials }}
-              </div>
-
-              <!-- User info -->
-              <div class="min-w-0 flex-1">
-                <p class="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
-                  {{ user.name }}
-                  <span v-if="user.role === 'owner'" class="ml-1 text-xs text-muted-foreground">(you)</span>
-                </p>
-                <p class="truncate text-xs text-muted-foreground dark:text-muted-foreground">{{ user.email }}</p>
-              </div>
-
-              <!-- Role selector / Remove -->
-              <div class="flex items-center gap-1">
-                <Select
-                  v-if="user.role !== 'owner'"
-                  :model-value="user.role"
-                  @update:model-value="updateUserRole(user.id, $event as 'editor' | 'viewer')"
-                >
-                  <SelectTrigger class="h-7 w-24 border-0 bg-transparent text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem
-                      v-for="opt in roleOptions"
-                      :key="opt.value"
-                      :value="opt.value"
-                    >
-                      {{ opt.label }}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <span v-else class="px-2 text-xs text-muted-foreground">{{ getRoleLabel(user.role) }}</span>
-
-                <button
-                  v-if="user.role !== 'owner'"
-                  class="rounded p-1 text-muted-foreground opacity-0 transition-all hover:bg-zinc-200 hover:text-zinc-600 group-hover:opacity-100 dark:hover:bg-zinc-700 dark:hover:text-zinc-300"
-                  @click="removeUser(user.id)"
-                >
-                  <Icon name="times" size="xs" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Link sharing section -->
-        <div class="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-800/50">
-          <div class="mb-3 flex items-start gap-3">
-            <div class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-zinc-200 dark:bg-zinc-700">
-              <Icon name="link" size="md" class="text-zinc-600 dark:text-muted-foreground" />
-            </div>
-            <div class="flex-1">
-              <Select v-model="linkAccess">
-                <SelectTrigger class="h-auto w-full justify-start border-0 bg-transparent p-0 text-sm font-medium">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem
-                    v-for="opt in linkAccessOptions"
-                    :key="opt.value"
-                    :value="opt.value"
-                  >
-                    {{ opt.label }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <p class="mt-0.5 text-xs text-muted-foreground dark:text-muted-foreground">
-                {{ linkAccess === 'restricted' ? 'Only people with access can open' : 'Anyone on the internet with the link' }}
-              </p>
-            </div>
-            <Select v-if="linkAccess === 'anyone'" v-model="linkPermission">
-              <SelectTrigger class="w-28">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem
-                  v-for="opt in roleOptions"
-                  :key="opt.value"
-                  :value="opt.value"
-                >
-                  {{ opt.label }}
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <!-- Copy link -->
-          <div class="flex gap-2">
-            <div class="flex-1 truncate rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-muted-foreground">
-              {{ shareLink }}
-            </div>
-            <button
-              :class="[
-                'flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                linkCopied
-                  ? 'bg-green-600 text-white'
-                  : 'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200'
-              ]"
-              @click="copyLink"
-            >
-              <Icon :name="linkCopied ? 'check' : 'copy'" size="xs" />
-              {{ linkCopied ? 'Copied!' : 'Copy link' }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <DialogFooter class="flex-row items-center justify-between border-t border-zinc-200 px-5 py-4 dark:border-zinc-800">
-        <button class="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-zinc-700 dark:text-muted-foreground dark:hover:text-zinc-200">
-          <Icon name="cog" size="xs" />
-          Advanced settings
-        </button>
+    <DialogContent class="max-w-[480px] gap-0 overflow-hidden p-0">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
+        <h2 class="text-base font-semibold text-zinc-900 dark:text-foreground">
+          Share "{{ workflowName }}"
+        </h2>
         <button
-          class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-500"
+          class="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
           @click="dialogVisible = false"
         >
-          Done
+          <Icon name="x" size="sm" />
         </button>
-      </DialogFooter>
+      </div>
+
+      <!-- Content -->
+      <div class="p-4">
+        <!-- Access Mode Tabs -->
+        <div class="mb-4">
+          <div class="inline-flex rounded-lg bg-zinc-100 p-0.5 dark:bg-zinc-800">
+            <button
+              v-for="mode in accessModes"
+              :key="mode"
+              class="rounded-md px-3 py-1.5 text-xs font-medium transition-all"
+              :class="accessMode === mode
+                ? 'bg-white text-zinc-900 shadow-sm dark:bg-zinc-700 dark:text-foreground'
+                : 'text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'"
+              @click="accessMode = mode"
+            >
+              {{ ACCESS_MODE_LABELS[mode] }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Invite Input -->
+        <div class="relative mb-3">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="Invite by name or email"
+            class="w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-zinc-600 dark:bg-zinc-800 dark:text-foreground dark:placeholder-zinc-500 dark:focus:border-blue-400"
+          />
+          <!-- Search Dropdown -->
+          <div
+            v-if="searchResults.length > 0"
+            class="absolute left-0 right-0 top-full z-10 mt-1 max-h-52 overflow-auto rounded-lg border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-800"
+          >
+            <button
+              v-for="user in searchResults"
+              :key="user.id"
+              class="flex w-full items-center gap-3 px-3 py-2 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-700/50"
+              @click="addUser(user)"
+            >
+              <img
+                v-if="user.avatar"
+                :src="user.avatar"
+                :alt="user.name"
+                class="h-7 w-7 rounded-full object-cover"
+              />
+              <div
+                v-else
+                class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 text-[10px] font-medium text-white"
+              >
+                {{ getInitials(user.name) }}
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium text-zinc-900 dark:text-foreground">{{ user.name }}</p>
+                <p class="truncate text-xs text-zinc-500">{{ user.email }}</p>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- People with Access -->
+        <div v-if="existingShares.length > 0" class="mb-4">
+          <p class="mb-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            People with access
+          </p>
+          <div class="space-y-0.5">
+            <div
+              v-for="share in existingShares"
+              :key="share.id"
+              class="group flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+            >
+              <img
+                v-if="share.user.avatar"
+                :src="share.user.avatar"
+                :alt="share.user.name"
+                class="h-7 w-7 rounded-full object-cover"
+              />
+              <div
+                v-else
+                class="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 text-[10px] font-medium text-white"
+              >
+                {{ getInitials(share.user.name) }}
+              </div>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm text-zinc-900 dark:text-foreground">{{ share.user.name }}</p>
+              </div>
+              <span
+                class="rounded px-1.5 py-0.5 text-[10px] font-medium"
+                :class="getAccessModeBadgeColor(share.accessMode)"
+              >
+                {{ ACCESS_MODE_LABELS[share.accessMode] }}
+              </span>
+              <button
+                class="flex h-6 w-6 items-center justify-center rounded text-zinc-400 opacity-0 transition-all hover:bg-zinc-200 hover:text-zinc-600 group-hover:opacity-100 dark:hover:bg-zinc-700 dark:hover:text-zinc-300"
+                title="Remove"
+                @click="removeShare(share.id)"
+              >
+                <Icon name="x" size="xs" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Copy Link Section -->
+        <div class="flex items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 p-2 dark:border-zinc-700 dark:bg-zinc-800/50">
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-zinc-200 dark:bg-zinc-700">
+            <Icon name="link" size="sm" class="text-zinc-500 dark:text-zinc-400" />
+          </div>
+          <div class="min-w-0 flex-1">
+            <p v-if="shareLink" class="truncate text-xs text-zinc-500 dark:text-zinc-400">
+              {{ formatShareLink(shareLink.code) }}
+            </p>
+            <p v-else class="text-xs text-zinc-500 dark:text-zinc-400">
+              Anyone with the link can view
+            </p>
+          </div>
+          <button
+            class="shrink-0 rounded-md px-3 py-1.5 text-xs font-medium transition-all"
+            :class="linkCopied
+              ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400'
+              : 'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200'"
+            @click="generateOrCopyLink"
+          >
+            {{ linkCopied ? 'Copied!' : 'Copy link' }}
+          </button>
+        </div>
+      </div>
     </DialogContent>
   </Dialog>
 </template>

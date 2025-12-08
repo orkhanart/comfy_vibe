@@ -1,13 +1,24 @@
 <script setup lang="ts">
 import { Icon } from '@/components/ui/icon'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useUiStore, type AdminTabType, ADMIN_TAB_CONFIG } from '@/stores/uiStore'
 import ModeTabs from '@/components/workflow-editor/ModeTabs.vue'
+import { ShareDialog } from '@/components/common'
 
 const router = useRouter()
 const route = useRoute()
 const uiStore = useUiStore()
+
+// Share dialog
+const showShareDialog = ref(false)
+const currentWorkflowName = computed(() => {
+  const activeTab = uiStore.workflowTabs.find(t => t.id === uiStore.activeWorkflowTabId)
+  return activeTab?.name || 'Workflow'
+})
+const currentWorkflowId = computed(() => {
+  return uiStore.activeWorkflowTabId || 'linear-workflow'
+})
 
 const showMenu = ref(false)
 
@@ -245,9 +256,20 @@ function handleCloseAdminTab(tabId: string, event: MouseEvent): void {
       <button
         v-tooltip.bottom="{ value: 'Share', showDelay: 50 }"
         class="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+        @click="showShareDialog = true"
       >
         <Icon name="share-alt" size="sm" />
       </button>
     </div>
   </header>
+
+  <!-- Share Dialog (outside header to avoid z-index issues) -->
+  <Teleport to="body">
+    <ShareDialog
+      v-model:open="showShareDialog"
+      item-type="workflow"
+      :item-name="currentWorkflowName"
+      :item-id="currentWorkflowId"
+    />
+  </Teleport>
 </template>
