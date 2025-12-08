@@ -17,14 +17,12 @@ Implement a workflow sharing system that enables users to:
 - Share workflows via shareable links (requires login to access)
 - Allow recipients to view and fork (duplicate with attribution) workflows
 - **Control access mode: allow recipients to view in Workflow Mode (node editor), Linear Mode (simplified UI), or both**
-- Optionally publish workflows to a discoverable gallery
 
 ### 1.3 Goals
 - Enable sharing workflows with other ComfyUI users and team members
 - Support both direct invite and link-based sharing
 - Provide View + Duplicate permissions (no collaborative editing)
 - Allow workflow builders to control which mode(s) recipients can access
-- Allow optional public discovery of workflows
 - Deliver in-app notifications for share events
 
 ### 1.4 Non-Goals (v1)
@@ -95,8 +93,7 @@ interface WorkspaceInvite {
 - **US-2:** As a workflow owner, I want to generate a shareable link so I can quickly share without entering emails.
 - **US-3:** As a workflow owner, I want to revoke access from users who no longer need it.
 - **US-4:** As a workflow owner, I want to see who has access to my workflow at any time.
-- **US-5:** As a workflow owner, I want to optionally list my workflow in a public gallery for discovery.
-- **US-6:** As a workflow owner, I want to control whether recipients can access my workflow in Workflow Mode (node editor), Linear Mode (simplified UI), or both.
+- **US-5:** As a workflow owner, I want to control whether recipients can access my workflow in Workflow Mode (node editor), Linear Mode (simplified UI), or both.
 
 ### 3.2 Share Recipient
 - **US-7:** As a share recipient, I want to receive an in-app notification when someone shares a workflow with me.
@@ -192,17 +189,7 @@ Workflow builders can control which mode(s) recipients are allowed to access:
 | FR-6.4 | Leave/remove from "Shared with me" | P0 |
 | FR-6.5 | Sort by date shared | P1 |
 
-### 4.7 Discovery (Optional Public Gallery)
-
-| Requirement | Description | Priority |
-|-------------|-------------|----------|
-| FR-7.1 | Owner can toggle "List in public gallery" | P1 |
-| FR-7.2 | Public workflows appear in browse/search | P1 |
-| FR-7.3 | Public workflows still require login to view/fork | P1 |
-| FR-7.4 | Gallery shows workflow thumbnail, name, author, fork count | P1 |
-| FR-7.5 | Gallery shows access mode badge (Linear/Workflow/Both) | P1 |
-
-### 4.8 Notifications
+### 4.7 Notifications
 
 | Requirement | Description | Priority |
 |-------------|-------------|----------|
@@ -245,7 +232,6 @@ export interface WorkflowShareLink {
 
 export interface WorkflowShareSettings {
   accessMode: ShareAccessMode  // default: 'linear'
-  isPublic: boolean            // listed in public gallery
   shareLink?: WorkflowShareLink
 }
 
@@ -299,7 +285,7 @@ DELETE /api/workflows/:workflowId/shares/:shareId
 
 // Update share settings (access mode, etc.)
 PATCH  /api/workflows/:workflowId/share-settings
-Body: { accessMode?: ShareAccessMode, isPublic?: boolean }
+Body: { accessMode?: ShareAccessMode }
 
 // ============================================
 // LINK SHARING
@@ -347,19 +333,6 @@ Response: { workflows: SharedWorkflow[] }
 
 // Leave shared workflow
 DELETE /api/users/me/shared-workflows/:workflowId
-
-// ============================================
-// PUBLIC GALLERY (P1)
-// ============================================
-
-// Toggle public visibility
-PATCH  /api/workflows/:workflowId/visibility
-Body: { isPublic: boolean }
-
-// Browse public workflows
-GET    /api/gallery/workflows
-Query: { search?, sort?, page?, limit? }
-Response: { workflows: PublicWorkflow[], total: number }
 
 // ============================================
 // NOTIFICATIONS
@@ -487,14 +460,6 @@ interface Props {
   component: () => import('@/views/SharedWorkflowView.vue'),
   meta: { requiresAuth: true }
 }
-
-// Public gallery (P1)
-{
-  path: '/gallery',
-  name: 'gallery',
-  component: () => import('@/views/GalleryView.vue'),
-  meta: { requiresAuth: true }
-}
 ```
 
 ### 5.6 Workflow Model Extension
@@ -506,12 +471,8 @@ interface Workflow {
 
   // New sharing fields
   ownerId: string
-  visibility: {
-    isPublic: boolean
-    shareLink?: WorkflowShareLink
-  }
+  shareLink?: WorkflowShareLink
   forkMetadata?: WorkflowForkMetadata
-  forkCount?: number           // For public gallery display
 }
 ```
 
@@ -555,11 +516,6 @@ interface Workflow {
 │  │ 🔗 https://comfy.app/shared/abc123...    [Copy] [⚙] │   │
 │  └─────────────────────────────────────────────────────┘   │
 │  ℹ️ Anyone with this link can view/fork in Linear Mode     │
-│                                                             │
-│  ─────────────────────────────────────────────────────────  │
-│                                                             │
-│  □ List in public gallery                                   │
-│    Make this workflow discoverable by all users             │
 │                                                             │
 ├─────────────────────────────────────────────────────────────┤
 │                                                    [Done]   │
@@ -718,7 +674,6 @@ interface Workflow {
 
 ### 7.3 Data Privacy
 - Private workflows only accessible via direct share or link
-- Public gallery workflows still require login
 - Fork attribution preserves original author credit
 
 ---
@@ -740,13 +695,7 @@ interface Workflow {
 - [ ] Build in-app notification system
 - [ ] Add notification bell to header
 
-### Phase 2: Public Gallery (P1)
-- [ ] Add "List in public gallery" toggle to share dialog
-- [ ] Create GalleryView with browse/search
-- [ ] Display fork counts on public workflows
-- [ ] Gallery sorting (popular, recent, etc.)
-
-### Phase 3: Enhanced Features (P2)
+### Phase 2: Enhanced Features (P2)
 - [ ] Link expiration dates
 - [ ] Pending invites for non-registered users
 - [ ] Transfer ownership functionality
@@ -762,7 +711,6 @@ interface Workflow {
 | What permissions do recipients get? | View + Fork (no edit) |
 | How does forking work? | Creates private copy with "Forked from X by Y" attribution |
 | Analytics on shares? | None for v1 |
-| Public discovery? | Optional - owner chooses to list in gallery |
 | Who can manage shares? | Owner + Workspace admins |
 | Notification method? | In-app only (no email for v1) |
 | **Access mode control?** | **Owner chooses: Linear Mode only, Workflow Mode only, or Both** |
@@ -813,7 +761,6 @@ interface Workflow {
 | `SharedWorkflowView.vue` | Page for accessing workflow via share link |
 | `NotificationBell.vue` | Header notification icon with dropdown |
 | `NotificationItem.vue` | Individual notification in dropdown |
-| `GalleryView.vue` | Public workflow browse page (P1) |
 
 ### C. New Files to Create
 
