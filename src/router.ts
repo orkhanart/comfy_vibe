@@ -279,6 +279,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./views/SharedWorkflowView.vue'),
     props: true
   },
+  // Test routes
+  {
+    path: '/test/share-dialog',
+    name: 'test-share-dialog',
+    component: () => import('./views/test/ShareDialogTest.vue')
+  },
 ]
 
 const router = createRouter({
