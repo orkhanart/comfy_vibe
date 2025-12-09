@@ -111,16 +111,10 @@ function formatShareLink(code: string): string {
   <Dialog :open="open" @update:open="emit('update:open', $event)">
     <DialogContent class="max-w-[480px] gap-0 overflow-hidden p-0">
       <!-- Header -->
-      <div class="flex items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
+      <div class="flex items-center border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
         <h2 class="text-base font-semibold text-zinc-900 dark:text-foreground">
           Share "{{ itemName }}"
         </h2>
-        <button
-          class="flex h-7 w-7 items-center justify-center rounded-md text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
-          @click="emit('update:open', false)"
-        >
-          <Icon name="x" size="sm" />
-        </button>
       </div>
 
       <!-- Content -->
