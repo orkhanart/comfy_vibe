@@ -1,10 +1,17 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, markRaw } from 'vue'
+import { VueFlow, useVueFlow } from '@vue-flow/core'
+import { Background } from '@vue-flow/background'
+import '@vue-flow/core/dist/style.css'
+import '@vue-flow/core/dist/theme-default.css'
+
 import { Icon } from '@/components/ui/icon'
+import { FlowNode } from '@/components/nodes'
 import {
   Dialog,
   DialogContent,
 } from '@/components/ui/dialog'
+import { DEMO_WORKFLOW_NODES, DEMO_WORKFLOW_EDGES } from '@/data/workflowMockData'
 
 // States
 const selectedView = ref<'creator' | 'consumer'>('creator')
@@ -21,6 +28,7 @@ const mockWorkflow = {
   name: 'Portrait Generator Pro',
   description: 'High-quality portrait generation with SDXL and face enhancement',
   author: 'Alice Chen',
+  authorAvatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice',
   nodeCount: 18,
   publishedUrl: 'https://comfy.org/w/abc123xyz',
   publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
@@ -64,6 +72,46 @@ const publishedDate = computed(() => {
     year: 'numeric'
   })
 })
+
+// VueFlow setup
+const nodeTypes = { flowNode: markRaw(FlowNode) }
+const previewNodes = ref(JSON.parse(JSON.stringify(DEMO_WORKFLOW_NODES)))
+const previewEdges = ref(JSON.parse(JSON.stringify(DEMO_WORKFLOW_EDGES)))
+const bgNodes = ref(JSON.parse(JSON.stringify(DEMO_WORKFLOW_NODES)))
+const bgEdges = ref(JSON.parse(JSON.stringify(DEMO_WORKFLOW_EDGES)))
+
+const { fitView, zoomIn, zoomOut, getViewport } = useVueFlow({ id: 'consumer-preview' })
+const zoomLevel = ref(75)
+const patternColor = '#27272a'
+const bgPatternColor = '#1f1f23'
+
+function handleCanvasReady() {
+  setTimeout(() => {
+    fitView({ padding: 0.15, maxZoom: 0.6 })
+    zoomLevel.value = Math.round(getViewport().zoom * 100)
+  }, 100)
+}
+
+function handleZoomIn() {
+  zoomIn()
+  setTimeout(() => {
+    zoomLevel.value = Math.round(getViewport().zoom * 100)
+  }, 50)
+}
+
+function handleZoomOut() {
+  zoomOut()
+  setTimeout(() => {
+    zoomLevel.value = Math.round(getViewport().zoom * 100)
+  }, 50)
+}
+
+function handleFitView() {
+  fitView({ padding: 0.15 })
+  setTimeout(() => {
+    zoomLevel.value = Math.round(getViewport().zoom * 100)
+  }, 50)
+}
 
 function publish() {
   isPublished.value = true
@@ -119,7 +167,7 @@ onUnmounted(() => {
 <template>
   <div class="relative flex h-screen w-screen flex-col overflow-hidden bg-zinc-900">
     <!-- Header Controls -->
-    <div class="border-b border-zinc-800 bg-zinc-900 px-4 py-3">
+    <div class="relative z-50 border-b border-zinc-800 bg-zinc-900 px-4 py-3">
       <div class="flex items-center gap-4">
         <span class="text-sm font-medium text-zinc-400">View as:</span>
         <div class="flex gap-1">
@@ -386,14 +434,32 @@ onUnmounted(() => {
       </DialogContent>
     </Dialog>
 
-    <!-- Consumer View -->
-    <div v-if="selectedView === 'consumer'" class="flex flex-1 items-center justify-center p-8">
-      <div class="w-full max-w-md">
-        <!-- NSFW Warning -->
-        <div
-          v-if="showNsfwWarning"
-          class="rounded-xl border border-zinc-700 bg-zinc-800 p-5 shadow-xl"
+    <!-- Consumer View: Full Workflow Preview -->
+    <template v-if="selectedView === 'consumer'">
+      <!-- Background Workflow -->
+      <div class="fixed inset-0 z-0 bg-zinc-900">
+        <VueFlow
+          id="consumer-bg"
+          v-model:nodes="bgNodes"
+          v-model:edges="bgEdges"
+          :node-types="nodeTypes"
+          :nodes-draggable="false"
+          :nodes-connectable="false"
+          :elements-selectable="false"
+          :pan-on-scroll="false"
+          :zoom-on-scroll="false"
+          :pan-on-drag="false"
+          :prevent-scrolling="true"
+          :default-viewport="{ x: 100, y: 50, zoom: 0.4 }"
+          class="bg-canvas pointer-events-none opacity-30"
         >
+          <Background :pattern-color="bgPatternColor" :gap="20" :size="1" />
+        </VueFlow>
+      </div>
+
+      <!-- NSFW Warning Modal -->
+      <div v-if="showNsfwWarning" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div class="w-full max-w-md rounded-xl border border-zinc-700 bg-zinc-800 p-5 shadow-2xl">
           <div class="mb-4 flex items-center gap-3">
             <div class="flex h-9 w-9 items-center justify-center rounded-full bg-amber-500/20">
               <Icon name="exclamation-triangle" size="lg" class="text-amber-400" />
@@ -428,50 +494,160 @@ onUnmounted(() => {
             </button>
           </div>
         </div>
+      </div>
 
-        <!-- Workflow Preview -->
-        <div
-          v-else
-          class="rounded-xl border border-zinc-700 bg-zinc-800 p-5 shadow-xl"
-        >
-          <div class="mb-5 text-center">
-            <div class="mx-auto mb-4 h-28 w-full rounded-lg bg-gradient-to-br from-purple-500/20 to-blue-500/20" />
-            <h2 class="text-lg font-semibold text-white">{{ mockWorkflow.name }}</h2>
-            <p class="mt-1 text-sm text-zinc-500">by {{ mockWorkflow.author }}</p>
-            <p class="mt-2 text-xs text-zinc-600">{{ mockWorkflow.nodeCount }} nodes</p>
+      <!-- Workflow Preview Modal -->
+      <div v-else class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+        <div class="flex h-full max-h-[80vh] w-full max-w-[1400px] flex-col overflow-hidden rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl">
+          <!-- Header -->
+          <div class="flex shrink-0 items-center justify-between border-b border-zinc-700 px-5 py-3">
+            <div class="flex items-center gap-3">
+              <h1 class="text-base font-semibold text-white">{{ mockWorkflow.name }}</h1>
+              <span class="rounded bg-blue-500/20 px-1.5 py-0.5 text-[10px] font-medium text-blue-400">
+                View & Fork
+              </span>
+              <span class="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-medium text-amber-400">
+                Read-only
+              </span>
+            </div>
+            <button
+              class="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-800 hover:text-zinc-200"
+            >
+              <Icon name="x" size="sm" />
+            </button>
           </div>
 
-          <div class="mb-5 flex gap-2">
-            <button class="flex-1 rounded-lg border border-zinc-600 py-2.5 text-sm font-medium text-zinc-300 transition-colors hover:bg-zinc-700">
-              Open in Editor
-            </button>
-            <button class="flex-1 rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-500">
-              Fork to Library
-            </button>
-          </div>
+          <!-- Canvas -->
+          <div class="relative flex-1 overflow-hidden bg-zinc-800/50">
+            <VueFlow
+              id="consumer-preview"
+              v-model:nodes="previewNodes"
+              v-model:edges="previewEdges"
+              :node-types="nodeTypes"
+              :nodes-draggable="false"
+              :nodes-connectable="false"
+              :elements-selectable="false"
+              :pan-on-scroll="true"
+              :zoom-on-scroll="true"
+              :pan-on-drag="true"
+              :prevent-scrolling="true"
+              :default-viewport="{ x: 0, y: 0, zoom: 0.6 }"
+              :min-zoom="0.1"
+              :max-zoom="2"
+              class="preview-canvas"
+              @vue-flow-ready="handleCanvasReady"
+            >
+              <Background :pattern-color="patternColor" :gap="20" :size="1" />
+            </VueFlow>
 
-          <div class="border-t border-zinc-700 pt-4">
-            <p class="mb-3 text-xs font-medium text-zinc-500">Requirements</p>
-            <div class="space-y-2">
-              <div
-                v-for="req in requirements"
-                :key="req.name"
-                class="flex items-center justify-between text-sm"
+            <!-- Zoom Controls -->
+            <div class="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-0.5 rounded-lg border border-zinc-700 bg-zinc-800 p-1 shadow-lg">
+              <button
+                class="flex h-7 w-7 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
+                @click="handleZoomOut"
               >
-                <div class="flex items-center gap-2">
-                  <Icon
-                    :name="req.hasIt ? 'check-circle' : 'exclamation-circle'"
-                    size="sm"
-                    :class="req.hasIt ? 'text-green-500' : 'text-amber-500'"
-                  />
-                  <span class="text-zinc-300">{{ req.name }}</span>
-                </div>
-                <span class="text-xs text-zinc-600">{{ req.type }}</span>
+                <Icon name="minus" size="xs" />
+              </button>
+              <div class="flex w-12 items-center justify-center text-xs font-medium text-zinc-300">
+                {{ zoomLevel }}%
               </div>
+              <button
+                class="flex h-7 w-7 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
+                @click="handleZoomIn"
+              >
+                <Icon name="plus" size="xs" />
+              </button>
+              <div class="mx-0.5 h-4 w-px bg-zinc-700" />
+              <button
+                class="flex h-7 w-7 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
+                @click="handleFitView"
+              >
+                <Icon name="expand" size="xs" />
+              </button>
+            </div>
+
+            <!-- Node Count -->
+            <div class="absolute left-4 top-4 flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800 px-2.5 py-1.5 shadow-lg">
+              <Icon name="cube" size="xs" class="text-zinc-400" />
+              <span class="text-xs font-medium text-zinc-300">{{ mockWorkflow.nodeCount }} nodes</span>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="flex shrink-0 items-center justify-between border-t border-zinc-700 px-5 py-3">
+            <!-- Author Info -->
+            <div class="flex items-center gap-2">
+              <img
+                :src="mockWorkflow.authorAvatar"
+                :alt="mockWorkflow.author"
+                class="h-6 w-6 rounded-full object-cover"
+              />
+              <span class="text-sm text-zinc-400">
+                Published by <span class="font-medium text-zinc-200">{{ mockWorkflow.author }}</span>
+              </span>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-2">
+              <button class="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-600 bg-zinc-800 text-zinc-300 transition-colors hover:bg-zinc-700">
+                <Icon name="folder-plus" size="sm" />
+              </button>
+              <button class="flex items-center gap-1.5 rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-700">
+                <Icon name="edit" size="xs" />
+                Open in Editor
+              </button>
+              <button class="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-blue-500">
+                <Icon name="play" size="xs" />
+                Run in Linear
+              </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
+
+<style>
+.preview-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.preview-canvas .vue-flow__node-flowNode {
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.preview-canvas .vue-flow__edge-path {
+  stroke-width: 2;
+}
+
+.preview-canvas .vue-flow__handle {
+  opacity: 0 !important;
+}
+
+.bg-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.bg-canvas .vue-flow__node-flowNode {
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.bg-canvas .vue-flow__edge-path {
+  stroke-width: 2;
+}
+
+.bg-canvas .vue-flow__handle {
+  opacity: 0 !important;
+}
+</style>
