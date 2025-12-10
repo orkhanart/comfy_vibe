@@ -63,71 +63,56 @@ function handleModelDragStart(e: DragEvent, model: ModelItem, category: ModelCat
 
 <template>
   <div class="flex h-full flex-col">
-    <!-- All/Core/Imported Tabs + Import Button -->
-    <div class="flex items-center justify-between border-b border-border px-2 py-1.5">
-      <!-- Tabs -->
-      <div class="flex items-center gap-1">
-        <button
-          class="rounded px-2 py-1 text-[11px] font-medium transition-colors"
-          :class="[
-            activeTab === 'all'
-              ? 'bg-accent text-foreground'
-              : 'text-muted-foreground hover:text-foreground'
-          ]"
-          @click="activeTab = 'all'"
-        >
-          <span class="flex items-center gap-1">
-            <Icon name="layers" size="xs" />
-            All
-          </span>
-        </button>
-        <button
-          class="rounded px-2 py-1 text-[11px] font-medium transition-colors"
-          :class="[
-            activeTab === 'core'
-              ? 'bg-accent text-foreground'
-              : 'text-muted-foreground hover:text-foreground'
-          ]"
-          @click="activeTab = 'core'"
-        >
-          <span class="flex items-center gap-1">
-            <Icon name="box" size="xs" />
-            Core
-          </span>
-        </button>
-        <button
-          class="rounded px-2 py-1 text-[11px] font-medium transition-colors"
-          :class="[
-            activeTab === 'imported'
-              ? 'bg-accent text-foreground'
-              : 'text-muted-foreground hover:text-foreground'
-          ]"
-          @click="activeTab = 'imported'"
-        >
-          <span class="flex items-center gap-1">
-            <Icon name="download" size="xs" />
-            Imported
-          </span>
-        </button>
-        <button
-          class="rounded px-2 py-1 text-[11px] font-medium transition-colors"
-          :class="[
-            activeTab === 'shared'
-              ? 'bg-accent text-foreground'
-              : 'text-muted-foreground hover:text-foreground'
-          ]"
-          @click="activeTab = 'shared'"
-        >
-          <span class="flex items-center gap-1">
-            <Icon name="users" size="xs" />
-            Shared
-          </span>
-        </button>
-      </div>
+    <!-- All/Core/Imported Tabs -->
+    <div class="flex items-center gap-1 border-b border-border px-2 py-1.5">
+      <button
+        class="rounded px-2 py-1 text-[11px] font-medium transition-colors"
+        :class="[
+          activeTab === 'all'
+            ? 'bg-accent text-foreground'
+            : 'text-muted-foreground hover:text-foreground'
+        ]"
+        @click="activeTab = 'all'"
+      >
+        All
+      </button>
+      <button
+        class="rounded px-2 py-1 text-[11px] font-medium transition-colors"
+        :class="[
+          activeTab === 'core'
+            ? 'bg-accent text-foreground'
+            : 'text-muted-foreground hover:text-foreground'
+        ]"
+        @click="activeTab = 'core'"
+      >
+        Core
+      </button>
+      <button
+        class="rounded px-2 py-1 text-[11px] font-medium transition-colors"
+        :class="[
+          activeTab === 'imported'
+            ? 'bg-accent text-foreground'
+            : 'text-muted-foreground hover:text-foreground'
+        ]"
+        @click="activeTab = 'imported'"
+      >
+        Imported
+      </button>
+      <button
+        class="rounded px-2 py-1 text-[11px] font-medium transition-colors"
+        :class="[
+          activeTab === 'shared'
+            ? 'bg-accent text-foreground'
+            : 'text-muted-foreground hover:text-foreground'
+        ]"
+        @click="activeTab = 'shared'"
+      >
+        Shared
+      </button>
 
       <!-- Import Model Button -->
       <button
-        class="flex items-center gap-1 rounded bg-primary px-2 py-1 text-[11px] font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+        class="ml-auto flex shrink-0 items-center gap-1 rounded bg-primary px-2 py-1 text-[11px] font-medium text-primary-foreground transition-colors hover:bg-primary/90"
       >
         <Icon name="plus" size="xs" />
         Import
