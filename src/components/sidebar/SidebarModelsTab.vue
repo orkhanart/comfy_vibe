@@ -63,8 +63,8 @@ function handleModelDragStart(e: DragEvent, model: ModelItem, category: ModelCat
 
 <template>
   <div class="flex h-full flex-col">
-    <!-- All/Core/Imported Tabs -->
-    <div class="flex items-center border-b border-border px-2 py-1.5">
+    <!-- All/Core/Imported Tabs + Import Button -->
+    <div class="flex items-center justify-between border-b border-border px-2 py-1.5">
       <!-- Tabs -->
       <div class="flex items-center gap-1">
         <button
@@ -124,6 +124,14 @@ function handleModelDragStart(e: DragEvent, model: ModelItem, category: ModelCat
           </span>
         </button>
       </div>
+
+      <!-- Import Model Button -->
+      <button
+        class="flex items-center gap-1 rounded bg-primary px-2 py-1 text-[11px] font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+      >
+        <Icon name="plus" size="xs" />
+        Import
+      </button>
     </div>
 
     <!-- Content -->
