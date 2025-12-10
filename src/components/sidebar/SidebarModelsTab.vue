@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { Icon } from '@/components/ui/icon'
 import { ref, computed } from 'vue'
+import { Icon } from '@/components/ui/icon'
 import { SidebarTreeCategory, SidebarGridCard } from '@/components/common/sidebar'
 import { MODEL_CATEGORIES_DATA, type ModelCategory, type ModelItem } from '@/data/sidebarMockData'
 
@@ -11,10 +11,6 @@ defineProps<{
 // Tab state: all, core, imported, shared
 const activeTab = ref<'all' | 'core' | 'imported' | 'shared'>('all')
 
-// Type filter dropdown
-const typeFilter = ref<'all' | string>('all')
-const showTypeDropdown = ref(false)
-
 // Model categories with source info (mock: first 3 categories are "core", next 2 are "imported", last is "shared")
 const modelCategories = ref<(ModelCategory & { source: 'core' | 'imported' | 'shared' })[]>(
   MODEL_CATEGORIES_DATA.map((c, i) => ({
@@ -23,21 +19,7 @@ const modelCategories = ref<(ModelCategory & { source: 'core' | 'imported' | 'sh
   }))
 )
 
-// Type filter options from categories
-const typeOptions = computed(() => {
-  return [
-    { id: 'all', label: 'All Types' },
-    ...MODEL_CATEGORIES_DATA.map(c => ({ id: c.id, label: c.label }))
-  ]
-})
-
-const typeFilterLabel = computed(() => {
-  if (typeFilter.value === 'all') return 'All Types'
-  const found = typeOptions.value.find(t => t.id === typeFilter.value)
-  return found?.label || 'All Types'
-})
-
-// Filtered categories based on tab and type filter
+// Filtered categories based on tab
 const filteredCategories = computed(() => {
   let categories = modelCategories.value
 
@@ -48,11 +30,6 @@ const filteredCategories = computed(() => {
     categories = categories.filter(c => c.source === 'imported')
   } else if (activeTab.value === 'shared') {
     categories = categories.filter(c => c.source === 'shared')
-  }
-
-  // Filter by type
-  if (typeFilter.value !== 'all') {
-    categories = categories.filter(c => c.id === typeFilter.value)
   }
 
   return categories
@@ -86,8 +63,8 @@ function handleModelDragStart(e: DragEvent, model: ModelItem, category: ModelCat
 
 <template>
   <div class="flex h-full flex-col">
-    <!-- All/Core/Imported Tabs + Type Filter Dropdown -->
-    <div class="flex items-center justify-between border-b border-border px-2 py-1.5">
+    <!-- All/Core/Imported Tabs -->
+    <div class="flex items-center border-b border-border px-2 py-1.5">
       <!-- Tabs -->
       <div class="flex items-center gap-1">
         <button
@@ -146,35 +123,6 @@ function handleModelDragStart(e: DragEvent, model: ModelItem, category: ModelCat
             Shared
           </span>
         </button>
-      </div>
-
-      <!-- Type Filter Dropdown -->
-      <div class="relative">
-        <button
-          class="flex items-center gap-1 rounded px-2 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          :class="typeFilter !== 'all' ? 'bg-accent/50 text-foreground' : ''"
-          @click="showTypeDropdown = !showTypeDropdown"
-        >
-          <Icon name="filter" size="xs" />
-          {{ typeFilterLabel }}
-          <Icon name="chevron-down" size="xs" />
-        </button>
-        <!-- Dropdown Menu -->
-        <div
-          v-if="showTypeDropdown"
-          class="absolute right-0 top-full z-50 mt-1 min-w-[140px] overflow-hidden rounded-md border border-border bg-popover shadow-md"
-          @mouseleave="showTypeDropdown = false"
-        >
-          <button
-            v-for="option in typeOptions"
-            :key="option.id"
-            class="flex w-full items-center gap-2 px-3 py-1.5 text-[11px] transition-colors hover:bg-accent"
-            :class="typeFilter === option.id ? 'bg-accent text-foreground' : 'text-muted-foreground'"
-            @click="typeFilter = option.id; showTypeDropdown = false"
-          >
-            {{ option.label }}
-          </button>
-        </div>
       </div>
     </div>
 
