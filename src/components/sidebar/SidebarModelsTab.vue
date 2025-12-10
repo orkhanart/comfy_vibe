@@ -2,11 +2,15 @@
 import { ref, computed } from 'vue'
 import { Icon } from '@/components/ui/icon'
 import { SidebarTreeCategory, SidebarGridCard } from '@/components/common/sidebar'
+import { ImportModelDialog } from '@/components/common'
 import { MODEL_CATEGORIES_DATA, type ModelCategory, type ModelItem } from '@/data/sidebarMockData'
 
 defineProps<{
   viewMode: 'list' | 'grid'
 }>()
+
+// Import dialog state
+const showImportDialog = ref(false)
 
 // Tab state: all, core, imported, shared
 const activeTab = ref<'all' | 'core' | 'imported' | 'shared'>('all')
@@ -113,11 +117,15 @@ function handleModelDragStart(e: DragEvent, model: ModelItem, category: ModelCat
       <!-- Import Model Button -->
       <button
         class="ml-auto flex shrink-0 items-center gap-1 rounded bg-primary px-2 py-1 text-[11px] font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+        @click="showImportDialog = true"
       >
         <Icon name="plus" size="xs" />
         Import
       </button>
     </div>
+
+    <!-- Import Model Dialog -->
+    <ImportModelDialog v-model:open="showImportDialog" />
 
     <!-- Content -->
     <div class="flex-1 overflow-y-auto p-2">

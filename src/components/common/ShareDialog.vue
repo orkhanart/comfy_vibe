@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ref, computed, watch } from 'vue'
 import { useShareStore } from '@/stores/shareStore'
+import { posthog } from '@/plugins/posthog'
 import type { ShareableUser } from '@/types/workflowShare'
 
 export type ShareItemType = 'workflow' | 'folder' | 'asset' | 'model' | 'project'
@@ -85,6 +86,12 @@ watch(() => props.open, (isOpen) => {
     searchQuery.value = ''
     searchResults.value = []
     linkCopied.value = false
+
+    // Track for PostHog surveys
+    posthog.capture('share_dialog_opened', {
+      item_type: props.itemType,
+      phase: props.phase,
+    })
   }
 })
 
@@ -147,6 +154,14 @@ async function copyLink() {
   const success = await shareStore.copyShareLink(props.itemId)
   if (success) {
     linkCopied.value = true
+
+    // Track link copy for PostHog
+    posthog.capture('share_link_copied', {
+      item_type: props.itemType,
+      permission: linkPermission.value,
+      included_items: includedItemsCount.value,
+    })
+
     setTimeout(() => {
       linkCopied.value = false
     }, 2000)

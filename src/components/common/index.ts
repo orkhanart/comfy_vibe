@@ -1,5 +1,6 @@
 export { default as FavoriteButton } from './FavoriteButton.vue'
 export { default as ShareDialog, type ShareItemType, type SharePermission } from './ShareDialog.vue'
+export { default as ImportModelDialog } from './ImportModelDialog.vue'
 export { default as ExtendedViewModal } from './ExtendedViewModal.vue'
 export { default as NodesExtendedModal } from './NodesExtendedModal.vue'
 export { default as ModelsExtendedModal } from './ModelsExtendedModal.vue'
