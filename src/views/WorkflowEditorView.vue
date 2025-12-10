@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, markRaw, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import '@vue-flow/core/dist/style.css'
@@ -13,7 +14,7 @@ import NodePropertiesPanel from '@/components/workflow-editor/NodePropertiesPane
 import { FlowNode } from '@/components/nodes'
 import { NodesExtendedModal, ModelsExtendedModal, LibraryExtendedModal } from '@/components/common'
 import { useWorkspaceStore } from '@/stores/workspaceStore'
-import { useUiStore } from '@/stores/uiStore'
+import { useUiStore, type SidebarTabId } from '@/stores/uiStore'
 import { DEMO_WORKFLOW_NODES, DEMO_WORKFLOW_EDGES, SUBGRAPH_DATA } from '@/data/workflowMockData'
 
 // Extended view modals
@@ -27,8 +28,36 @@ import type { Node } from '@vue-flow/core'
 
 const props = defineProps<WorkflowEditorRouteParams>()
 
+const route = useRoute()
+const router = useRouter()
 const workspaceStore = useWorkspaceStore()
 const uiStore = useUiStore()
+
+// Sync sidebar tab with route
+watch(
+  () => route.meta.sidebar,
+  (sidebar) => {
+    if (sidebar) {
+      uiStore.setSidebarTab(sidebar as SidebarTabId)
+    }
+  },
+  { immediate: true }
+)
+
+// Sync route with sidebar tab changes
+watch(
+  () => uiStore.activeSidebarTab,
+  (tab) => {
+    const currentSidebar = route.meta.sidebar as string | undefined
+    if (tab && tab !== currentSidebar) {
+      // Navigate to the sidebar route
+      router.push({ name: `workflow-editor-${tab}` })
+    } else if (!tab && currentSidebar) {
+      // Navigate back to base workflow-editor
+      router.push({ name: 'workflow-editor' })
+    }
+  }
+)
 
 // Dynamic pattern color based on theme
 const patternColor = computed(() => uiStore.themeMode === 'dark' ? '#27272a' : '#d4d4d8')

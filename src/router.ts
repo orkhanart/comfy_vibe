@@ -259,7 +259,39 @@ const routes: RouteRecordRaw[] = [
     path: '/workflow-editor/:workflowId?',
     name: 'workflow-editor',
     component: () => import('./views/WorkflowEditorView.vue'),
-    props: true
+    props: true,
+    children: [
+      {
+        path: 'nodes',
+        name: 'workflow-editor-nodes',
+        component: () => import('./views/WorkflowEditorView.vue'),
+        meta: { sidebar: 'nodes' }
+      },
+      {
+        path: 'models',
+        name: 'workflow-editor-models',
+        component: () => import('./views/WorkflowEditorView.vue'),
+        meta: { sidebar: 'models' }
+      },
+      {
+        path: 'workflows',
+        name: 'workflow-editor-workflows',
+        component: () => import('./views/WorkflowEditorView.vue'),
+        meta: { sidebar: 'workflows' }
+      },
+      {
+        path: 'assets',
+        name: 'workflow-editor-assets',
+        component: () => import('./views/WorkflowEditorView.vue'),
+        meta: { sidebar: 'assets' }
+      },
+      {
+        path: 'templates',
+        name: 'workflow-editor-templates',
+        component: () => import('./views/WorkflowEditorView.vue'),
+        meta: { sidebar: 'templates' }
+      },
+    ]
   },
   {
     path: '/linear-mode/:workflowId?',
