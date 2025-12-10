@@ -284,6 +284,11 @@ const routes: RouteRecordRaw[] = [
     name: 'workflow-editor-share-dialog',
     component: () => import('./views/workflow-editor/ShareDialogTest.vue')
   },
+  {
+    path: '/workflow-editor/share-dialog-2',
+    name: 'workflow-editor-share-dialog-2',
+    component: () => import('./views/workflow-editor/PublishDialogTest.vue')
+  },
 ]
 
 const router = createRouter({
