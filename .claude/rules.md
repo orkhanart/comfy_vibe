@@ -255,3 +255,327 @@ import { cn } from '@/lib/utils'
 - Composables: `useCamelCase.ts` → `useFolders.ts`
 - Stores: `camelCaseStore.ts` → `uiStore.ts`
 - Types: `camelCase.ts` → `node.ts`
+
+## UI/UX Heuristics (Nielsen's 10 Principles)
+
+Based on [Jakob Nielsen's 10 Usability Heuristics](https://www.nngroup.com/articles/ten-usability-heuristics/)
+
+### 1. Visibility of System Status
+
+Always keep users informed about what's happening.
+
+```vue
+<!-- Show loading states -->
+<Button :disabled="isLoading">
+  <Loader2 v-if="isLoading" class="size-4 animate-spin mr-2" />
+  {{ isLoading ? 'Saving...' : 'Save' }}
+</Button>
+
+<!-- Show progress for long operations -->
+<Progress :value="progress" />
+<span class="text-sm text-muted-foreground">{{ progress }}% complete</span>
+
+<!-- Indicate selection state -->
+<div :class="cn('border rounded-lg p-2', selected && 'ring-2 ring-primary')">
+```
+
+**Rules:**
+- Always show loading spinners during async operations
+- Display progress bars for operations > 2 seconds
+- Highlight selected/active items clearly
+- Show success/error toasts after user actions
+
+### 2. Match Between System and Real World
+
+Use familiar language and concepts.
+
+```vue
+<!-- Good: Clear, user-friendly labels -->
+<Button>Create Workflow</Button>
+<Button>Add Image</Button>
+<Button variant="destructive">Delete</Button>
+
+<!-- Avoid: Technical jargon -->
+<Button>Instantiate Pipeline</Button>
+<Button>Append Blob Reference</Button>
+```
+
+**Rules:**
+- Use action verbs: "Create", "Add", "Save", "Delete"
+- Avoid internal/technical terms in UI text
+- Use icons that match real-world objects (trash for delete, folder for directory)
+- Order options logically (chronologically, alphabetically, or by importance)
+
+### 3. User Control and Freedom
+
+Provide clear exits and undo options.
+
+```vue
+<!-- Always provide cancel/close options -->
+<Dialog>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Edit Workflow</DialogTitle>
+      <DialogClose /> <!-- X button -->
+    </DialogHeader>
+    <!-- content -->
+    <DialogFooter>
+      <Button variant="outline" @click="cancel">Cancel</Button>
+      <Button @click="save">Save</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
+<!-- Support undo for destructive actions -->
+<Button @click="deleteWithUndo">
+  Delete
+</Button>
+<!-- Toast with undo -->
+<Toast>
+  Workflow deleted. <Button variant="link" @click="undo">Undo</Button>
+</Toast>
+```
+
+**Rules:**
+- Every modal must have a close button and Cancel option
+- Support Escape key to close dialogs/popovers
+- Provide undo for destructive actions (delete, clear, reset)
+- Never trap users in a flow without exit
+
+### 4. Consistency and Standards
+
+Follow established patterns.
+
+```vue
+<!-- Consistent button placement -->
+<DialogFooter>
+  <Button variant="outline">Cancel</Button>  <!-- Secondary left -->
+  <Button>Confirm</Button>                   <!-- Primary right -->
+</DialogFooter>
+
+<!-- Consistent icon meanings -->
+<Plus />     <!-- Always means "add/create" -->
+<Trash2 />   <!-- Always means "delete" -->
+<Settings /> <!-- Always means "settings/config" -->
+<X />        <!-- Always means "close/dismiss" -->
+```
+
+**Rules:**
+- Primary action buttons always on the right
+- Destructive buttons use `variant="destructive"`
+- Icons should have consistent meanings across the app
+- Use the same terminology everywhere (don't mix "Delete" and "Remove")
+- Follow platform conventions (Cmd on Mac, Ctrl on Windows)
+
+### 5. Error Prevention
+
+Prevent problems before they occur.
+
+```vue
+<!-- Disable invalid actions -->
+<Button :disabled="!canSubmit">Submit</Button>
+
+<!-- Confirm destructive actions -->
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="destructive">Delete Workflow</Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+      <AlertDialogDescription>
+        This will permanently delete "{{ workflowName }}".
+        This action cannot be undone.
+      </AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel>Cancel</AlertDialogCancel>
+      <AlertDialogAction @click="deleteWorkflow">Delete</AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+
+<!-- Provide smart defaults -->
+<Input v-model="filename" placeholder="Untitled Workflow" />
+```
+
+**Rules:**
+- Disable buttons when action isn't valid
+- Require confirmation for destructive/irreversible actions
+- Use input constraints (maxlength, type="number", etc.)
+- Provide sensible default values
+- Auto-save work when possible
+
+### 6. Recognition Rather Than Recall
+
+Make options visible; don't require memorization.
+
+```vue
+<!-- Show recent items -->
+<div class="space-y-1">
+  <p class="text-sm text-muted-foreground">Recent workflows</p>
+  <Button v-for="workflow in recentWorkflows" variant="ghost">
+    {{ workflow.name }}
+  </Button>
+</div>
+
+<!-- Use autocomplete -->
+<Command>
+  <CommandInput placeholder="Search nodes..." />
+  <CommandList>
+    <CommandItem v-for="node in filteredNodes">
+      <node.icon class="size-4 mr-2" />
+      {{ node.name }}
+    </CommandItem>
+  </CommandList>
+</Command>
+
+<!-- Show previews -->
+<Card class="group">
+  <img :src="workflow.thumbnail" alt="" class="aspect-video" />
+  <CardContent>{{ workflow.name }}</CardContent>
+</Card>
+```
+
+**Rules:**
+- Show recently used items
+- Use visual previews/thumbnails for workflows
+- Provide search with autocomplete
+- Display keyboard shortcuts next to menu items
+- Show tooltips for icon-only buttons
+
+### 7. Flexibility and Efficiency of Use
+
+Support both novice and expert users.
+
+```vue
+<!-- Keyboard shortcuts for power users -->
+<DropdownMenuItem @click="save">
+  Save
+  <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+</DropdownMenuItem>
+
+<!-- Multiple ways to perform actions -->
+<!-- 1. Menu item -->
+<DropdownMenuItem>Duplicate</DropdownMenuItem>
+<!-- 2. Right-click context menu -->
+<ContextMenuItem>Duplicate</ContextMenuItem>
+<!-- 3. Keyboard shortcut: Cmd+D -->
+
+<!-- Allow customization -->
+<Tabs v-model="viewMode">
+  <TabsList>
+    <TabsTrigger value="grid">Grid</TabsTrigger>
+    <TabsTrigger value="list">List</TabsTrigger>
+  </TabsList>
+</Tabs>
+```
+
+**Rules:**
+- Implement keyboard shortcuts for common actions
+- Support right-click context menus
+- Allow drag-and-drop where intuitive
+- Provide grid/list view options
+- Remember user preferences (last view, sort order)
+
+### 8. Aesthetic and Minimalist Design
+
+Show only what's needed.
+
+```vue
+<!-- Progressive disclosure -->
+<Collapsible>
+  <CollapsibleTrigger>Advanced Options</CollapsibleTrigger>
+  <CollapsibleContent>
+    <!-- Advanced settings hidden by default -->
+  </CollapsibleContent>
+</Collapsible>
+
+<!-- Clean, focused cards -->
+<Card>
+  <CardContent class="p-4">
+    <h3 class="font-medium truncate">{{ workflow.name }}</h3>
+    <p class="text-sm text-muted-foreground">
+      {{ formatDate(workflow.updatedAt) }}
+    </p>
+  </CardContent>
+</Card>
+<!-- Don't add: view count, star rating, share buttons, etc. unless needed -->
+```
+
+**Rules:**
+- Hide advanced options in collapsible sections
+- Use whitespace effectively
+- One primary action per screen/card
+- Remove decorative elements that don't aid comprehension
+- Truncate long text; show full on hover
+
+### 9. Help Users Recover from Errors
+
+Clear error messages with solutions.
+
+```vue
+<!-- Good error message -->
+<Alert variant="destructive">
+  <AlertCircle class="size-4" />
+  <AlertTitle>Upload failed</AlertTitle>
+  <AlertDescription>
+    The file "image.png" exceeds the 10MB limit.
+    Please choose a smaller file or compress the image.
+  </AlertDescription>
+</Alert>
+
+<!-- Inline validation with guidance -->
+<div class="space-y-1">
+  <Input v-model="name" :class="{ 'border-destructive': error }" />
+  <p v-if="error" class="text-sm text-destructive">
+    {{ error }}
+  </p>
+</div>
+```
+
+**Rules:**
+- Use plain language, not error codes
+- Explain what went wrong specifically
+- Suggest how to fix the problem
+- Show errors inline, close to the source
+- Use `variant="destructive"` styling for errors
+
+### 10. Help and Documentation
+
+Provide contextual help when needed.
+
+```vue
+<!-- Tooltips for unclear items -->
+<TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Button variant="ghost" size="icon">
+        <HelpCircle class="size-4" />
+      </Button>
+    </TooltipTrigger>
+    <TooltipContent>
+      <p>CFG Scale controls how closely the image follows the prompt.</p>
+      <p class="text-muted-foreground">Recommended: 7-9</p>
+    </TooltipContent>
+  </Tooltip>
+</TooltipProvider>
+
+<!-- Empty states with guidance -->
+<div class="text-center py-12">
+  <FolderOpen class="size-12 mx-auto text-muted-foreground" />
+  <h3 class="mt-4 font-medium">No workflows yet</h3>
+  <p class="text-muted-foreground">Create your first workflow to get started.</p>
+  <Button class="mt-4">
+    <Plus class="size-4 mr-2" />
+    New Workflow
+  </Button>
+</div>
+```
+
+**Rules:**
+- Add tooltips for technical/unfamiliar controls
+- Provide helpful empty states with next action
+- Use placeholder text to show expected input format
+- Link to documentation for complex features
+- Show onboarding hints for new users

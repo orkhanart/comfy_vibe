@@ -199,7 +199,7 @@ export const useShareStore = defineStore('share', () => {
   }
 
   /**
-   * Share workflow with users
+   * Share workflow with users or email addresses
    */
   function shareWorkflow(
     workflowId: string,
@@ -208,18 +208,29 @@ export const useShareStore = defineStore('share', () => {
     const currentShares = workflowShares.value[workflowId] || []
     const newShares: WorkflowShareWithUser[] = []
 
-    for (const userId of payload.userIds) {
+    for (const userIdOrEmail of payload.userIds) {
       // Skip if already shared
-      if (currentShares.some(s => s.sharedWith === userId)) continue
+      if (currentShares.some(s => s.sharedWith === userIdOrEmail)) continue
 
-      const user = getUserById(userId)
+      let user = getUserById(userIdOrEmail)
+
+      // Handle email invites (userId starts with 'email-' or contains '@')
+      if (!user && (userIdOrEmail.startsWith('email-') || userIdOrEmail.includes('@'))) {
+        const email = userIdOrEmail.includes('@') ? userIdOrEmail : `invited-${Date.now()}@pending.com`
+        user = {
+          id: userIdOrEmail,
+          name: email.split('@')[0],
+          email: email,
+        }
+      }
+
       if (!user) continue
 
       const share: WorkflowShareWithUser = {
-        id: `ws-${Date.now()}-${userId}`,
+        id: `ws-${Date.now()}-${userIdOrEmail}`,
         workflowId,
         sharedBy: 'user-1', // Current user
-        sharedWith: userId,
+        sharedWith: userIdOrEmail,
         accessMode: payload.accessMode,
         createdAt: Date.now(),
         user,
