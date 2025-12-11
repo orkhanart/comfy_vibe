@@ -321,6 +321,46 @@ const routes: RouteRecordRaw[] = [
     name: 'workflow-editor-share-dialog-2',
     component: () => import('./views/workflow-editor/PublishDialogTest.vue')
   },
+  {
+    path: '/showcase/model-import',
+    name: 'showcase-model-import',
+    component: () => import('./views/ModelImportShowcaseView.vue')
+  },
+  {
+    path: '/showcase/activity',
+    name: 'showcase-activity',
+    component: () => import('./views/ActivityShowcaseView.vue')
+  },
+  {
+    path: '/showcase/activity/queue',
+    name: 'showcase-activity-queue',
+    component: () => import('./views/showcase/activity/QueueProgressMockup.vue')
+  },
+  {
+    path: '/showcase/activity/jobs',
+    name: 'showcase-activity-jobs',
+    component: () => import('./views/showcase/activity/JobListMockup.vue')
+  },
+  {
+    path: '/showcase/activity/toasts',
+    name: 'showcase-activity-toasts',
+    component: () => import('./views/showcase/activity/ToastsMockup.vue')
+  },
+  {
+    path: '/showcase/activity/downloads',
+    name: 'showcase-activity-downloads',
+    component: () => import('./views/showcase/activity/DownloadsMockup.vue')
+  },
+  {
+    path: '/showcase/activity/manager',
+    name: 'showcase-activity-manager',
+    component: () => import('./views/showcase/activity/ManagerMockup.vue')
+  },
+  {
+    path: '/showcase/activity/errors',
+    name: 'showcase-activity-errors',
+    component: () => import('./views/showcase/activity/ErrorDialogMockup.vue')
+  },
 ]
 
 const router = createRouter({
