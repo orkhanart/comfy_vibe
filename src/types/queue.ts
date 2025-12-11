@@ -4,8 +4,63 @@
 
 export type JobState = 'pending' | 'running' | 'completed' | 'failed' | 'cancelled'
 
+export type JobType = 'workflow' | 'download'
+
+export type DownloadSource = 'civitai' | 'huggingface' | 'url'
+
 export type AutoQueueMode = 'disabled' | 'instant' | 'change'
 
+// Base job interface
+export interface BaseJob {
+  id: string
+  type: JobType
+  state: JobState
+  title: string
+  createdAt: Date
+  startedAt?: Date
+  completedAt?: Date
+  errorMessage?: string
+}
+
+// Workflow execution job (existing)
+export interface WorkflowJob extends BaseJob {
+  type: 'workflow'
+  promptId: string
+  queueIndex: number
+  workflowName?: string
+  progress?: {
+    currentNode?: string
+    currentPercent: number
+    totalPercent: number
+  }
+  outputs: QueueJobOutput[]
+}
+
+// Download job (new)
+export interface DownloadJob extends BaseJob {
+  type: 'download'
+  source: DownloadSource
+  sourceUrl: string
+  modelName: string
+  modelType?: 'checkpoint' | 'lora' | 'vae' | 'controlnet'
+  baseModel?: 'SD1.5' | 'SDXL' | 'Flux' | 'Pony' | 'unknown'
+  progress?: {
+    percent: number
+    downloadedBytes: number
+    totalBytes: number
+    speed: number // bytes per second
+    eta: number // seconds remaining
+  }
+  result?: {
+    filePath: string
+    fileSize: number
+  }
+}
+
+// Union type for all jobs
+export type Job = WorkflowJob | DownloadJob
+
+// Legacy alias for backwards compatibility
 export interface QueueJob {
   id: string
   promptId: string

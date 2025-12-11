@@ -5,8 +5,10 @@ import { useQueueStore } from '@/stores/queueStore'
 import QueueHeader from './QueueHeader.vue'
 import QueueJobItem from './QueueJobItem.vue'
 import QueueActiveProgress from './QueueActiveProgress.vue'
+import DownloadJobCard from './DownloadJobCard.vue'
+import type { QueueJob, DownloadJob } from '@/types/queue'
 
-type TabId = 'all' | 'running' | 'pending' | 'completed' | 'failed'
+type TabId = 'all' | 'running' | 'pending' | 'downloads' | 'completed' | 'failed'
 
 const queueStore = useQueueStore()
 
@@ -14,11 +16,20 @@ const isExpanded = ref(false)
 const isHovered = ref(false)
 const activeTab = ref<TabId>('all')
 
+// Type guards
+function isDownloadJob(job: QueueJob | DownloadJob): job is DownloadJob {
+  return 'sourceUrl' in job
+}
+
+function isWorkflowJob(job: QueueJob | DownloadJob): job is QueueJob {
+  return 'promptId' in job
+}
+
 // Auto-collapse when no jobs
 watch(
-  () => queueStore.isExecuting,
-  (executing) => {
-    if (!executing && !isHovered.value) {
+  () => queueStore.hasAnyActiveJobs,
+  (hasActive) => {
+    if (!hasActive && !isHovered.value) {
       isExpanded.value = false
     }
   }
@@ -27,32 +38,43 @@ watch(
 const tabs = [
   { id: 'all' as TabId, label: 'All' },
   { id: 'running' as TabId, label: 'Running' },
-  { id: 'pending' as TabId, label: 'Pending' },
+  { id: 'downloads' as TabId, label: 'Downloads' },
   { id: 'completed' as TabId, label: 'Completed' },
   { id: 'failed' as TabId, label: 'Failed' }
 ]
 
-const filteredJobs = computed(() => {
+const filteredJobs = computed((): (QueueJob | DownloadJob)[] => {
   switch (activeTab.value) {
     case 'running':
       return queueStore.runningJobs
     case 'pending':
       return queueStore.pendingJobs
+    case 'downloads':
+      return queueStore.downloadJobs
     case 'completed':
-      return queueStore.historyJobs.filter(j => j.state === 'completed')
+      return [
+        ...queueStore.historyJobs.filter(j => j.state === 'completed'),
+        ...queueStore.downloadJobs.filter(j => j.state === 'completed')
+      ]
     case 'failed':
-      return queueStore.historyJobs.filter(j => j.state === 'failed')
+      return [
+        ...queueStore.historyJobs.filter(j => j.state === 'failed'),
+        ...queueStore.downloadJobs.filter(j => j.state === 'failed')
+      ]
     default:
       return [
         ...queueStore.runningJobs,
         ...queueStore.pendingJobs,
-        ...queueStore.historyJobs
+        ...queueStore.runningDownloads,
+        ...queueStore.pendingDownloads,
+        ...queueStore.historyJobs,
+        ...queueStore.downloadHistory
       ]
   }
 })
 
 const showOverlay = computed(() => {
-  return queueStore.isExecuting || isExpanded.value || queueStore.historyJobs.length > 0
+  return queueStore.hasAnyActiveJobs || isExpanded.value || queueStore.historyJobs.length > 0 || queueStore.downloadJobs.length > 0
 })
 
 const showActiveProgress = computed(() => {
@@ -69,6 +91,7 @@ function handleClearQueue(): void {
 
 function handleClearHistory(): void {
   queueStore.clearHistory()
+  queueStore.clearDownloadHistory()
 }
 
 function handleCancelJob(promptId: string): void {
@@ -82,6 +105,19 @@ function handleDeleteJob(promptId: string): void {
 function handleViewJob(promptId: string): void {
   // TODO: Open job details/outputs
   console.log('View job:', promptId)
+}
+
+// Download job handlers
+function handleCancelDownload(jobId: string): void {
+  queueStore.cancelDownload(jobId)
+}
+
+function handleRetryDownload(jobId: string): void {
+  queueStore.retryDownload(jobId)
+}
+
+function handleDeleteDownload(jobId: string): void {
+  queueStore.deleteDownload(jobId)
 }
 
 function toggleExpanded(): void {
@@ -105,7 +141,7 @@ function toggleExpanded(): void {
       <div class="flex items-center gap-2">
         <span class="text-sm font-medium text-foreground">Queue</span>
 
-        <!-- Running indicator -->
+        <!-- Running indicator (workflow) -->
         <div
           v-if="queueStore.runningCount > 0"
           class="flex items-center gap-1 rounded bg-blue-500/10 px-1.5 py-0.5"
@@ -114,13 +150,22 @@ function toggleExpanded(): void {
           <span class="text-[10px] font-medium text-blue-500">{{ queueStore.runningCount }}</span>
         </div>
 
-        <!-- Pending count -->
+        <!-- Pending count (workflow) -->
         <div
           v-if="queueStore.pendingCount > 0"
           class="flex items-center gap-1 rounded bg-amber-500/10 px-1.5 py-0.5"
         >
           <Icon name="clock" size="xs" class="text-amber-500" />
           <span class="text-[10px] font-medium text-amber-500">{{ queueStore.pendingCount }}</span>
+        </div>
+
+        <!-- Download indicator -->
+        <div
+          v-if="queueStore.downloadCount > 0"
+          class="flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5"
+        >
+          <Icon name="download" size="xs" class="text-emerald-500" />
+          <span class="text-[10px] font-medium text-emerald-500">{{ queueStore.downloadCount }}</span>
         </div>
       </div>
 
@@ -188,21 +233,34 @@ function toggleExpanded(): void {
       </div>
 
       <!-- Job list -->
-      <div class="max-h-64 flex-1 overflow-y-auto">
+      <div class="max-h-64 flex-1 overflow-y-auto p-2">
         <template v-if="filteredJobs.length > 0">
-          <QueueJobItem
-            v-for="job in filteredJobs"
-            :key="job.id"
-            :job-id="job.id"
-            :state="job.state"
-            :title="job.title"
-            :progress-current-percent="job.state === 'running' ? queueStore.currentProgressPercent : undefined"
-            :progress-total-percent="job.state === 'running' ? queueStore.totalProgressPercent : undefined"
-            :current-node="job.state === 'running' ? queueStore.currentNodeName || undefined : undefined"
-            @cancel="handleCancelJob(job.promptId)"
-            @delete="handleDeleteJob(job.promptId)"
-            @view="handleViewJob(job.promptId)"
-          />
+          <div class="flex flex-col gap-2">
+            <template v-for="job in filteredJobs" :key="job.id">
+              <!-- Download Job Card -->
+              <DownloadJobCard
+                v-if="isDownloadJob(job)"
+                :job="job"
+                @cancel="handleCancelDownload(job.id)"
+                @retry="handleRetryDownload(job.id)"
+                @delete="handleDeleteDownload(job.id)"
+              />
+
+              <!-- Workflow Job Item -->
+              <QueueJobItem
+                v-else-if="isWorkflowJob(job)"
+                :job-id="job.id"
+                :state="job.state"
+                :title="job.title"
+                :progress-current-percent="job.state === 'running' ? queueStore.currentProgressPercent : undefined"
+                :progress-total-percent="job.state === 'running' ? queueStore.totalProgressPercent : undefined"
+                :current-node="job.state === 'running' ? queueStore.currentNodeName || undefined : undefined"
+                @cancel="handleCancelJob(job.promptId)"
+                @delete="handleDeleteJob(job.promptId)"
+                @view="handleViewJob(job.promptId)"
+              />
+            </template>
+          </div>
         </template>
 
         <!-- Empty state -->
@@ -216,7 +274,7 @@ function toggleExpanded(): void {
       </div>
 
       <!-- Footer with clear history -->
-      <div v-if="queueStore.historyJobs.length > 0" class="border-t border-border p-2">
+      <div v-if="queueStore.historyJobs.length > 0 || queueStore.downloadHistory.length > 0" class="border-t border-border p-2">
         <button
           class="flex w-full items-center justify-center gap-1.5 rounded-md py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           @click="handleClearHistory"
@@ -229,13 +287,13 @@ function toggleExpanded(): void {
 
     <!-- Completion summary (when nothing running but has history) -->
     <div
-      v-if="!queueStore.isExecuting && !isExpanded && queueStore.historyJobs.length > 0"
+      v-if="!queueStore.hasAnyActiveJobs && !isExpanded && (queueStore.historyJobs.length > 0 || queueStore.downloadHistory.length > 0)"
       class="flex items-center justify-between px-3 py-2"
     >
       <div class="flex items-center gap-2">
         <Icon name="check-circle" size="sm" class="text-emerald-500" />
         <span class="text-xs text-muted-foreground">
-          {{ queueStore.historyJobs.length }} completed
+          {{ queueStore.historyJobs.length + queueStore.downloadHistory.length }} completed
         </span>
       </div>
       <button

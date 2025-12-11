@@ -425,6 +425,37 @@ function wsStatusColor(status: WsStatus): string {
             </div>
           </a>
         </div>
+
+        <!-- UX Enhancement Options Demos -->
+        <div class="mt-6 border-t border-charcoal-600 pt-6">
+          <h3 class="mb-3 text-sm font-medium text-purple-400">UX Enhancement Options</h3>
+          <div class="grid gap-3 sm:grid-cols-2">
+            <a
+              href="/showcase/activity/option1"
+              class="flex items-center gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 transition-colors hover:border-emerald-500/50 hover:bg-emerald-500/20"
+            >
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/20">
+                <Icon name="layers" size="md" class="text-emerald-400" />
+              </div>
+              <div>
+                <p class="text-sm font-medium text-white">Option 1: Enhanced Overlay</p>
+                <p class="text-xs text-smoke-800">Downloads/Manager + Smart Toasts</p>
+              </div>
+            </a>
+            <a
+              href="/showcase/activity/option5"
+              class="flex items-center gap-3 rounded-lg border border-blue-500/30 bg-blue-500/10 p-3 transition-colors hover:border-blue-500/50 hover:bg-blue-500/20"
+            >
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/20">
+                <Icon name="picture-in-picture-2" size="md" class="text-blue-400" />
+              </div>
+              <div>
+                <p class="text-sm font-medium text-white">Option 5: PiP Preview</p>
+                <p class="text-xs text-smoke-800">Draggable live preview window</p>
+              </div>
+            </a>
+          </div>
+        </div>
       </div>
 
       <Tabs default-value="queue" class="w-full">

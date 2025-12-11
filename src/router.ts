@@ -361,6 +361,16 @@ const routes: RouteRecordRaw[] = [
     name: 'showcase-activity-errors',
     component: () => import('./views/showcase/activity/ErrorDialogMockup.vue')
   },
+  {
+    path: '/showcase/activity/option1',
+    name: 'showcase-activity-option1',
+    component: () => import('./views/showcase/activity/Option1EnhancedOverlayMockup.vue')
+  },
+  {
+    path: '/showcase/activity/option5',
+    name: 'showcase-activity-option5',
+    component: () => import('./views/showcase/activity/Option5PiPPreviewMockup.vue')
+  },
 ]
 
 const router = createRouter({

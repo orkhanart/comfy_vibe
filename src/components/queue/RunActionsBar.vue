@@ -4,11 +4,12 @@ import { Icon } from '@/components/ui/icon'
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { useQueueStore } from '@/stores/queueStore'
 import QueuePanel from './QueuePanel.vue'
+import { AssetsExtendedModal } from '@/components/common'
 
 const queueStore = useQueueStore()
 
-const showQueuePanel = ref(false)
 const showRunMenu = ref(false)
+const showAssetsModal = ref(false)
 
 const activeJobsCount = computed(() => {
   return queueStore.runningJobs.length + queueStore.pendingJobs.length
@@ -19,7 +20,7 @@ function handleRun() {
 }
 
 function handleShowHistory() {
-  showQueuePanel.value = !showQueuePanel.value
+  queueStore.showQueuePanel = !queueStore.showQueuePanel
 }
 
 function incrementBatch() {
@@ -103,16 +104,6 @@ function decrementBatch() {
         >
           <Icon name="history" class="h-4 w-4 text-smoke-800" />
         </button>
-
-        <!-- User Sign In Button -->
-        <div class="flex items-center gap-1 rounded-full py-0 pl-0 pr-1">
-          <!-- Avatar -->
-          <div class="relative h-8 w-8 shrink-0 overflow-hidden rounded-full bg-charcoal-400">
-            <Icon name="user" class="absolute inset-0 m-auto h-4 w-4 text-smoke-800" />
-          </div>
-          <!-- Chevron -->
-          <Icon name="chevron-down" class="h-4 w-4 text-smoke-800" />
-        </div>
       </div>
     </div>
 
@@ -126,14 +117,18 @@ function decrementBatch() {
       leave-to-class="opacity-0 translate-y-[-8px]"
     >
       <div
-        v-if="showQueuePanel || activeJobsCount > 0"
+        v-if="queueStore.showQueuePanel || activeJobsCount > 0"
         class="absolute right-0 top-[52px]"
       >
         <QueuePanel
-          v-model="showQueuePanel"
-          @close="showQueuePanel = false"
+          v-model="queueStore.showQueuePanel"
+          @close="queueStore.showQueuePanel = false"
+          @show-assets="showAssetsModal = true"
         />
       </div>
     </Transition>
+
+    <!-- Assets Extended Modal -->
+    <AssetsExtendedModal v-model:visible="showAssetsModal" />
   </div>
 </template>

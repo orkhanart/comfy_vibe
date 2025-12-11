@@ -5,6 +5,7 @@ import {
   Dialog,
   DialogContent,
 } from '@/components/ui/dialog'
+import { useQueueStore } from '@/stores/queueStore'
 
 interface Props {
   open: boolean
@@ -14,8 +15,10 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
+  'import-started': []
 }>()
 
+const queueStore = useQueueStore()
 const urlInput = ref('')
 
 const isValidUrl = computed(() => {
@@ -25,6 +28,7 @@ const isValidUrl = computed(() => {
 })
 
 function handleClose() {
+  urlInput.value = ''
   emit('update:open', false)
 }
 
@@ -34,11 +38,21 @@ function handlePasteFromClipboard() {
   })
 }
 
-function handleContinue() {
+function handleImport() {
   if (!isValidUrl.value) return
-  // TODO: Implement import logic
-  console.log('Importing model from:', urlInput.value)
-  handleClose()
+
+  // Parse the URL and extract model info
+  const { source, modelName } = queueStore.parseModelUrl(urlInput.value)
+
+  // Add download job to queue directly
+  queueStore.addDownloadJob(urlInput.value, modelName, source, 'checkpoint')
+
+  // Emit event to notify parent
+  emit('import-started')
+
+  // Reset and close
+  urlInput.value = ''
+  emit('update:open', false)
 }
 </script>
 
@@ -154,9 +168,9 @@ function handleContinue() {
           <button
             class="h-10 rounded-lg bg-charcoal-600 px-4 text-sm text-white transition-colors hover:bg-charcoal-200/20 disabled:opacity-30"
             :disabled="!isValidUrl"
-            @click="handleContinue"
+            @click="handleImport"
           >
-            Continue
+            Import
           </button>
         </div>
       </div>

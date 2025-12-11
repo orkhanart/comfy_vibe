@@ -1,6 +1,8 @@
 import { ref, computed, shallowRef } from 'vue'
 import { defineStore } from 'pinia'
+import { toast } from 'vue-sonner'
 import { comfyApi } from '@/services/comfyApi'
+import { useModelsStore, type ModelType, type BaseModel } from './modelsStore'
 import type {
   QueueJob,
   QueueJobOutput,
@@ -9,20 +11,28 @@ import type {
   WebSocketMessage,
   ProgressMessage,
   ExecutingMessage,
-  ExecutedMessage
+  ExecutedMessage,
+  DownloadJob,
+  DownloadSource
 } from '@/types/queue'
 
 export const useQueueStore = defineStore('queue', () => {
-  // State
+  // State - Workflow Jobs
   const runningJobs = shallowRef<QueueJob[]>([])
   const pendingJobs = shallowRef<QueueJob[]>([])
   const historyJobs = shallowRef<QueueJob[]>([])
   const isLoading = ref(false)
   const maxHistoryItems = ref(64)
 
+  // State - Download Jobs
+  const downloadJobs = shallowRef<DownloadJob[]>([])
+
   // Auto-queue settings
   const autoQueueMode = ref<AutoQueueMode>('disabled')
   const batchCount = ref(1)
+
+  // UI state
+  const showQueuePanel = ref(false)
 
   // Current execution state
   const currentNodeName = ref<string | null>(null)
@@ -30,7 +40,7 @@ export const useQueueStore = defineStore('queue', () => {
   const totalProgress = ref(0)
   const queueRemaining = ref(0)
 
-  // Computed
+  // Computed - Workflow Jobs
   const allJobs = computed(() => [
     ...runningJobs.value,
     ...pendingJobs.value,
@@ -42,6 +52,34 @@ export const useQueueStore = defineStore('queue', () => {
   const hasRunningJobs = computed(() => runningJobs.value.length > 0)
   const hasPendingJobs = computed(() => pendingJobs.value.length > 0)
   const isExecuting = computed(() => hasRunningJobs.value || hasPendingJobs.value)
+
+  // Computed - Download Jobs
+  const activeDownloads = computed(() =>
+    downloadJobs.value.filter(j => j.state === 'running' || j.state === 'pending')
+  )
+  const downloadHistory = computed(() =>
+    downloadJobs.value.filter(j => j.state === 'completed' || j.state === 'failed' || j.state === 'cancelled')
+  )
+  const runningDownloads = computed(() =>
+    downloadJobs.value.filter(j => j.state === 'running')
+  )
+  const pendingDownloads = computed(() =>
+    downloadJobs.value.filter(j => j.state === 'pending')
+  )
+  const hasActiveDownloads = computed(() => activeDownloads.value.length > 0)
+  const downloadCount = computed(() => activeDownloads.value.length)
+
+  // Computed - Combined (for unified queue view)
+  const allActiveJobs = computed(() => [
+    ...runningJobs.value,
+    ...pendingJobs.value,
+    ...runningDownloads.value,
+    ...pendingDownloads.value
+  ])
+  const totalActiveCount = computed(() =>
+    runningCount.value + pendingCount.value + downloadCount.value
+  )
+  const hasAnyActiveJobs = computed(() => isExecuting.value || hasActiveDownloads.value)
 
   const currentProgressPercent = computed(() => {
     if (currentProgress.value === 0) return 0
@@ -397,6 +435,259 @@ export const useQueueStore = defineStore('queue', () => {
     pendingJobs.value = [...pendingJobs.value, job]
   }
 
+  // ============================================
+  // Download Job Actions
+  // ============================================
+
+  // Helper to format bytes for display
+  function formatBytes(bytes: number): string {
+    if (bytes === 0) return '0 B'
+    const k = 1024
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  let downloadJobCounter = 0
+  let downloadIntervals: Map<string, ReturnType<typeof setInterval>> = new Map()
+
+  function addDownloadJob(
+    sourceUrl: string,
+    modelName: string,
+    source: DownloadSource = 'civitai',
+    modelType?: ModelType,
+    baseModel?: BaseModel
+  ): DownloadJob {
+    const jobId = `download-${++downloadJobCounter}-${Date.now()}`
+    const job: DownloadJob = {
+      id: jobId,
+      type: 'download',
+      state: 'pending',
+      title: modelName,
+      source,
+      sourceUrl,
+      modelName,
+      modelType,
+      baseModel,
+      createdAt: new Date()
+    }
+
+    downloadJobs.value = [job, ...downloadJobs.value]
+
+    // Auto-start if no other download is running
+    if (runningDownloads.value.length === 0) {
+      startNextDownload()
+    }
+
+    // Auto-open queue panel when download starts
+    showQueuePanel.value = true
+
+    return job
+  }
+
+  function startNextDownload(): void {
+    const nextJob = pendingDownloads.value[0]
+    if (!nextJob) return
+
+    // Start the download (simulation for now)
+    simulateDownload(nextJob.id)
+  }
+
+  function simulateDownload(jobId: string): void {
+    const job = downloadJobs.value.find(j => j.id === jobId)
+    if (!job || job.state !== 'pending') return
+
+    // Update to running
+    downloadJobs.value = downloadJobs.value.map(j =>
+      j.id === jobId
+        ? { ...j, state: 'running' as JobState, startedAt: new Date() }
+        : j
+    )
+
+    // Simulate file size (1-5 GB)
+    const totalBytes = Math.floor(Math.random() * 4 * 1024 * 1024 * 1024) + 1024 * 1024 * 1024
+    let downloadedBytes = 0
+
+    const interval = setInterval(() => {
+      // Simulate download speed (10-50 MB/s)
+      const speed = Math.floor(Math.random() * 40 * 1024 * 1024) + 10 * 1024 * 1024
+      downloadedBytes = Math.min(downloadedBytes + speed / 10, totalBytes)
+
+      const percent = Math.round((downloadedBytes / totalBytes) * 100)
+      const eta = Math.round((totalBytes - downloadedBytes) / speed)
+
+      // Update progress
+      downloadJobs.value = downloadJobs.value.map(j =>
+        j.id === jobId
+          ? {
+              ...j,
+              progress: {
+                percent,
+                downloadedBytes,
+                totalBytes,
+                speed,
+                eta
+              }
+            }
+          : j
+      )
+
+      // Check if complete
+      if (downloadedBytes >= totalBytes) {
+        clearInterval(interval)
+        downloadIntervals.delete(jobId)
+
+        // Get job before updating for model store
+        const completedJob = downloadJobs.value.find(j => j.id === jobId)
+
+        // Mark as completed
+        downloadJobs.value = downloadJobs.value.map(j =>
+          j.id === jobId
+            ? {
+                ...j,
+                state: 'completed' as JobState,
+                completedAt: new Date(),
+                progress: { ...j.progress!, percent: 100 },
+                result: {
+                  filePath: `models/checkpoints/${j.modelName.toLowerCase().replace(/\s+/g, '_')}.safetensors`,
+                  fileSize: totalBytes
+                }
+              }
+            : j
+        )
+
+        // Add model to models store
+        if (completedJob) {
+          const modelsStore = useModelsStore()
+          const modelType = completedJob.modelType || 'checkpoint'
+          const baseModel = completedJob.baseModel || 'SDXL'
+
+          modelsStore.addModel({
+            name: completedJob.modelName,
+            type: modelType as ModelType,
+            baseModel: baseModel as BaseModel,
+            size: formatBytes(totalBytes),
+            sizeBytes: totalBytes,
+            version: '1.0',
+            source: 'imported',
+            sourceUrl: completedJob.sourceUrl,
+          })
+
+          // Show success toast
+          toast.success('Model imported successfully', {
+            description: `${completedJob.modelName} (${formatBytes(totalBytes)}) is now available in your library.`,
+          })
+        }
+
+        // Start next download if any
+        startNextDownload()
+      }
+    }, 100)
+
+    downloadIntervals.set(jobId, interval)
+  }
+
+  function cancelDownload(jobId: string): void {
+    const interval = downloadIntervals.get(jobId)
+    if (interval) {
+      clearInterval(interval)
+      downloadIntervals.delete(jobId)
+    }
+
+    downloadJobs.value = downloadJobs.value.map(j =>
+      j.id === jobId
+        ? { ...j, state: 'cancelled' as JobState, completedAt: new Date() }
+        : j
+    )
+
+    // Start next download if this was running
+    startNextDownload()
+  }
+
+  function retryDownload(jobId: string): void {
+    const job = downloadJobs.value.find(j => j.id === jobId)
+    if (!job || (job.state !== 'failed' && job.state !== 'cancelled')) return
+
+    // Reset job state
+    downloadJobs.value = downloadJobs.value.map(j =>
+      j.id === jobId
+        ? { ...j, state: 'pending' as JobState, progress: undefined, errorMessage: undefined }
+        : j
+    )
+
+    // Start if no other download running
+    if (runningDownloads.value.length === 0) {
+      startNextDownload()
+    }
+  }
+
+  function deleteDownload(jobId: string): void {
+    const interval = downloadIntervals.get(jobId)
+    if (interval) {
+      clearInterval(interval)
+      downloadIntervals.delete(jobId)
+    }
+
+    downloadJobs.value = downloadJobs.value.filter(j => j.id !== jobId)
+  }
+
+  function clearDownloadHistory(): void {
+    // Only remove completed/failed/cancelled downloads
+    downloadJobs.value = downloadJobs.value.filter(
+      j => j.state === 'running' || j.state === 'pending'
+    )
+  }
+
+  // Parse model info from CivitAI URL
+  function parseModelUrl(url: string): { source: DownloadSource; modelName: string } {
+    try {
+      const urlObj = new URL(url)
+
+      if (urlObj.hostname.includes('civitai.com')) {
+        // Extract model name from URL path
+        // Format: /models/123456/model-name or /models/123456
+        const pathParts = urlObj.pathname.split('/')
+        const modelIndex = pathParts.indexOf('models')
+        if (modelIndex !== -1 && pathParts[modelIndex + 2]) {
+          // Convert slug to readable name: "flux-1-dev-lora" -> "Flux 1 Dev Lora"
+          const slug = pathParts[modelIndex + 2]
+          const modelName = slug
+            .split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ')
+          return { source: 'civitai', modelName }
+        }
+        const modelId = pathParts[modelIndex + 1] || ''
+        return {
+          source: 'civitai',
+          modelName: `CivitAI Model ${modelId}`
+        }
+      }
+
+      if (urlObj.hostname.includes('huggingface.co')) {
+        const pathParts = urlObj.pathname.split('/').filter(Boolean)
+        // Format: /org/model-name or /model-name
+        const modelName = pathParts.length >= 2
+          ? pathParts[1].split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+          : pathParts[0] || 'HuggingFace Model'
+        return {
+          source: 'huggingface',
+          modelName
+        }
+      }
+
+      return {
+        source: 'url',
+        modelName: urlObj.pathname.split('/').pop() || 'Downloaded Model'
+      }
+    } catch {
+      return {
+        source: 'url',
+        modelName: 'Downloaded Model'
+      }
+    }
+  }
+
   // Helpers
   function getMediaType(filename: string): QueueJobOutput['mediaType'] {
     const ext = filename.split('.').pop()?.toLowerCase()
@@ -429,7 +720,7 @@ export const useQueueStore = defineStore('queue', () => {
   }
 
   return {
-    // State
+    // State - Workflow Jobs
     runningJobs,
     pendingJobs,
     historyJobs,
@@ -442,7 +733,13 @@ export const useQueueStore = defineStore('queue', () => {
     totalProgress,
     queueRemaining,
 
-    // Computed
+    // State - Download Jobs
+    downloadJobs,
+
+    // UI State
+    showQueuePanel,
+
+    // Computed - Workflow Jobs
     allJobs,
     runningCount,
     pendingCount,
@@ -452,7 +749,20 @@ export const useQueueStore = defineStore('queue', () => {
     currentProgressPercent,
     totalProgressPercent,
 
-    // Actions
+    // Computed - Download Jobs
+    activeDownloads,
+    downloadHistory,
+    runningDownloads,
+    pendingDownloads,
+    hasActiveDownloads,
+    downloadCount,
+
+    // Computed - Combined
+    allActiveJobs,
+    totalActiveCount,
+    hasAnyActiveJobs,
+
+    // Actions - Workflow Jobs
     fetchQueue,
     fetchHistory,
     update,
@@ -466,6 +776,14 @@ export const useQueueStore = defineStore('queue', () => {
     setAutoQueueMode,
     setBatchCount,
     getOutputUrl,
+
+    // Actions - Download Jobs
+    addDownloadJob,
+    cancelDownload,
+    retryDownload,
+    deleteDownload,
+    clearDownloadHistory,
+    parseModelUrl,
 
     // Demo mode
     runDemo,

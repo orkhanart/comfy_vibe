@@ -4,6 +4,7 @@ import { Icon } from '@/components/ui/icon'
 import { SidebarTreeCategory, SidebarGridCard } from '@/components/common/sidebar'
 import { ImportModelDialog } from '@/components/common'
 import { MODEL_CATEGORIES_DATA, type ModelCategory, type ModelItem } from '@/data/sidebarMockData'
+import { useModelsStore } from '@/stores/modelsStore'
 
 defineProps<{
   viewMode: 'list' | 'grid'
@@ -11,6 +12,9 @@ defineProps<{
 
 // Import dialog state
 const showImportDialog = ref(false)
+
+// Models store for imported models
+const modelsStore = useModelsStore()
 
 // Tab state: all, core, imported, shared
 const activeTab = ref<'all' | 'core' | 'imported' | 'shared'>('all')
@@ -23,20 +27,44 @@ const modelCategories = ref<(ModelCategory & { source: 'core' | 'imported' | 'sh
   }))
 )
 
+// Create imported category from modelsStore
+const importedCategory = computed<(ModelCategory & { source: 'imported' })>(() => ({
+  id: 'imported-models',
+  icon: 'download',
+  label: 'Imported',
+  expanded: true,
+  source: 'imported' as const,
+  models: modelsStore.importedModels.map(m => ({
+    name: m.id,
+    display: m.name,
+    size: m.size,
+  }))
+}))
+
 // Filtered categories based on tab
 const filteredCategories = computed(() => {
-  let categories = modelCategories.value
+  // Start with core categories (first 3 from mock data)
+  let coreCategories = modelCategories.value.filter(c => c.source === 'core')
+  // Get shared categories (from mock data)
+  let sharedCategories = modelCategories.value.filter(c => c.source === 'shared')
 
   // Filter by tab (source)
   if (activeTab.value === 'core') {
-    categories = categories.filter(c => c.source === 'core')
+    return coreCategories
   } else if (activeTab.value === 'imported') {
-    categories = categories.filter(c => c.source === 'imported')
+    // Show only the real imported models from store
+    return importedCategory.value.models.length > 0 ? [importedCategory.value] : []
   } else if (activeTab.value === 'shared') {
-    categories = categories.filter(c => c.source === 'shared')
+    return sharedCategories
   }
 
-  return categories
+  // 'all' tab - combine everything
+  const allCategories = [...coreCategories]
+  if (importedCategory.value.models.length > 0) {
+    allCategories.push(importedCategory.value)
+  }
+  allCategories.push(...sharedCategories)
+  return allCategories
 })
 
 function toggleCategory(categoryId: string): void {

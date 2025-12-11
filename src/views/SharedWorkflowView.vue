@@ -54,8 +54,8 @@ const { fitView, zoomIn, zoomOut, getViewport } = useVueFlow({ id: 'shared-previ
 const zoomLevel = ref(75)
 
 // Pattern color based on theme
-const patternColor = computed(() => uiStore.themeMode === 'dark' ? '#27272a' : '#e4e4e7')
-const bgPatternColor = computed(() => uiStore.themeMode === 'dark' ? '#1f1f23' : '#f4f4f5')
+const patternColor = computed(() => uiStore.themeMode === 'dark' ? '#27272a' : '#c0c0c0')
+const bgPatternColor = computed(() => uiStore.themeMode === 'dark' ? '#1f1f23' : '#c0c0c0')
 
 // Fetch shared workflow on mount
 onMounted(async () => {

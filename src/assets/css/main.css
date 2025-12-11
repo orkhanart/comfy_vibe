@@ -185,7 +185,7 @@
   --base-foreground: #111827;
   --base-background: #ffffff;
   --muted-foreground: var(--color-neutral-500);
-  --secondary-background: var(--color-neutral-100);
+  --secondary-background: #D3D3D3;
   --secondary-background-hover: var(--color-neutral-200);
   --primary-background: var(--color-comfy-blue-600);
   --primary-background-hover: var(--color-comfy-blue-500);

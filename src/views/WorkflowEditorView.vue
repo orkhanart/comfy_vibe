@@ -60,7 +60,7 @@ watch(
 )
 
 // Dynamic pattern color based on theme
-const patternColor = computed(() => uiStore.themeMode === 'dark' ? '#27272a' : '#d4d4d8')
+const patternColor = computed(() => uiStore.themeMode === 'dark' ? '#27272a' : '#c0c0c0')
 
 // Custom node types for Vue Flow
 const nodeTypes = {

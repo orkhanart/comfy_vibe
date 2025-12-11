@@ -2,6 +2,7 @@
 import { computed, type HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
 import {
+  Activity,
   AlertCircle,
   AlertTriangle,
   Archive,
@@ -75,6 +76,7 @@ import {
   LogOut,
   Mail,
   Maximize,
+  Maximize2,
   Menu,
   MessageSquare,
   Minus,
@@ -86,8 +88,10 @@ import {
   Palette,
   Pause,
   Pencil,
+  PictureInPicture2,
   Pin,
   Play,
+  PlayCircle,
   Plus,
   Power,
   Receipt,
@@ -100,6 +104,7 @@ import {
   Share2,
   Shield,
   Shuffle,
+  SkipForward,
   Sliders,
   SlidersHorizontal,
   SlidersVertical,
@@ -117,9 +122,11 @@ import {
   Users,
   Video,
   Volume2,
+  VolumeX,
   Wallet,
   Workflow,
   X,
+  XCircle,
   Zap,
   type LucideIcon
 } from 'lucide-vue-next'
@@ -141,6 +148,11 @@ const sizeClasses: Record<string, string> = {
 
 // Map icon names to lucide components
 const iconMap: Record<string, LucideIcon> = {
+  // Activity/Status
+  'activity': Activity,
+  'loader-2': Loader2,
+  'play-circle': PlayCircle,
+
   // Navigation
   'chevron-down': ChevronDown,
   'chevron-up': ChevronUp,
@@ -185,7 +197,10 @@ const iconMap: Record<string, LucideIcon> = {
   'play': Play,
   'pause': Pause,
   'stop': Square,
+  'skip-forward': SkipForward,
   'volume-up': Volume2,
+  'volume-2': Volume2,
+  'volume-x': VolumeX,
 
   // Files & Folders
   'file': File,
@@ -253,9 +268,11 @@ const iconMap: Record<string, LucideIcon> = {
   'circle-help': CircleHelp,
   'exclamation-circle': AlertCircle,
   'exclamation-triangle': AlertTriangle,
+  'alert-triangle': AlertTriangle,
   'alert-circle': AlertCircle,
   'check-circle': CheckCircle,
   'times-circle': X,
+  'x-circle': XCircle,
   'verified': CheckCircle,
   'x': X,
 
@@ -281,7 +298,11 @@ const iconMap: Record<string, LucideIcon> = {
   'type': Type,
   'bold': Bold,
   'thumbtack': Pin,
+  'pin': Pin,
   'bookmark': Bookmark,
+  'maximize-2': Maximize2,
+  'picture-in-picture-2': PictureInPicture2,
+  'settings': Settings,
 
   // Billing & Finance
   'credit-card': CreditCard,

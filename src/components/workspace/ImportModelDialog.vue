@@ -10,6 +10,7 @@ import {
   DialogFooter
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { useQueueStore } from '@/stores/queueStore'
 
 const props = defineProps<{
   visible: boolean
@@ -20,12 +21,15 @@ const emit = defineEmits<{
   'import': [modelUrl: string]
 }>()
 
+const queueStore = useQueueStore()
+
 const dialogVisible = computed({
   get: () => props.visible,
   set: (value) => emit('update:visible', value)
 })
 
 const modelUrl = ref('')
+const modelName = ref('')
 const isImporting = ref(false)
 
 const isValidUrl = computed(() => {
@@ -33,9 +37,22 @@ const isValidUrl = computed(() => {
 
   try {
     const url = new URL(modelUrl.value)
-    return url.hostname.includes('civitai.com')
+    return url.hostname.includes('civitai.com') || url.hostname.includes('huggingface.co')
   } catch {
     return false
+  }
+})
+
+// Auto-detect source from URL
+const detectedSource = computed(() => {
+  if (!modelUrl.value) return null
+  try {
+    const url = new URL(modelUrl.value)
+    if (url.hostname.includes('civitai.com')) return 'civitai'
+    if (url.hostname.includes('huggingface.co')) return 'huggingface'
+    return 'url'
+  } catch {
+    return null
   }
 })
 
@@ -43,18 +60,33 @@ function handleImport() {
   if (!isValidUrl.value || isImporting.value) return
 
   isImporting.value = true
+
+  // Parse model info and add to download queue
+  const { source, modelName: parsedName } = queueStore.parseModelUrl(modelUrl.value)
+  const finalName = modelName.value.trim() || parsedName
+
+  queueStore.addDownloadJob(
+    modelUrl.value,
+    finalName,
+    source,
+    'checkpoint' // Default model type
+  )
+
+  // Emit for any parent handling
   emit('import', modelUrl.value)
 
-  // Reset after emit (parent should handle actual import)
+  // Reset and close
   setTimeout(() => {
     isImporting.value = false
     modelUrl.value = ''
+    modelName.value = ''
     dialogVisible.value = false
-  }, 500)
+  }, 300)
 }
 
 function handleClose() {
   modelUrl.value = ''
+  modelName.value = ''
   dialogVisible.value = false
 }
 </script>
@@ -69,7 +101,7 @@ function handleClose() {
 
       <div class="p-5">
         <!-- URL Input -->
-        <div class="mb-5">
+        <div class="mb-4">
           <label class="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
             Model URL
           </label>
@@ -81,17 +113,38 @@ function handleClose() {
             />
             <Input
               v-model="modelUrl"
-              placeholder="https://civitai.com/models/..."
+              placeholder="https://civitai.com/models/... or https://huggingface.co/..."
               class="pl-9"
               @keyup.enter="handleImport"
             />
           </div>
-          <p
-            v-if="modelUrl && !isValidUrl"
-            class="mt-1.5 text-xs text-red-500"
-          >
-            Please enter a valid Civitai URL
-          </p>
+          <div class="mt-1.5 flex items-center gap-2">
+            <p
+              v-if="modelUrl && !isValidUrl"
+              class="text-xs text-red-500"
+            >
+              Please enter a valid CivitAI or HuggingFace URL
+            </p>
+            <div
+              v-else-if="detectedSource"
+              class="flex items-center gap-1 text-xs text-emerald-500"
+            >
+              <Icon name="check" size="xs" />
+              <span class="capitalize">{{ detectedSource }} detected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Model Name (optional) -->
+        <div class="mb-5">
+          <label class="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Model Name <span class="text-muted-foreground">(optional)</span>
+          </label>
+          <Input
+            v-model="modelName"
+            placeholder="Custom name for this model"
+            @keyup.enter="handleImport"
+          />
         </div>
 
         <!-- Import Info -->
@@ -104,13 +157,15 @@ function handleClose() {
             </div>
             <div>
               <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                How to import from Civitai
+                Supported sources
               </p>
               <ul class="mt-1.5 space-y-1 text-xs text-muted-foreground">
-                <li>1. Find a model on Civitai.com</li>
-                <li>2. Copy the model page URL from your browser</li>
-                <li>3. Paste the URL above and click Import</li>
+                <li>• CivitAI (civitai.com/models/...)</li>
+                <li>• HuggingFace (huggingface.co/...)</li>
               </ul>
+              <p class="mt-2 text-xs text-muted-foreground">
+                The download will run in the background. You can continue working while it downloads.
+              </p>
             </div>
           </div>
         </div>

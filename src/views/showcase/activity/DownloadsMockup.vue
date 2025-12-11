@@ -2,527 +2,313 @@
 /**
  * Downloads Mockup
  *
- * Simulates model download manager:
- * - Multiple concurrent downloads
- * - Pause/resume/cancel controls
- * - Progress tracking with speed/ETA
- * - Download history
+ * Replicates the actual ComfyUI download UI:
+ * - Downloads appear in Model Library sidebar (ElectronDownloadItems)
+ * - Each download shows progress bar with pause/resume/cancel (DownloadItem)
+ * - Cancelled/error downloads show removable chip
+ * - Based on electronDownloadStore
  */
 
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Icon } from '@/components/ui/icon'
-import { Progress } from '@/components/ui/progress'
 
-type DownloadState = 'pending' | 'in_progress' | 'paused' | 'completed' | 'cancelled' | 'error'
+// Match ElectronDownload interface from electronDownloadStore.ts
+type DownloadStatus = 'in_progress' | 'paused' | 'completed' | 'cancelled' | 'error'
 
-interface Download {
-  id: string
+interface ElectronDownload {
   url: string
   filename: string
-  folder: string
-  state: DownloadState
-  progress: number
-  downloadedBytes: number
-  totalBytes: number
-  speed: number
-  startedAt?: Date
-  completedAt?: Date
-  error?: string
+  savePath: string
+  progress: number // 0 to 1
+  status: DownloadStatus
 }
 
-const downloads = ref<Download[]>([
+// Mock downloads
+const downloads = ref<ElectronDownload[]>([
   {
-    id: 'd1',
-    url: 'https://huggingface.co/stabilityai/sdxl/resolve/main/sd_xl_base_1.0.safetensors',
-    filename: 'sd_xl_base_1.0.safetensors',
-    folder: 'checkpoints',
-    state: 'in_progress',
-    progress: 34,
-    downloadedBytes: 2.2 * 1024 * 1024 * 1024,
-    totalBytes: 6.46 * 1024 * 1024 * 1024,
-    speed: 45 * 1024 * 1024,
-    startedAt: new Date(Date.now() - 120000),
+    url: 'https://huggingface.co/stabilityai/sd-vae-ft-mse/resolve/main/vae-ft-mse-840000-ema-pruned.safetensors',
+    filename: 'vae-ft-mse-840000-ema-pruned.safetensors',
+    savePath: 'models/vae/vae-ft-mse-840000-ema-pruned.safetensors',
+    progress: 0.45,
+    status: 'in_progress',
   },
   {
-    id: 'd2',
-    url: 'https://civitai.com/models/detail-tweaker-xl',
-    filename: 'detail_tweaker_xl_v1.2.safetensors',
-    folder: 'loras',
-    state: 'in_progress',
-    progress: 78,
-    downloadedBytes: 145 * 1024 * 1024,
-    totalBytes: 186 * 1024 * 1024,
-    speed: 32 * 1024 * 1024,
-    startedAt: new Date(Date.now() - 60000),
+    url: 'https://huggingface.co/runwayml/stable-diffusion-v1-5/resolve/main/v1-5-pruned.safetensors',
+    filename: 'v1-5-pruned.safetensors',
+    savePath: 'models/checkpoints/v1-5-pruned.safetensors',
+    progress: 0.78,
+    status: 'paused',
   },
   {
-    id: 'd3',
-    url: 'https://huggingface.co/madebyollin/sdxl-vae-fp16-fix',
-    filename: 'sdxl_vae_fp16.safetensors',
-    folder: 'vae',
-    state: 'paused',
-    progress: 45,
-    downloadedBytes: 150 * 1024 * 1024,
-    totalBytes: 335 * 1024 * 1024,
-    speed: 0,
-    startedAt: new Date(Date.now() - 180000),
-  },
-  {
-    id: 'd4',
-    url: 'https://civitai.com/models/controlnet-canny',
-    filename: 'controlnet_canny_xl.safetensors',
-    folder: 'controlnet',
-    state: 'pending',
+    url: 'https://huggingface.co/lllyasviel/ControlNet/resolve/main/control_canny.safetensors',
+    filename: 'control_canny.safetensors',
+    savePath: 'models/controlnet/control_canny.safetensors',
     progress: 0,
-    downloadedBytes: 0,
-    totalBytes: 2.5 * 1024 * 1024 * 1024,
-    speed: 0,
+    status: 'cancelled',
   },
 ])
 
-const completedDownloads = ref<Download[]>([
-  {
-    id: 'c1',
-    url: 'https://civitai.com/models/bad-hands',
-    filename: 'bad_hands_5.pt',
-    folder: 'embeddings',
-    state: 'completed',
-    progress: 100,
-    downloadedBytes: 12 * 1024 * 1024,
-    totalBytes: 12 * 1024 * 1024,
-    speed: 0,
-    completedAt: new Date(Date.now() - 600000),
-  },
-  {
-    id: 'c2',
-    url: 'https://huggingface.co/upscale-4x',
-    filename: '4x_ultrasharp.pth',
-    folder: 'upscale_models',
-    state: 'completed',
-    progress: 100,
-    downloadedBytes: 64 * 1024 * 1024,
-    totalBytes: 64 * 1024 * 1024,
-    speed: 0,
-    completedAt: new Date(Date.now() - 1200000),
-  },
-])
+// Computed: in-progress downloads (not completed)
+const inProgressDownloads = computed(() =>
+  downloads.value.filter(d => d.status !== 'completed')
+)
 
-const failedDownloads = ref<Download[]>([
-  {
-    id: 'f1',
-    url: 'https://civitai.com/models/realistic-vision',
-    filename: 'realistic_vision_v6.safetensors',
-    folder: 'checkpoints',
-    state: 'error',
-    progress: 23,
-    downloadedBytes: 0.5 * 1024 * 1024 * 1024,
-    totalBytes: 2.1 * 1024 * 1024 * 1024,
-    speed: 0,
-    error: 'Network error: Connection timed out',
-  },
-])
+// Get label like "vae/vae-ft-mse-840000-ema-pruned.safetensors"
+function getDownloadLabel(savePath: string): string {
+  const parts = savePath.split('/')
+  const name = parts.pop()
+  const dir = parts.pop()
+  return `${dir}/${name}`
+}
 
-// View mode
-const viewMode = ref<'active' | 'completed' | 'failed'>('active')
+// Actions
+function pauseDownload(url: string) {
+  const download = downloads.value.find(d => d.url === url)
+  if (download && download.status === 'in_progress') {
+    download.status = 'paused'
+  }
+}
 
-// Stats
-const stats = computed(() => ({
-  active: downloads.value.filter(d => ['in_progress', 'paused', 'pending'].includes(d.state)).length,
-  completed: completedDownloads.value.length,
-  failed: failedDownloads.value.length,
-  totalSpeed: downloads.value.filter(d => d.state === 'in_progress').reduce((sum, d) => sum + d.speed, 0),
-}))
+function resumeDownload(url: string) {
+  const download = downloads.value.find(d => d.url === url)
+  if (download && download.status === 'paused') {
+    download.status = 'in_progress'
+  }
+}
 
-// Animation
+function cancelDownload(url: string) {
+  const download = downloads.value.find(d => d.url === url)
+  if (download) {
+    download.status = 'cancelled'
+  }
+}
+
+function removeDownload(url: string) {
+  downloads.value = downloads.value.filter(d => d.url !== url)
+}
+
+function addMockDownload() {
+  const models = [
+    { name: 'sd_xl_base_1.0.safetensors', dir: 'checkpoints' },
+    { name: 'clip_l.safetensors', dir: 'clip' },
+    { name: 'control_depth.safetensors', dir: 'controlnet' },
+    { name: 'lora_character.safetensors', dir: 'loras' },
+  ]
+  const model = models[Math.floor(Math.random() * models.length)]
+  downloads.value.push({
+    url: `https://huggingface.co/example/${model.name}`,
+    filename: model.name,
+    savePath: `models/${model.dir}/${model.name}`,
+    progress: 0,
+    status: 'in_progress',
+  })
+}
+
+// Animation: simulate download progress
 let animationInterval: ReturnType<typeof setInterval> | null = null
 
 onMounted(() => {
   animationInterval = setInterval(() => {
-    downloads.value.forEach(d => {
-      if (d.state === 'in_progress') {
-        // Simulate download progress
-        const increment = (d.speed / 10) // per 100ms
-        d.downloadedBytes = Math.min(d.totalBytes, d.downloadedBytes + increment)
-        d.progress = (d.downloadedBytes / d.totalBytes) * 100
-
-        // Vary speed slightly
-        d.speed = d.speed * (0.95 + Math.random() * 0.1)
-
-        // Complete download
-        if (d.progress >= 100) {
-          d.state = 'completed'
-          d.completedAt = new Date()
-          completedDownloads.value.unshift({ ...d })
-          downloads.value = downloads.value.filter(dl => dl.id !== d.id)
-
-          // Start next pending
-          const nextPending = downloads.value.find(dl => dl.state === 'pending')
-          if (nextPending) {
-            nextPending.state = 'in_progress'
-            nextPending.startedAt = new Date()
-            nextPending.speed = 30 * 1024 * 1024 + Math.random() * 20 * 1024 * 1024
-          }
+    downloads.value.forEach(download => {
+      if (download.status === 'in_progress') {
+        download.progress = Math.min(1, download.progress + Math.random() * 0.02)
+        if (download.progress >= 1) {
+          download.status = 'completed'
         }
       }
     })
-  }, 100)
+  }, 200)
 })
 
 onUnmounted(() => {
   if (animationInterval) clearInterval(animationInterval)
 })
 
-// Actions
-function pauseDownload(id: string) {
-  const d = downloads.value.find(dl => dl.id === id)
-  if (d) {
-    d.state = 'paused'
-    d.speed = 0
-  }
-}
-
-function resumeDownload(id: string) {
-  const d = downloads.value.find(dl => dl.id === id)
-  if (d) {
-    d.state = 'in_progress'
-    d.speed = 30 * 1024 * 1024 + Math.random() * 20 * 1024 * 1024
-  }
-}
-
-function cancelDownload(id: string) {
-  downloads.value = downloads.value.filter(d => d.id !== id)
-}
-
-function retryDownload(id: string) {
-  const d = failedDownloads.value.find(dl => dl.id === id)
-  if (d) {
-    failedDownloads.value = failedDownloads.value.filter(dl => dl.id !== id)
-    downloads.value.push({
-      ...d,
-      state: 'pending',
-      progress: 0,
-      downloadedBytes: 0,
-      error: undefined,
-    })
-  }
-}
-
-function removeFromHistory(id: string) {
-  completedDownloads.value = completedDownloads.value.filter(d => d.id !== id)
-}
-
-function clearFailed() {
-  failedDownloads.value = []
-}
-
-function addNewDownload() {
-  const id = `d${Date.now()}`
-  const models = [
-    { filename: 'dreamshaper_xl.safetensors', folder: 'checkpoints', size: 6.5 * 1024 * 1024 * 1024 },
-    { filename: 'film_grain_lora.safetensors', folder: 'loras', size: 150 * 1024 * 1024 },
-    { filename: 'face_restore_v2.pth', folder: 'facerestore', size: 340 * 1024 * 1024 },
-  ]
-  const model = models[Math.floor(Math.random() * models.length)]
-
-  const newDownload: Download = {
-    id,
-    url: `https://example.com/${model.filename}`,
-    filename: model.filename,
-    folder: model.folder,
-    state: downloads.value.some(d => d.state === 'in_progress') ? 'pending' : 'in_progress',
-    progress: 0,
-    downloadedBytes: 0,
-    totalBytes: model.size,
-    speed: 0,
-  }
-
-  if (newDownload.state === 'in_progress') {
-    newDownload.startedAt = new Date()
-    newDownload.speed = 30 * 1024 * 1024 + Math.random() * 20 * 1024 * 1024
-  }
-
-  downloads.value.push(newDownload)
-}
-
-// Formatting
-function formatSize(bytes: number): string {
-  if (bytes >= 1024 * 1024 * 1024) return (bytes / (1024 * 1024 * 1024)).toFixed(2) + ' GB'
-  if (bytes >= 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB'
-  if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB'
-  return bytes + ' B'
-}
-
-function formatSpeed(bytesPerSec: number): string {
-  return formatSize(bytesPerSec) + '/s'
-}
-
-function formatEta(download: Download): string {
-  if (download.speed <= 0) return '--'
-  const remaining = download.totalBytes - download.downloadedBytes
-  const seconds = Math.round(remaining / download.speed)
-  if (seconds < 60) return `${seconds}s`
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`
-  return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`
-}
-
-function formatTime(date: Date): string {
-  const diff = Math.floor((Date.now() - date.getTime()) / 1000)
-  if (diff < 60) return 'Just now'
-  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
-  return date.toLocaleDateString()
-}
-
-function stateIcon(state: DownloadState): string {
-  switch (state) {
-    case 'pending': return 'clock'
-    case 'in_progress': return 'download'
-    case 'paused': return 'pause'
-    case 'completed': return 'check-circle'
-    case 'cancelled': return 'x-circle'
-    case 'error': return 'alert-circle'
-  }
-}
-
-function stateColor(state: DownloadState): string {
-  switch (state) {
-    case 'pending': return 'text-yellow-400'
-    case 'in_progress': return 'text-blue-400'
-    case 'paused': return 'text-orange-400'
-    case 'completed': return 'text-emerald-400'
-    case 'cancelled': return 'text-smoke-600'
-    case 'error': return 'text-red-400'
-  }
-}
+// Mock model folders for tree
+const modelFolders = [
+  { name: 'checkpoints', count: 12, expanded: false },
+  { name: 'clip', count: 4, expanded: false },
+  { name: 'controlnet', count: 8, expanded: false },
+  { name: 'embeddings', count: 23, expanded: false },
+  { name: 'loras', count: 45, expanded: false },
+  { name: 'unet', count: 2, expanded: false },
+  { name: 'vae', count: 6, expanded: true },
+]
 </script>
 
 <template>
-  <div class="min-h-screen bg-charcoal-950">
-    <!-- Header -->
-    <div class="flex items-center justify-between border-b border-charcoal-600 bg-charcoal-900 px-4 py-2">
-      <div class="flex items-center gap-4">
-        <a href="/showcase/activity" class="text-smoke-800 hover:text-white">
-          <Icon name="arrow-left" size="sm" />
-        </a>
-        <h1 class="text-sm font-medium text-white">Download Manager Demo</h1>
+  <div class="flex min-h-screen bg-charcoal-950">
+    <!-- Sidebar: Model Library -->
+    <div class="flex w-[320px] flex-col border-r border-charcoal-600 bg-charcoal-900">
+      <!-- Header -->
+      <div class="flex items-center justify-between border-b border-charcoal-600 px-3 py-2">
+        <div class="flex items-center gap-2">
+          <a href="/showcase/activity" class="text-smoke-800 hover:text-white">
+            <Icon name="arrow-left" size="sm" />
+          </a>
+          <span class="text-sm font-medium text-white">Model Library</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <button class="flex h-7 w-7 items-center justify-center rounded text-smoke-800 hover:bg-charcoal-700 hover:text-white">
+            <Icon name="refresh-cw" size="sm" />
+          </button>
+          <button class="flex h-7 w-7 items-center justify-center rounded text-smoke-800 hover:bg-charcoal-700 hover:text-white">
+            <Icon name="cloud-download" size="sm" />
+          </button>
+        </div>
       </div>
-      <div class="flex items-center gap-4 text-xs">
-        <span v-if="stats.totalSpeed > 0" class="text-blue-400">
-          <Icon name="download" size="sm" class="mr-1 inline" />
-          {{ formatSpeed(stats.totalSpeed) }}
-        </span>
-        <button
-          class="rounded bg-blue-600 px-3 py-1.5 text-white hover:bg-blue-500"
-          @click="addNewDownload"
-        >
-          <Icon name="plus" size="sm" class="mr-1 inline" />
-          Add Download
-        </button>
+
+      <!-- Search -->
+      <div class="border-b border-charcoal-600 p-2">
+        <div class="flex items-center gap-2 rounded bg-charcoal-700 px-2 py-1.5">
+          <Icon name="search" size="sm" class="text-smoke-800" />
+          <input
+            type="text"
+            placeholder="Search models..."
+            class="flex-1 bg-transparent text-xs text-white placeholder-smoke-800 outline-none"
+          />
+        </div>
+      </div>
+
+      <!-- Downloads Section (ElectronDownloadItems) -->
+      <div v-if="inProgressDownloads.length > 0" class="border-b border-charcoal-600 px-4 py-3">
+        <div class="mb-3 text-sm font-medium text-white">In Progress</div>
+
+        <!-- DownloadItem for each download -->
+        <div v-for="download in inProgressDownloads" :key="download.url" class="mb-3">
+          <!-- Label -->
+          <div class="mb-1 truncate text-xs text-white">
+            {{ getDownloadLabel(download.savePath) }}
+          </div>
+
+          <!-- Cancelled/Error state: show chip -->
+          <div v-if="['cancelled', 'error'].includes(download.status)">
+            <div class="mt-1 inline-flex items-center gap-1 rounded bg-red-700 px-2 py-0.5 text-xs text-white">
+              <span>Cancelled</span>
+              <button class="ml-1 hover:text-red-200" @click="removeDownload(download.url)">
+                <Icon name="x" size="xs" />
+              </button>
+            </div>
+          </div>
+
+          <!-- In progress / Paused / Completed: show progress bar -->
+          <div
+            v-if="['in_progress', 'paused', 'completed'].includes(download.status)"
+            class="mt-1 flex items-center gap-2"
+          >
+            <!-- Progress bar (PrimeVue ProgressBar style) -->
+            <div class="relative h-4 flex-1 overflow-hidden rounded bg-charcoal-600">
+              <div
+                class="absolute inset-y-0 left-0 bg-blue-500 transition-[width]"
+                :style="{ width: `${download.progress * 100}%` }"
+              />
+              <span
+                v-if="download.progress > 0.1"
+                class="absolute inset-0 flex items-center justify-center text-[10px] font-medium text-white"
+              >
+                {{ (download.progress * 100).toFixed(1) }}%
+              </span>
+            </div>
+
+            <!-- Pause button (when in_progress) -->
+            <button
+              v-if="download.status === 'in_progress'"
+              class="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-charcoal-600 text-white hover:bg-charcoal-500"
+              title="Pause"
+              @click="pauseDownload(download.url)"
+            >
+              <Icon name="pause" size="xs" />
+            </button>
+
+            <!-- Resume button (when paused) -->
+            <button
+              v-if="download.status === 'paused'"
+              class="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-charcoal-600 text-white hover:bg-charcoal-500"
+              title="Resume"
+              @click="resumeDownload(download.url)"
+            >
+              <Icon name="play" size="xs" />
+            </button>
+
+            <!-- Cancel button (when in_progress or paused) -->
+            <button
+              v-if="['in_progress', 'paused'].includes(download.status)"
+              class="flex h-[22px] w-[22px] items-center justify-center rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30"
+              title="Cancel"
+              @click="cancelDownload(download.url)"
+            >
+              <Icon name="x-circle" size="xs" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model Tree (TreeExplorer) -->
+      <div class="flex-1 overflow-y-auto p-2">
+        <div v-for="folder in modelFolders" :key="folder.name" class="mb-1">
+          <button
+            class="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs hover:bg-charcoal-700"
+            @click="folder.expanded = !folder.expanded"
+          >
+            <Icon
+              :name="folder.expanded ? 'chevron-down' : 'chevron-right'"
+              size="xs"
+              class="text-smoke-800"
+            />
+            <Icon name="folder" size="sm" class="text-yellow-500" />
+            <span class="flex-1 text-white">{{ folder.name }}</span>
+            <span class="rounded bg-charcoal-600 px-1.5 py-0.5 text-[10px] text-smoke-800">
+              {{ folder.count }}
+            </span>
+          </button>
+
+          <!-- Expanded folder contents (mock) -->
+          <div v-if="folder.expanded" class="ml-6 mt-1 space-y-1">
+            <div
+              v-for="i in 3"
+              :key="i"
+              class="flex items-center gap-2 rounded px-2 py-1 text-xs text-smoke-800 hover:bg-charcoal-700 hover:text-white"
+            >
+              <Icon name="file" size="sm" />
+              <span>model_{{ folder.name }}_{{ i }}.safetensors</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="flex h-[calc(100vh-49px)]">
-      <!-- Sidebar -->
-      <div class="flex w-[400px] flex-col border-r border-charcoal-600 bg-charcoal-900">
-        <!-- View tabs -->
-        <div class="flex border-b border-charcoal-600">
+    <!-- Main content area -->
+    <div class="flex-1 p-8">
+      <div class="max-w-xl rounded-lg border border-charcoal-600 bg-charcoal-800 p-6">
+        <h2 class="mb-2 text-sm font-semibold text-white">Model Downloads (Electron Desktop)</h2>
+        <p class="mb-4 text-xs text-smoke-800">
+          This mockup shows how downloads appear in the actual ComfyUI desktop app.
+          Downloads are displayed in the Model Library sidebar, above the folder tree.
+          Each download shows:
+        </p>
+        <ul class="mb-4 space-y-1 text-xs text-smoke-800">
+          <li>• <strong class="text-white">Label:</strong> folder/filename from savePath</li>
+          <li>• <strong class="text-white">Progress bar:</strong> with percentage (PrimeVue ProgressBar)</li>
+          <li>• <strong class="text-white">Pause/Resume:</strong> toggle download state</li>
+          <li>• <strong class="text-white">Cancel:</strong> stops download, shows removable chip</li>
+        </ul>
+
+        <div class="flex gap-2">
           <button
-            v-for="mode in (['active', 'completed', 'failed'] as const)"
-            :key="mode"
-            class="flex-1 px-3 py-2 text-xs font-medium capitalize transition-colors"
-            :class="viewMode === mode
-              ? 'border-b-2 border-blue-500 text-white'
-              : 'text-smoke-800 hover:text-white'"
-            @click="viewMode = mode"
+            class="rounded bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-500"
+            @click="addMockDownload"
           >
-            {{ mode }}
-            <span class="ml-1 rounded bg-charcoal-600 px-1.5 py-0.5 text-xs">
-              {{ mode === 'active' ? stats.active : mode === 'completed' ? stats.completed : stats.failed }}
-            </span>
+            <Icon name="plus" size="sm" class="mr-1 inline" />
+            Add Download
           </button>
         </div>
 
-        <!-- Download list -->
-        <div class="flex-1 overflow-y-auto p-3">
-          <!-- Active downloads -->
-          <template v-if="viewMode === 'active'">
-            <div v-if="downloads.length === 0" class="flex flex-col items-center justify-center py-12 text-smoke-800">
-              <Icon name="inbox" size="xl" class="mb-2 opacity-30" />
-              <p class="text-sm">No active downloads</p>
-            </div>
-
-            <div v-for="download in downloads" :key="download.id" class="mb-3">
-              <div class="rounded-lg border border-charcoal-600 bg-charcoal-800 p-3">
-                <!-- Header row -->
-                <div class="mb-2 flex items-start justify-between">
-                  <div class="flex items-center gap-2">
-                    <Icon
-                      :name="stateIcon(download.state)"
-                      size="sm"
-                      :class="[stateColor(download.state), download.state === 'in_progress' && 'animate-pulse']"
-                    />
-                    <div>
-                      <p class="text-sm text-white">{{ download.filename }}</p>
-                      <p class="text-xs text-smoke-800">{{ download.folder }}/</p>
-                    </div>
-                  </div>
-                  <span class="text-xs capitalize" :class="stateColor(download.state)">
-                    {{ download.state.replace('_', ' ') }}
-                  </span>
-                </div>
-
-                <!-- Progress -->
-                <div v-if="['in_progress', 'paused'].includes(download.state)" class="mb-2">
-                  <div class="mb-1 flex items-center gap-2">
-                    <Progress :model-value="download.progress" class="h-2 flex-1" />
-                    <span class="min-w-[3rem] text-right text-xs text-smoke-800">
-                      {{ Math.round(download.progress) }}%
-                    </span>
-                  </div>
-                  <div class="flex items-center justify-between text-xs text-smoke-800">
-                    <span>{{ formatSize(download.downloadedBytes) }} / {{ formatSize(download.totalBytes) }}</span>
-                    <span v-if="download.state === 'in_progress'">
-                      {{ formatSpeed(download.speed) }} • ETA {{ formatEta(download) }}
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Pending info -->
-                <div v-else-if="download.state === 'pending'" class="mb-2 text-xs text-smoke-800">
-                  {{ formatSize(download.totalBytes) }} • Waiting in queue
-                </div>
-
-                <!-- Controls -->
-                <div class="flex items-center gap-2">
-                  <button
-                    v-if="download.state === 'in_progress'"
-                    class="flex h-7 w-7 items-center justify-center rounded bg-charcoal-600 hover:bg-charcoal-500"
-                    title="Pause"
-                    @click="pauseDownload(download.id)"
-                  >
-                    <Icon name="pause" size="sm" class="text-white" />
-                  </button>
-                  <button
-                    v-if="download.state === 'paused'"
-                    class="flex h-7 w-7 items-center justify-center rounded bg-charcoal-600 hover:bg-charcoal-500"
-                    title="Resume"
-                    @click="resumeDownload(download.id)"
-                  >
-                    <Icon name="play" size="sm" class="text-white" />
-                  </button>
-                  <button
-                    class="flex h-7 w-7 items-center justify-center rounded bg-red-500/20 hover:bg-red-500/30"
-                    title="Cancel"
-                    @click="cancelDownload(download.id)"
-                  >
-                    <Icon name="x" size="sm" class="text-white" />
-                  </button>
-                  <button
-                    class="ml-auto text-xs text-smoke-800 hover:text-white"
-                    title="Copy URL"
-                  >
-                    Copy URL
-                  </button>
-                </div>
-              </div>
-            </div>
-          </template>
-
-          <!-- Completed downloads -->
-          <template v-else-if="viewMode === 'completed'">
-            <div v-if="completedDownloads.length === 0" class="flex flex-col items-center justify-center py-12 text-smoke-800">
-              <Icon name="inbox" size="xl" class="mb-2 opacity-30" />
-              <p class="text-sm">No completed downloads</p>
-            </div>
-
-            <div v-for="download in completedDownloads" :key="download.id" class="mb-2">
-              <div class="flex items-center justify-between rounded-lg border border-charcoal-600 bg-charcoal-800 p-3">
-                <div class="flex items-center gap-2">
-                  <Icon name="check-circle" size="sm" class="text-emerald-400" />
-                  <div>
-                    <p class="text-sm text-white">{{ download.filename }}</p>
-                    <p class="text-xs text-smoke-800">
-                      {{ download.folder }}/ • {{ formatSize(download.totalBytes) }}
-                    </p>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="text-xs text-smoke-800">
-                    {{ download.completedAt ? formatTime(download.completedAt) : '' }}
-                  </span>
-                  <button
-                    class="text-smoke-800 hover:text-red-400"
-                    @click="removeFromHistory(download.id)"
-                  >
-                    <Icon name="x" size="sm" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </template>
-
-          <!-- Failed downloads -->
-          <template v-else>
-            <div v-if="failedDownloads.length === 0" class="flex flex-col items-center justify-center py-12 text-smoke-800">
-              <Icon name="inbox" size="xl" class="mb-2 opacity-30" />
-              <p class="text-sm">No failed downloads</p>
-            </div>
-
-            <div class="mb-3 flex justify-end">
-              <button
-                v-if="failedDownloads.length > 0"
-                class="text-xs text-smoke-800 hover:text-white"
-                @click="clearFailed"
-              >
-                Clear All
-              </button>
-            </div>
-
-            <div v-for="download in failedDownloads" :key="download.id" class="mb-2">
-              <div class="rounded-lg border border-red-500/30 bg-charcoal-800 p-3">
-                <div class="mb-2 flex items-start justify-between">
-                  <div class="flex items-center gap-2">
-                    <Icon name="alert-circle" size="sm" class="text-red-400" />
-                    <div>
-                      <p class="text-sm text-white">{{ download.filename }}</p>
-                      <p class="text-xs text-red-400">{{ download.error }}</p>
-                    </div>
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <button
-                    class="rounded bg-blue-600 px-3 py-1 text-xs text-white hover:bg-blue-500"
-                    @click="retryDownload(download.id)"
-                  >
-                    <Icon name="refresh-cw" size="xs" class="mr-1 inline" />
-                    Retry
-                  </button>
-                  <span class="text-xs text-smoke-800">
-                    {{ Math.round(download.progress) }}% completed before error
-                  </span>
-                </div>
-              </div>
-            </div>
-          </template>
-        </div>
-      </div>
-
-      <!-- Main content -->
-      <div class="flex-1 p-8">
-        <div class="rounded-lg border border-charcoal-600 bg-charcoal-800 p-6">
-          <h2 class="mb-2 text-sm font-semibold text-white">Scenario: Model Download Manager</h2>
-          <p class="mb-4 text-xs text-smoke-800">
-            This mockup simulates the Electron download manager for models. Downloads run
-            concurrently with real-time progress, speed, and ETA tracking.
+        <div class="mt-6 rounded border border-charcoal-600 bg-charcoal-700 p-3">
+          <p class="text-xs text-smoke-800">
+            <strong class="text-yellow-400">Note:</strong> This download UI only appears in the
+            <strong class="text-white">Electron desktop app</strong> (ComfyUI Desktop).
+            The web version uses browser-native downloads.
           </p>
-          <ul class="space-y-1 text-xs text-smoke-800">
-            <li>• Active downloads show progress bars with speed and ETA</li>
-            <li>• Pause/resume individual downloads</li>
-            <li>• Cancel downloads at any time</li>
-            <li>• Failed downloads can be retried</li>
-            <li>• Completed downloads show in history</li>
-            <li>• Downloads queue automatically when limit reached</li>
-          </ul>
         </div>
       </div>
     </div>
